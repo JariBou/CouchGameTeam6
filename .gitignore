@@ -57,6 +57,7 @@ Binaries/Win64/*
 Plugins/*/Binaries/*
 !Plugins/LocalMultiplayerPlugin/Binaries/Win64
 Plugins/LocalMultiplayerPlugin/Binaries/Win64/*
+!Plugins/LocalMultiplayerPlugin/Binaries/Win64/UnrealEditor.modules
 !Plugins/LocalMultiplayerPlugin/Binaries/Win64/UnrealEditor-LocalMultiplayerPlugin.dll
 
 # Builds
