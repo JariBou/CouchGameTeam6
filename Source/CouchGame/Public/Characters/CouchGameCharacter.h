@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class BP_PickableItem_C;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -19,7 +20,7 @@ UCLASS(config=Game)
 class ACouchGameCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
+	
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -47,7 +48,6 @@ class ACouchGameCharacter : public ACharacter
 public:
 	ACouchGameCharacter();
 	
-
 protected:
 
 	/** Called for movement input */
