@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "CouchGameGameMode.h"
-#include "CouchGameCharacter.h"
+#include "CouchGame/Public/CouchGameGameMode.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACouchGameGameMode::ACouchGameGameMode()
