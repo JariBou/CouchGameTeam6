@@ -96,6 +96,11 @@ void ACouchGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	}
 }
 
+void ACouchGameCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
+{
+	PlayerType = TypeOfPlayer;
+}
+
 void ACouchGameCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D

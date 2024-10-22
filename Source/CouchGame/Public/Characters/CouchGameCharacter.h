@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "TypeOfPickable.h"
 #include "CouchGameCharacter.generated.h"
 
 class USpringArmComponent;
@@ -45,9 +46,16 @@ class ACouchGameCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	
 public:
 	ACouchGameCharacter();
+
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<TypeOfPlayer> PlayerType;
+	
+	UFUNCTION(BlueprintCallable, meta=(TypeOfPlayer))
+	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer);
 protected:
 
 	/** Called for movement input */
