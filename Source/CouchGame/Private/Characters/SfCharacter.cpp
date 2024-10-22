@@ -65,8 +65,7 @@ void ASfCharacter::BeginPlay()
 
 	CreateStateMachine();
 	InitStateMachine();
-
-	
+		
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 	//Add Input Mapping Context
@@ -79,6 +78,13 @@ void ASfCharacter::BeginPlay()
 	// }
 }
 
+void ASfCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (StateMachine) StateMachine->Tick(DeltaSeconds);
+}
+
 FVector2D ASfCharacter::GetInputMove() const
 {
 	return InputMove;
@@ -86,6 +92,8 @@ FVector2D ASfCharacter::GetInputMove() const
 
 void ASfCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("AGUGUGAGA")));
+
 	InputMove = InputActionValue.Get<FVector2D>();
 }
 
@@ -143,8 +151,6 @@ TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> ASfCharacter::GetPossi
 void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	//SetupMappingContextIntoController();
 
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComponent == nullptr) return;

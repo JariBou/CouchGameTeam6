@@ -66,6 +66,8 @@ void USfCharacterStateMachine::FindStates()
 		StateSubclass = StatesMap.Find(StateID);
 
 		USfCharacterState* NewState = NewObject<USfCharacterState>(this, *StateSubclass);
+
+		AllStates.Add(NewState);
 	}
 }
 

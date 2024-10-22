@@ -39,14 +39,14 @@ void USfCharacterStateIdle::StateTick(float DeltaTime)
 {
 	Super::StateTick(DeltaTime);
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::Green,
-		TEXT("TICK StateIdle")
-	);
+	// GEngine->AddOnScreenDebugMessage(
+	// 	-1,
+	// 	3.f,
+	// 	FColor::Green,
+	// 	TEXT("TICK StateIdle")
+	// );
 
-	if(Character->GetVelocity().Length() > 0.1f)
+	if(Character->GetInputMove().Length() > 0.1f)
 	{
 		StateMachine->ChangeState(ESfCharacterStateID::Walk);
 	}
