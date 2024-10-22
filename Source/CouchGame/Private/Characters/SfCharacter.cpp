@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "Kismet/KismetStringLibrary.h"
 
@@ -62,14 +63,55 @@ void ASfCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	CreateStateMachine();
+	InitStateMachine();
+
+	
+
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// {
+	// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	// 	{
+	// 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+	// 	}
+	// }
+}
+
+FVector2D ASfCharacter::GetInputMove() const
+{
+	return InputMove;
+}
+
+void ASfCharacter::OnInputMove(const FInputActionValue& InputActionValue)
+{
+	InputMove = InputActionValue.Get<FVector2D>();
+}
+
+void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
+{
+	if (InputData == nullptr) return;
+
+	if(InputData->InputActionMove)
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Started,
+			this,
+			&ASfCharacter::OnInputMove);
+
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Completed,
+			this,
+			&ASfCharacter::OnInputMove);
+
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Triggered,
+			this,
+			&ASfCharacter::OnInputMove);
 	}
 }
 
@@ -100,23 +142,14 @@ TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> ASfCharacter::GetPossi
 
 void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
-		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASfCharacter::Move);
+	//SetupMappingContextIntoController();
 
-		// Looking
-		//EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACouchGameCharacter::Look);
-	}
-	else
-	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
-	}
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent == nullptr) return;
+
+	BindInputMoveAndActions(EnhancedInputComponent);
 }
 
 void ASfCharacter::Move(const FInputActionValue& Value)

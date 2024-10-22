@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+	// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -8,6 +8,7 @@
 #include "Logging/LogMacros.h"
 #include "SfCharacter.generated.h"
 
+	class USfCharacterInputData;
 class USfCharacterState;
 class USfCharacterStateMachine;
 class USpringArmComponent;
@@ -73,6 +74,35 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+#pragma region Input Data / Mapping Context
+
+public:
+	UPROPERTY()
+	TObjectPtr<UInputMappingContext> InputMappingContext;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USfCharacterInputData> InputData;
+
+protected:
+	//void SetupMappingContextIntoController() const;
+	
+#pragma endregion
+
+#pragma region Input Move X
+	
+public:
+	FVector2D GetInputMove() const;
+
+protected:
+	UPROPERTY()
+	FVector2D InputMove = {0.f, 0.f};
+
+private:
+	void OnInputMove(const FInputActionValue& InputActionValue);
+	
+	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
+	
+#pragma endregion 
 
 #pragma region StateMachine
 
