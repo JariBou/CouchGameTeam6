@@ -3,7 +3,7 @@
 
 #include "Pickable.h"
 #include "AssetTypeCategories.h"
-#include "Characters/CouchGameCharacter.h"
+#include "Characters/SfCharacter.h"
 
 
 // Sets default values
@@ -31,7 +31,7 @@ void APickable::Interact_Implementation()
 	GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Blue, TEXT("Interaction With Interface"));
 }
 
-bool APickable::CanPickUp_Implementation(ACouchGameCharacter* CouchGameCharacter)
+bool APickable::CanPickUp_Implementation(ASfCharacter* CouchGameCharacter)
 {
 	TEnumAsByte<TypeOfPlayer> PlayerType = CouchGameCharacter->PlayerType;
 	return PlayerType & TypeOfPickable;

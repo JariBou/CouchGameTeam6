@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/SfCharacter.h"
 #include "UObject/Interface.h"
 #include "Interactions.generated.h"
 
@@ -27,6 +28,6 @@ public:
 	void Interact();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Pickup")
-	bool CanPickUp(ACouchGameCharacter* CouchGameCharacter);
+	bool CanPickUp(ASfCharacter* CouchGameCharacter);
 };
 

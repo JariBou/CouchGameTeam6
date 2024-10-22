@@ -28,7 +28,7 @@ public:
 
 	void Interact_Implementation() override;
 
-	virtual bool CanPickUp_Implementation(ACouchGameCharacter* CouchGameCharacter) override;
+	virtual bool CanPickUp_Implementation(ASfCharacter* CouchGameCharacter) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Bitmask, BitmaskEnum = ETypeOfPickable))
 	int32 TypeOfPickable = 0;
