@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SfCharacterStateID.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "CouchGameCharacter.generated.h"
+#include "SfCharacter.generated.h"
 
+class USfCharacterState;
+class USfCharacterStateMachine;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -17,7 +20,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class ACouchGameCharacter : public ACharacter
+class ASfCharacter : public ACharacter
 {
 	GENERATED_BODY()
 	
@@ -46,7 +49,7 @@ class ACouchGameCharacter : public ACharacter
 	UInputAction* LookAction;
 
 public:
-	ACouchGameCharacter();
+	ASfCharacter();
 	
 protected:
 
@@ -69,5 +72,26 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+
+#pragma region StateMachine
+
+public:
+	void CreateStateMachine();
+
+	void InitStateMachine();
+
+	void TickStateMachine(float DeltaTime) const;
+
+	TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> GetPossibleStates();
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<USfCharacterStateMachine> StateMachine;
+	
+	UPROPERTY(EditAnywhere)
+	TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> PossibleStates;
+	
+#pragma endregion
 };
 

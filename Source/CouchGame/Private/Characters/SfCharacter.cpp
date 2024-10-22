@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "CouchGame/Public/Characters/CouchGameCharacter.h"
+#include "CouchGame/Public/Characters/SfCharacter.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Characters/SfCharacterStateMachine.h"
 #include "Kismet/KismetStringLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -17,7 +18,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // ACouchGameCharacter
 
-ACouchGameCharacter::ACouchGameCharacter()
+ASfCharacter::ASfCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -56,7 +57,7 @@ ACouchGameCharacter::ACouchGameCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
-void ACouchGameCharacter::BeginPlay()
+void ASfCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
@@ -72,10 +73,32 @@ void ACouchGameCharacter::BeginPlay()
 	}
 }
 
+void ASfCharacter::CreateStateMachine()
+{
+	StateMachine = NewObject<USfCharacterStateMachine>(this);
+}
+
+void ASfCharacter::InitStateMachine()
+{
+	if (StateMachine == nullptr) return;
+	StateMachine->Init(this);
+}
+
+void ASfCharacter::TickStateMachine(float DeltaTime) const
+{
+	if (StateMachine == nullptr) return;
+	StateMachine->Tick(DeltaTime);
+}
+
+TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> ASfCharacter::GetPossibleStates()
+{
+	return PossibleStates;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void ACouchGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
@@ -85,7 +108,7 @@ void ACouchGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACouchGameCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASfCharacter::Move);
 
 		// Looking
 		//EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACouchGameCharacter::Look);
@@ -96,7 +119,7 @@ void ACouchGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	}
 }
 
-void ACouchGameCharacter::Move(const FInputActionValue& Value)
+void ASfCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -119,7 +142,7 @@ void ACouchGameCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void ACouchGameCharacter::Look(const FInputActionValue& Value)
+void ASfCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
