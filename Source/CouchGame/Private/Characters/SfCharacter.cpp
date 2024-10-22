@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "CouchGame/Public/Characters/CouchGameCharacter.h"
+#include "CouchGame/Public/Characters/SfCharacter.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Characters/SfCharacterInputData.h"
+#include "Characters/SfCharacterStateMachine.h"
 #include "Kismet/KismetStringLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -17,7 +19,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // ACouchGameCharacter
 
-ACouchGameCharacter::ACouchGameCharacter()
+ASfCharacter::ASfCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -56,52 +58,113 @@ ACouchGameCharacter::ACouchGameCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
-void ACouchGameCharacter::BeginPlay()
+void ASfCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
 
+	CreateStateMachine();
+	InitStateMachine();
+		
+
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// {
+	// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	// 	{
+	// 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+	// 	}
+	// }
+}
+
+void ASfCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (StateMachine) StateMachine->Tick(DeltaSeconds);
+}
+
+FVector2D ASfCharacter::GetInputMove() const
+{
+	return InputMove;
+}
+
+void ASfCharacter::OnInputMove(const FInputActionValue& InputActionValue)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("AGUGUGAGA")));
+
+	InputMove = InputActionValue.Get<FVector2D>();
+}
+
+void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
+{
+	if (InputData == nullptr) return;
+
+	if(InputData->InputActionMove)
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Started,
+			this,
+			&ASfCharacter::OnInputMove);
+
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Completed,
+			this,
+			&ASfCharacter::OnInputMove);
+
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionMove,
+			ETriggerEvent::Triggered,
+			this,
+			&ASfCharacter::OnInputMove);
 	}
+}
+
+void ASfCharacter::CreateStateMachine()
+{
+	StateMachine = NewObject<USfCharacterStateMachine>(this);
+}
+
+void ASfCharacter::InitStateMachine()
+{
+	if (StateMachine == nullptr) return;
+	StateMachine->Init(this);
+}
+
+void ASfCharacter::TickStateMachine(float DeltaTime) const
+{
+	if (StateMachine == nullptr) return;
+	StateMachine->Tick(DeltaTime);
+}
+
+TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> ASfCharacter::GetPossibleStates()
+{
+	return PossibleStates;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void ACouchGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
-		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACouchGameCharacter::Move);
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent == nullptr) return;
 
-		// Looking
-		//EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACouchGameCharacter::Look);
-	}
-	else
-	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
-	}
+	BindInputMoveAndActions(EnhancedInputComponent);
 }
 
-void ACouchGameCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
+
+void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 {
 	PlayerType = TypeOfPlayer;
 }
 
-void ACouchGameCharacter::Move(const FInputActionValue& Value)
+void ASfCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -124,7 +187,7 @@ void ACouchGameCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void ACouchGameCharacter::Look(const FInputActionValue& Value)
+void ASfCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
