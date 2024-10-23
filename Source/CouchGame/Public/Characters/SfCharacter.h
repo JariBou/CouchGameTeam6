@@ -52,11 +52,14 @@ class ASfCharacter : public ACharacter
 
 	
 public:
+	/** Constructeur */
 	ASfCharacter();
-	
+
+	/**Player Type */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<TypeOfPlayer> PlayerType;
-	
+
+	/**Change Player Type */
 	UFUNCTION(BlueprintCallable, meta=(TypeOfPlayer))
 	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer);
 protected:
