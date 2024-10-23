@@ -51,6 +51,16 @@ ASfCharacter* USfCharacterStateMachine::GetCharacter() const
 	return Character;
 }
 
+void USfCharacterStateMachine::SetWantsToRun(bool NewWantsToRun)
+{
+	WantsToRun = NewWantsToRun;
+}
+
+bool USfCharacterStateMachine::GetWantsToRun() const
+{
+	return WantsToRun;
+}
+
 void USfCharacterStateMachine::FindStates()
 {
 	TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> StatesMap = Character->GetPossibleStates();

@@ -12,7 +12,7 @@ class USfCharacterStateMachine;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class COUCHGAME_API USfCharacterState : public UObject
 {
 	GENERATED_BODY()
@@ -39,4 +39,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> Montage;
+
+	UPROPERTY()
+	float PlayerMaxWalkSpeedOnEnter;
 };
