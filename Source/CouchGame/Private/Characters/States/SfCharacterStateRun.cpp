@@ -1,38 +1,36 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Characters/States/SfCharacterStateWalk.h"
+#include "Characters/States/SfCharacterStateRun.h"
 
 #include "Characters/SfCharacter.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-ESfCharacterStateID USfCharacterStateWalk::GetStateID() const
+ESfCharacterStateID USfCharacterStateRun::GetStateID() const
 {
-	return ESfCharacterStateID::Walk;
+	return ESfCharacterStateID::Run;
 }
 
-void USfCharacterStateWalk::StateInit(USfCharacterStateMachine* InStateMachine)
+void USfCharacterStateRun::StateInit(USfCharacterStateMachine* InStateMachine)
 {
 	Super::StateInit(InStateMachine);
 	MovementComponent = Character->FindComponentByClass<UCharacterMovementComponent>();
 }
 
-void USfCharacterStateWalk::StateEnter(ESfCharacterStateID PreviousStateID)
+void USfCharacterStateRun::StateEnter(ESfCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
 
-	Character->GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
-
+	Character->GetCharacterMovement()->MaxWalkSpeed = MaxRunSpeed;
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		3.f,
 		FColor::Green,
-		TEXT("ENTER StateWalk")
-	);
+		TEXT("ENTER StateRun"));
 }
 
-void USfCharacterStateWalk::StateExit(ESfCharacterStateID NextStateID)
+void USfCharacterStateRun::StateExit(ESfCharacterStateID NextStateID)
 {
 	Super::StateExit(NextStateID);
 
@@ -40,22 +38,14 @@ void USfCharacterStateWalk::StateExit(ESfCharacterStateID NextStateID)
 		-1,
 		3.f,
 		FColor::Red,
-		TEXT("EXIT StateWalk")
-	);
+		TEXT("EXIT StateRun"));
 }
 
-void USfCharacterStateWalk::StateTick(float DeltaTime)
+void USfCharacterStateRun::StateTick(float DeltaTime)
 {
 	Super::StateTick(DeltaTime);
 
-	// GEngine->AddOnScreenDebugMessage(
-	// 	-1,
-	// 	3.f,
-	// 	FColor::Red,
-	// 	TEXT("TICK StateWalk")
-	// );
-
-	if(Character->GetInputMove().Length() < 0.1f)
+	if (FMath::Abs(Character->GetInputMove().Length()) < 0.1f)
 	{
 		StateMachine->ChangeState(ESfCharacterStateID::Idle);
 	}
@@ -64,9 +54,9 @@ void USfCharacterStateWalk::StateTick(float DeltaTime)
 		FVector2D InputMove = Character->GetInputMove();
 		Character->AddMovementInput(FVector(InputMove.X, InputMove.Y, 0));
 
-		if(StateMachine->GetWantsToRun())
+		if(!StateMachine->GetWantsToRun())
 		{
-			StateMachine->ChangeState(ESfCharacterStateID::Run);
+			StateMachine->ChangeState(ESfCharacterStateID::Walk);
 		}
 	}
 }

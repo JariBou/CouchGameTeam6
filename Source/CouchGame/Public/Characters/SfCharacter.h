@@ -9,7 +9,7 @@
 #include "TypeOfPickable.h"
 #include "SfCharacter.generated.h"
 
-	class USfCharacterInputData;
+class USfCharacterInputData;
 class USfCharacterState;
 class USfCharacterStateMachine;
 class USpringArmComponent;
@@ -105,6 +105,8 @@ protected:
 
 private:
 	void OnInputMove(const FInputActionValue& InputActionValue);
+
+	void OnInputRun(const FInputActionValue& InputActionValue);
 	
 	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 	

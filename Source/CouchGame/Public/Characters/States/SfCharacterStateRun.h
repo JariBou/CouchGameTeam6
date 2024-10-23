@@ -4,32 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "Characters/SfCharacterState.h"
-#include "SfCharacterStateWalk.generated.h"
+#include "SfCharacterStateRun.generated.h"
 
 class UCharacterMovementComponent;
 /**
  * 
  */
 UCLASS(BlueprintType, Blueprintable, Abstract)
-class COUCHGAME_API USfCharacterStateWalk : public USfCharacterState
+class COUCHGAME_API USfCharacterStateRun : public USfCharacterState
 {
+	GENERATED_BODY()
+
 public:
 	virtual ESfCharacterStateID GetStateID() const override;
 
 	virtual void StateInit(USfCharacterStateMachine* InStateMachine) override;
-	
-	virtual void StateEnter(ESfCharacterStateID PreviousStateID) override;
-	
-	virtual void StateExit(ESfCharacterStateID NextStateID) override;
-	
-	virtual void StateTick(float DeltaTime) override;
 
+	virtual void StateEnter(ESfCharacterStateID PreviousStateID) override;
+
+	virtual void StateExit(ESfCharacterStateID NextStateID) override;
+
+	virtual void StateTick(float DeltaTime) override;
+	
 	UPROPERTY(EditAnywhere)
-	float MaxSpeed = 500.f;
+	float MaxRunSpeed = 1000.f;
 
 	UPROPERTY()
 	TObjectPtr<UCharacterMovementComponent> MovementComponent;
-	
-private:
-	GENERATED_BODY()
 };

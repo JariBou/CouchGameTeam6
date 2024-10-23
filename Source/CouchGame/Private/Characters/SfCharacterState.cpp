@@ -5,6 +5,7 @@
 
 #include "Characters/SfCharacter.h"
 #include "Characters/SfCharacterStateMachine.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 USfCharacterState::USfCharacterState()
 {
@@ -25,10 +26,13 @@ void USfCharacterState::StateInit(USfCharacterStateMachine* InStateMachine)
 void USfCharacterState::StateEnter(ESfCharacterStateID PreviousStateID)
 {
 	Character->PlayAnimMontage(Montage);
+
+	PlayerMaxWalkSpeedOnEnter = Character->GetCharacterMovement()->MaxWalkSpeed;
 }
 
 void USfCharacterState::StateExit(ESfCharacterStateID NextStateID)
 {
+	Character->GetCharacterMovement()->MaxWalkSpeed = PlayerMaxWalkSpeedOnEnter;
 }
 
 void USfCharacterState::StateTick(float DeltaTime)

@@ -92,9 +92,14 @@ FVector2D ASfCharacter::GetInputMove() const
 
 void ASfCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("AGUGUGAGA")));
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("AGUGUGAGA")));
 
 	InputMove = InputActionValue.Get<FVector2D>();
+}
+
+void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
+{
+	StateMachine->SetWantsToRun(InputActionValue.Get<bool>());
 }
 
 void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
@@ -120,6 +125,21 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 			ETriggerEvent::Triggered,
 			this,
 			&ASfCharacter::OnInputMove);
+	}
+
+	if(InputData->InputActionRun)
+	{
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionRun,
+			ETriggerEvent::Started,
+			this,
+			&ASfCharacter::OnInputRun);
+
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionRun,
+			ETriggerEvent::Completed,
+			this,
+			&ASfCharacter::OnInputRun);
 	}
 }
 

@@ -29,6 +29,10 @@ public:
 
 	ASfCharacter* GetCharacter() const;
 
+	void SetWantsToRun(bool NewWantsToRun);
+
+	bool GetWantsToRun() const;
+
 protected:
 	UPROPERTY()
 	TObjectPtr<ASfCharacter> Character;
@@ -41,6 +45,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<USfCharacterState> CurrentState;
+
+	UPROPERTY()
+	bool WantsToRun;
 
 	void FindStates();
 

@@ -48,6 +48,13 @@ void USfCharacterStateIdle::StateTick(float DeltaTime)
 
 	if(Character->GetInputMove().Length() > 0.1f)
 	{
-		StateMachine->ChangeState(ESfCharacterStateID::Walk);
+		if(StateMachine->GetWantsToRun())
+		{
+			StateMachine->ChangeState(ESfCharacterStateID::Run);
+		}
+		else
+		{
+			StateMachine->ChangeState(ESfCharacterStateID::Walk);
+		}
 	}
 }

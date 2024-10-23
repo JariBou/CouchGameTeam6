@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable, Abstract)
 class COUCHGAME_API USfCharacterStateIdle : public USfCharacterState
 {
 public:
