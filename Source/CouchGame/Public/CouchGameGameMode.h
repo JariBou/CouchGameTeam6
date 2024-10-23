@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/SfCharacter.h"
 #include "GameFramework/GameModeBase.h"
 #include "CouchGameGameMode.generated.h"
 
@@ -13,6 +14,14 @@ class ACouchGameGameMode : public AGameModeBase
 
 public:
 	ACouchGameGameMode();
+
+	virtual void BeginPlay() override;
+
+private:
+	void CreateAndInitPlayers() const;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ASfCharacter> SfCharacterBpClass;
 };
 
 

@@ -53,6 +53,7 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
 			EventArgs.Event, EventArgs.AmountDepressed, EventArgs.IsGamepad());
 	}
 
+	// Need this for esc to work
 	return Super::InputKey(EventArgs);
 }
 
@@ -78,5 +79,5 @@ bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInpu
 		UGameplayStatics::GetPlayerController(GetGameInstance()->GetWorld(), PlayerIndex)->InputAxis(Key, Delta, DeltaTime, NumSamples, bGamepad);
 	}
 	
-	return Super::InputAxis(Viewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad);
+	return true;
 }
