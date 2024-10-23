@@ -107,6 +107,8 @@ private:
 	void OnInputMove(const FInputActionValue& InputActionValue);
 
 	void OnInputRun(const FInputActionValue& InputActionValue);
+
+	void OnInputDash(const FInputActionValue& InputActionValue);
 	
 	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 	
