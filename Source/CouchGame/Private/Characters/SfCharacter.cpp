@@ -102,6 +102,18 @@ void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 	StateMachine->SetWantsToRun(InputActionValue.Get<bool>());
 }
 
+void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
+{
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		4.0f,
+		FColor::Yellow,
+		TEXT("OnInputDash"));
+		
+	
+	StateMachine->ChangeState(ESfCharacterStateID::Dash);
+}
+
 void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
 {
 	if (InputData == nullptr) return;
@@ -140,6 +152,21 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 			ETriggerEvent::Completed,
 			this,
 			&ASfCharacter::OnInputRun);
+	}
+
+	if(InputData->InputActionSquireDash)
+	{
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionSquireDash,
+			ETriggerEvent::Started,
+			this,
+			&ASfCharacter::OnInputDash);
+
+		EnhancedInputComponent->BindAction(
+			InputData->InputActionSquireDash,
+			ETriggerEvent::Completed,
+			this,
+			&ASfCharacter::OnInputDash);
 	}
 }
 

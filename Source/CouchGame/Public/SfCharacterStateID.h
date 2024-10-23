@@ -11,6 +11,6 @@ enum class ESfCharacterStateID : uint8
 	Idle = 1,
 	Walk = 2,
 	Run = 3,
-	Jump = 4,
+	Dash = 4,
 	Fall = 5,
 };
