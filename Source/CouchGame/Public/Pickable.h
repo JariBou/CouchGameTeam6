@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Interactions.h"
 #include "TypeOfPickable.h"
+#include "Components/StaticMeshComponent.h"
 #include "Pickable.generated.h"
 
 
@@ -32,4 +33,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Bitmask, BitmaskEnum = ETypeOfPickable))
 	int32 TypeOfPickable = 0;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UStaticMeshComponent* StaticMeshComponent;
 };
