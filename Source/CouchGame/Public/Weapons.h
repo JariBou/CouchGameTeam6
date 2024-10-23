@@ -24,7 +24,8 @@ struct FWeaponStats
 };
 
 USTRUCT()
-struct FWeaponInfo {
+struct FWeaponInfo : public FTableRowBase 
+{
 	GENERATED_BODY()
 		 
 	UPROPERTY(EditAnywhere)
@@ -43,6 +44,7 @@ struct FWeaponInfo {
 	FWeaponStats WeaponStats;
 };
 
+/*
 //Weapons Data Asset
 UCLASS()
 class COUCHGAME_API UWeapons : public UPrimaryDataAsset
@@ -52,3 +54,4 @@ class COUCHGAME_API UWeapons : public UPrimaryDataAsset
 	UPROPERTY(EditAnywhere)
 	TArray<FWeaponInfo> WeaponsList;
 };
+*/
