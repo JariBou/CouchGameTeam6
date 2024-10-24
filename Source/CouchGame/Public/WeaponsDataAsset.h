@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "Weapons.generated.h"
-
+#include "WeaponsDataAsset.generated.h"
 class ASfCharacter;
+
+
 
 UENUM(BlueprintType)
 enum EWeaponRarity : uint8
@@ -46,7 +47,7 @@ struct FWeaponInfo : public FTableRowBase
 	FString ID_Name;
 		 
 	UPROPERTY(EditAnywhere)
-	UStaticMesh* WeaponMesh;
+	TSoftObjectPtr<UStaticMesh> WeaponMesh;
 		 
 	//UPROPERTY(EditAnywhere)
 	//TSubclassOf<ASfCharacter> WeaponBP;
