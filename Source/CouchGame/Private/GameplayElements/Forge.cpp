@@ -28,3 +28,9 @@ void AForge::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+TArray<FName> AForge::GetWeaponNames() const
+{
+	if (WeaponsDataTable == nullptr) return TArray<FName>({"NO DATA TABLE"});
+	return WeaponsDataTable->GetRowNames();
+}
+

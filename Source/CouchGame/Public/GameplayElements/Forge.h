@@ -22,8 +22,8 @@ struct FWeaponsList
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
-	TArray<FWeaponInfo> Weapons;
+	UPROPERTY(EditAnywhere, meta=(GetOptions="GetWeaponNames"))
+	TArray<FName> Weapons;
 
 	UPROPERTY(EditAnywhere)
 	uint8 PercentChance;
@@ -64,8 +64,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
+	TObjectPtr<UDataTable> WeaponsDataTable;
+
+	UPROPERTY(EditAnywhere)
 	TArray<FTransform> SpawnPoints;
 
 	UPROPERTY(EditAnywhere)
 	TMap<TEnumAsByte<EForgeLevel>, FWeaponsRarityList> ForgeMap;
+
+	UFUNCTION()
+	TArray<FName> GetWeaponNames() const;
 };

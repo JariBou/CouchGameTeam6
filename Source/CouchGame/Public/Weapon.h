@@ -26,7 +26,7 @@ public:
 
 #pragma region Data Table
 public:
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta=(RowType = "WeaponInfo"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(RowType = "WeaponInfo"))
 	FDataTableRowHandle Weapon;
 
 	UPROPERTY(BlueprintReadWrite)
