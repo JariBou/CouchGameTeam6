@@ -13,6 +13,7 @@
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "PhysicsEngine/PhysicalAnimationComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -65,6 +66,8 @@ void ASfCharacter::BeginPlay()
 
 	CreateStateMachine();
 	InitStateMachine();
+	SetUpArmsRagdoll();
+	
 		
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
@@ -190,6 +193,22 @@ void ASfCharacter::TickStateMachine(float DeltaTime) const
 TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> ASfCharacter::GetPossibleStates()
 {
 	return PossibleStates;
+}
+
+void ASfCharacter::SetUpArmsRagdoll()
+{
+	if (PhysicalComponent!=nullptr) return;
+
+	UPhysicalAnimationComponent* NewComp = NewObject<UPhysicalAnimationComponent>(this);
+	NewComp->RegisterComponent();
+	PhysicalComponent = NewComp;
+	AddInstanceComponent(PhysicalComponent);
+
+	PhysicalComponent->SetSkeletalMeshComponent(GetMesh());
+	PhysicalComponent->ApplyPhysicalAnimationSettingsBelow(BoneName, PhysicalAnimationData, true);
+	GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
+
+	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Yellow, PhysicalComponent.GetName());
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -7,8 +7,11 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "TypeOfPickable.h"
+#include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+//struct FPhysicalAnimationData;
+class UPhysicalAnimationComponent;
 class USfCharacterInputData;
 class USfCharacterState;
 class USfCharacterStateMachine;
@@ -134,6 +137,23 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> PossibleStates;
+	
+#pragma endregion
+
+#pragma region Arms Ragdoll
+
+public:
+	void SetUpArmsRagdoll() ;
+	
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UPhysicalAnimationComponent> PhysicalComponent;
+
+	UPROPERTY(EditAnywhere)
+	FName BoneName;
+
+	UPROPERTY(EditAnywhere)
+	FPhysicalAnimationData PhysicalAnimationData;
 	
 #pragma endregion
 };
