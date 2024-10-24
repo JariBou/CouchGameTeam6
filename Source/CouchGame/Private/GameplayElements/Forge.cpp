@@ -11,9 +11,8 @@ AForge::AForge()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AForge::SpawnWeaponsAtRandomLocation(UPrimaryDataAsset* WeaponData, int Number)
+void AForge::SpawnWeaponsAtRandomLocation(int NumberToSpawn, int SpawnDelayOfAttempts)
 {
-	// CreateWeapon
 }
 
 // Called when the game starts or when spawned

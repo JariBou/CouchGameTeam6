@@ -8,6 +8,17 @@
 
 class ASfCharacter;
 
+UENUM(BlueprintType)
+enum EWeaponRarity : uint8
+{
+	Common = 0 ,
+	Rare = 1,
+	SuperRare = 2,
+	SuperSuperRare = 3,
+	LegendFuckingDary = 4,
+};
+
+
 USTRUCT()
 struct FWeaponStats
 {
