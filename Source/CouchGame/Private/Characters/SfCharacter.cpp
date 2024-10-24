@@ -99,7 +99,7 @@ void ASfCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 
 void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 {
-	StateMachine->SetWantsToRun(InputActionValue.Get<bool>());
+	StateMachine->SetWantsToRun(InputActionValue.Get<bool>() ? !StateMachine->GetWantsToRun() : StateMachine->GetWantsToRun());
 }
 
 void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
