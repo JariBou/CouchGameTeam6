@@ -36,6 +36,9 @@ struct FWeaponsRarityList
 
 	UPROPERTY(EditAnywhere)
 	TMap<TEnumAsByte<EWeaponRarity>, FWeaponsList> WeaponListRarity;
+	
+	FORCEINLINE       FWeaponsList& operator[](TEnumAsByte<EWeaponRarity> Key) { return WeaponListRarity[Key]; }
+	FORCEINLINE const FWeaponsList& operator[](TEnumAsByte<EWeaponRarity> Key) const { return WeaponListRarity[Key]; }
 };
 
 UCLASS()
@@ -54,6 +57,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Forge")
 	void SpawnWeaponsAtRandomLocation(int NumberToSpawn, int SpawnDelayOfAttempts);
+	void SpawnRandomWeapon();
 
 protected:
 	// Called when the game starts or when spawned
@@ -62,6 +66,9 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<EForgeLevel> ForgeLevel = Level1;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UDataTable> WeaponsDataTable;
