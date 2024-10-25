@@ -26,13 +26,22 @@ public:
 
 #pragma region Data Table
 public:
+	#pragma region Property
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(RowType = "WeaponInfo"))
 	FDataTableRowHandle Weapon;
 
 	UPROPERTY(BlueprintReadWrite)
 	FWeaponInfo CurrentDataRow;
 
+	UPROPERTY(BlueprintReadWrite)
+	uint8 Durability = 0;
+
+	#pragma endregion 
+
 	UFUNCTION(BlueprintCallable)
 	FWeaponInfo& GetDataWeaponRowInfo(FName NameOfRow);
+
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentData(FWeaponInfo NewData);
 #pragma endregion 
 };

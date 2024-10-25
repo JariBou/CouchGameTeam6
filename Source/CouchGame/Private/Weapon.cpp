@@ -29,3 +29,10 @@ FWeaponInfo& AWeapon::GetDataWeaponRowInfo(FName NameOfRow)
 	return *Weapon.DataTable->FindRow<FWeaponInfo>(NameOfRow, "");
 }
 
+void AWeapon::SetCurrentData(FWeaponInfo NewData)
+{
+	CurrentDataRow = NewData;
+	Durability = CurrentDataRow.WeaponStats.Durability;
+	StaticMeshComponent->SetStaticMesh(CurrentDataRow.WeaponMesh.LoadSynchronous());
+}
+
