@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
+#include "Components/PoseableMeshComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 
@@ -86,6 +87,16 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	if (StateMachine) StateMachine->Tick(DeltaSeconds);
+
+	//Clamping Z location between ZLocation of bone where we apply ragdoll and its own ZLocation
+	//float ClampedZLocation = FMath::Clamp(BoneTransformToMove.GetLocation().Z, BoneTransformToApplyRagdoll.GetLocation().Z, BoneTransformToMove.GetLocation().Z);
+	//Create new vector Location
+	//FVector NewClampedLocation = FVector(BoneTransformToMove.GetLocation().X, BoneTransformToMove.GetLocation().Y, ClampedZLocation);
+	//Set new Location
+	//BoneTransformToMove.SetLocation(NewClampedLocation);
+	//Set Bone transform with modifications
+	
+		
 }
 
 FVector2D ASfCharacter::GetInputMove() const
@@ -205,10 +216,13 @@ void ASfCharacter::SetUpArmsRagdoll()
 	AddInstanceComponent(PhysicalComponent);
 
 	PhysicalComponent->SetSkeletalMeshComponent(GetMesh());
-	PhysicalComponent->ApplyPhysicalAnimationSettingsBelow(BoneName, PhysicalAnimationData, true);
-	GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
+	PhysicalComponent->ApplyPhysicalAnimationSettingsBelow(BoneNameToApplyRagdoll, PhysicalAnimationData, true);
+	GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneNameToApplyRagdoll, true, false);
 
+	//BoneTransformToApplyRagdoll = GetMesh()->GetBoneTransform(BoneNameToApplyRagdoll);
+	//BoneTransformToMove = GetMesh()->GetBoneTransform(BoneNameToMove);
 	
+	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Turquoise, BoneTransformToMove.ToHumanReadableString());
 }
 
 //////////////////////////////////////////////////////////////////////////

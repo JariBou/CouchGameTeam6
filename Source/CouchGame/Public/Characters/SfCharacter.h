@@ -10,6 +10,7 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+	class UPoseableMeshComponent;
 //struct FPhysicalAnimationData;
 class UPhysicalAnimationComponent;
 class USfCharacterInputData;
@@ -150,7 +151,16 @@ protected:
 	TObjectPtr<UPhysicalAnimationComponent> PhysicalComponent;
 
 	UPROPERTY(EditAnywhere)
-	FName BoneName;
+	FName BoneNameToApplyRagdoll;
+
+	/*UPROPERTY()
+	FTransform BoneTransformToApplyRagdoll;
+
+	UPROPERTY(EditAnywhere)
+	FName BoneNameToMove;
+
+	UPROPERTY()
+	FTransform BoneTransformToMove;*/
 
 	UPROPERTY(EditAnywhere)
 	FPhysicalAnimationData PhysicalAnimationData;
