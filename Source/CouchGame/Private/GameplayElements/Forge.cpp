@@ -50,7 +50,7 @@ void AForge::SpawnRandomWeapon()
 			FTransform SpawnPointTransform = SpawnPoints[RandomSpawnpointIndex];
 
 			AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), AWeapon::StaticClass(), SpawnPointTransform));
-			NewWeapon->CurrentDataRow = *WeaponInfo;
+			NewWeapon->SetCurrentData(*WeaponInfo);
 			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
 			NewWeapon->FinishSpawning(SpawnPointTransform);
 		}
