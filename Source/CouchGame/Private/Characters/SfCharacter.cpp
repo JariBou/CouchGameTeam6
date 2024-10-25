@@ -208,7 +208,7 @@ void ASfCharacter::SetUpArmsRagdoll()
 	PhysicalComponent->ApplyPhysicalAnimationSettingsBelow(BoneName, PhysicalAnimationData, true);
 	GetMesh()->SetAllBodiesBelowSimulatePhysics(BoneName, true, false);
 
-	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Yellow, PhysicalComponent.GetName());
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
