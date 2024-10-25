@@ -50,8 +50,8 @@ void AForge::SpawnRandomWeapon()
 			FWeaponInfo* WeaponInfo = WeaponsDataTable->FindRow<FWeaponInfo>(WeaponRowName, "");
 
 			float RandomSpawnpointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
-			// FTransform SpawnPointTransform = SpawnPoints[RandomSpawnpointIndex];
-			FTransform SpawnPointTransform = FTransform();
+			FTransform SpawnPointTransform = SpawnPoints[RandomSpawnpointIndex];
+			// FTransform SpawnPointTransform = FTransform();
 
 			AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), AWeapon::StaticClass(), SpawnPointTransform));
 			NewWeapon->SetCurrentData(*WeaponInfo);

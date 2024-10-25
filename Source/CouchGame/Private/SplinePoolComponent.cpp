@@ -32,8 +32,8 @@ TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(const FVector& S
 	ForgeSpline.SplineComponent = NewSplineComponent;
 	
 	NewSplineComponent->ClearSplinePoints();
-	FVector Vector = EndLocation * 1/4 + FVector(0, 0, 1000);
-	FVector Vector2 = EndLocation * 3/4 + FVector(0, 0, 1000);
+	FVector Vector = (EndLocation - StartLocation) * 1/4 + FVector(0, 0, 1000) + StartLocation;
+	FVector Vector2 = (EndLocation - StartLocation) * 3/4 + FVector(0, 0, 1000) + StartLocation;
 
 	NewSplineComponent->AddSplinePoint(StartLocation, ESplineCoordinateSpace::World, false);
 	NewSplineComponent->AddSplinePoint(Vector, ESplineCoordinateSpace::World, false);
