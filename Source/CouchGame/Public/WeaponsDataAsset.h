@@ -26,13 +26,13 @@ struct FWeaponStats
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	uint8 Durability;
+	uint8 Durability = 1;
 
 	UPROPERTY(EditAnywhere)
-	uint32 Damage;
+	uint32 Damage = 1;
 
 	UPROPERTY(EditAnywhere)
-	uint8 DMGMultiplier;
+	uint8 DMGMultiplier = 1;
 };
 
 USTRUCT()
