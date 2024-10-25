@@ -3,6 +3,7 @@
 
 #include "SplinePoolComponent.h"
 
+#include "Weapon.h"
 #include "Components/SplineComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -17,7 +18,7 @@ USplinePoolComponent::USplinePoolComponent()
 	// ...
 }
 
-void USplinePoolComponent::CreateNewSpline(FVector EndLocation)
+TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(FVector EndLocation)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "Spline Created");
 	FTransform RelativeTransform = FTransform();
@@ -29,7 +30,6 @@ void USplinePoolComponent::CreateNewSpline(FVector EndLocation)
 
 	FForgeSpline ForgeSpline;
 	ForgeSpline.SplineComponent = NewSplineComponent;
-	Splines.Add(ForgeSpline);
 	
 	NewSplineComponent->ClearSplinePoints();
 	FVector Vector = EndLocation * 1/4 + FVector(0, 0, 1000);
@@ -43,30 +43,38 @@ void USplinePoolComponent::CreateNewSpline(FVector EndLocation)
 	NewSplineComponent->UpdateSpline();
 
 	NewSplineComponent->SetDrawDebug(true);
-
-	// FVector OutTossVelocity;
-	// UGameplayStatics::SuggestProjectileVelocity(GetOwner()->GetWorld(), OutTossVelocity, FVector(), EndLocation, 100000, true);
-	//
-	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, OutTossVelocity.ToString());
-	//
-	// FPredictProjectilePathParams PredictParams{
-	// 2, FVector(), OutTossVelocity, 2};
-	// PredictParams.TraceChannel = ECC_WorldStatic;
-	// PredictParams.DrawDebugType = EDrawDebugTrace::ForDuration;
-	// PredictParams.DrawDebugTime = 1;
-	//
-	// FPredictProjectilePathResult PredictResults;
-	// UGameplayStatics::PredictProjectilePath(GetOwner()->GetWorld(), PredictParams, PredictResults);
+	
+	return Splines.Add(ForgeSpline);
 }
 
+void USplinePoolComponent::StartSplineForWeapon(AWeapon* ForWeapon, FVector FromLocation, FVector ToLocation)
+{
+	int SplineIndex = -1;
+	for (int i = 0; i < Splines.Num()-1; i++)
+	{
+		if (Splines[i].IsFree)
+		{
+			// Do stuff
+			SplineIndex = i;
+			break;
+		}
+	}
+	if (SplineIndex == -1)
+	{
+		SplineIndex = CreateNewSpline(ToLocation);
+	}
+
+	WeaponSplineIndexMap.Add(ForWeapon, SplineIndex);
+	
+}
 
 // Called when the game starts
 void USplinePoolComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FTimerHandle Handle;
-	GetOwner()->GetWorldTimerManager().SetTimer(Handle, this, &USplinePoolComponent::TempFunc, 2, true);
+	//FTimerHandle Handle;
+	//GetOwner()->GetWorldTimerManager().SetTimer(Handle, this, &USplinePoolComponent::TempFunc, 2, true);
 
 	// ...
 	
@@ -84,6 +92,12 @@ void USplinePoolComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
+	for (TTuple<AWeapon*, int> Pair : WeaponSplineIndexMap)
+	{
+		TObjectPtr<USplineComponent> SplineComponent = Splines[Pair.Value].SplineComponent;
+		FVector Direction = SplineComponent->FindDirectionClosestToWorldLocation(Pair.Key->GetTransform().GetLocation(), ESplineCoordinateSpace::World);
+		Pair.Key->AddActorWorldOffset(Direction);
+	}
 
 	// ...
 }

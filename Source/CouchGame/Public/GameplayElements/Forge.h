@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SplinePoolComponent.h"
 #include "WeaponsDataAsset.h"
 #include "GameFramework/Actor.h"
 #include "Forge.generated.h"
@@ -78,6 +79,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TMap<TEnumAsByte<EForgeLevel>, FWeaponsRarityList> ForgeMap;
+
+	UPROPERTY(VisibleAnywhere)
+	USplinePoolComponent* SplinePoolComponent;
 
 	UFUNCTION()
 	TArray<FName> GetWeaponNames() const;

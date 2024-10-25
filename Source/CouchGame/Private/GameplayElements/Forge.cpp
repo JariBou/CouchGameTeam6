@@ -3,6 +3,7 @@
 
 #include "GameplayElements/Forge.h"
 
+#include "SplinePoolComponent.h"
 #include "Weapon.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -12,6 +13,8 @@ AForge::AForge()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	SplinePoolComponent = CreateDefaultSubobject<USplinePoolComponent>(TEXT("Spline Pool Component"));
 }
 
 void AForge::SpawnWeaponsAtRandomLocation(int NumberToSpawn, int SpawnDelayOfAttempts)
@@ -47,12 +50,15 @@ void AForge::SpawnRandomWeapon()
 			FWeaponInfo* WeaponInfo = WeaponsDataTable->FindRow<FWeaponInfo>(WeaponRowName, "");
 
 			float RandomSpawnpointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
-			FTransform SpawnPointTransform = SpawnPoints[RandomSpawnpointIndex];
+			// FTransform SpawnPointTransform = SpawnPoints[RandomSpawnpointIndex];
+			FTransform SpawnPointTransform = FTransform();
 
 			AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), AWeapon::StaticClass(), SpawnPointTransform));
 			NewWeapon->SetCurrentData(*WeaponInfo);
 			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
 			NewWeapon->FinishSpawning(SpawnPointTransform);
+			
+			SplinePoolComponent->StartSplineForWeapon(NewWeapon, SpawnPointTransform.GetLocation(), GetTransform().GetLocation());
 		}
 	}
 }

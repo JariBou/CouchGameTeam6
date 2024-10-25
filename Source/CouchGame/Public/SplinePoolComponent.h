@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SplinePoolComponent.generated.h"
 
+class AWeapon;
 class USplineComponent;
 
 USTRUCT(BlueprintType)
@@ -30,7 +31,9 @@ public:
 	// Sets default values for this component's properties
 	USplinePoolComponent();
 
-	void CreateNewSpline(FVector EndLocation);
+	TBitsToSizeType<32>::Type CreateNewSpline(FVector EndLocation);
+
+	void StartSplineForWeapon(AWeapon* ForWeapon, FVector FromLocation, FVector ToLocation);
 
 protected:
 	// Called when the game starts
@@ -39,6 +42,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FForgeSpline> Splines;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<AWeapon*, int> WeaponSplineIndexMap;
 
 public:
 	// Called every frame
