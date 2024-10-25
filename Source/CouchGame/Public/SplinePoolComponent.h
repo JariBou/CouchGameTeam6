@@ -31,9 +31,9 @@ public:
 	// Sets default values for this component's properties
 	USplinePoolComponent();
 
-	TBitsToSizeType<32>::Type CreateNewSpline(FVector EndLocation);
+	TBitsToSizeType<32>::Type CreateNewSpline(const FVector& StartLocation, const FVector& EndLocation);
 
-	void StartSplineForWeapon(AWeapon* ForWeapon, FVector FromLocation, FVector ToLocation);
+	void StartSplineForWeapon(AWeapon* ForWeapon, const FVector& FromLocation, const FVector& ToLocation);
 
 protected:
 	// Called when the game starts

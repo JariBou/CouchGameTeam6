@@ -18,7 +18,7 @@ USplinePoolComponent::USplinePoolComponent()
 	// ...
 }
 
-TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(FVector EndLocation)
+TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(const FVector& StartLocation, const FVector& EndLocation)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "Spline Created");
 	FTransform RelativeTransform = FTransform();
@@ -35,7 +35,7 @@ TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(FVector EndLocat
 	FVector Vector = EndLocation * 1/4 + FVector(0, 0, 1000);
 	FVector Vector2 = EndLocation * 3/4 + FVector(0, 0, 1000);
 
-	NewSplineComponent->AddSplinePoint(FVector(), ESplineCoordinateSpace::World, false);
+	NewSplineComponent->AddSplinePoint(StartLocation, ESplineCoordinateSpace::World, false);
 	NewSplineComponent->AddSplinePoint(Vector, ESplineCoordinateSpace::World, false);
 	NewSplineComponent->AddSplinePoint(Vector2, ESplineCoordinateSpace::World, false);
 	NewSplineComponent->AddSplinePoint(EndLocation, ESplineCoordinateSpace::World, false);
@@ -47,7 +47,7 @@ TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(FVector EndLocat
 	return Splines.Add(ForgeSpline);
 }
 
-void USplinePoolComponent::StartSplineForWeapon(AWeapon* ForWeapon, FVector FromLocation, FVector ToLocation)
+void USplinePoolComponent::StartSplineForWeapon(AWeapon* ForWeapon, const FVector& FromLocation, const FVector& ToLocation)
 {
 	int SplineIndex = -1;
 	for (int i = 0; i < Splines.Num()-1; i++)
@@ -61,7 +61,7 @@ void USplinePoolComponent::StartSplineForWeapon(AWeapon* ForWeapon, FVector From
 	}
 	if (SplineIndex == -1)
 	{
-		SplineIndex = CreateNewSpline(ToLocation);
+		SplineIndex = CreateNewSpline(FromLocation, ToLocation);
 	}
 
 	WeaponSplineIndexMap.Add(ForWeapon, SplineIndex);
@@ -82,7 +82,7 @@ void USplinePoolComponent::BeginPlay()
 
 void USplinePoolComponent::TempFunc()
 {
-	CreateNewSpline(GetOwner()->GetTransform().GetLocation());
+	CreateNewSpline(FVector(), GetOwner()->GetTransform().GetLocation());
 }
 
 
