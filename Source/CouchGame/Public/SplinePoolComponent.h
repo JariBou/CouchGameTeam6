@@ -19,7 +19,8 @@ public:
 	TObjectPtr<USplineComponent> SplineComponent;
 
 	UPROPERTY()
-	bool IsFree = true;
+	bool IsFree = false;
+	void DestroySpline();
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))

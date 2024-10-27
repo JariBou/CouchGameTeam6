@@ -50,15 +50,16 @@ void AForge::SpawnRandomWeapon()
 			FWeaponInfo* WeaponInfo = WeaponsDataTable->FindRow<FWeaponInfo>(WeaponRowName, "");
 
 			float RandomSpawnpointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
-			FTransform SpawnPointTransform = SpawnPoints[RandomSpawnpointIndex];
+			FVector SpawnPointLocation = SpawnPoints[RandomSpawnpointIndex].GetLocation();
+			FTransform WeaponSpawnTransform = GetActorTransform();
 			// FTransform SpawnPointTransform = FTransform();
 
-			AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), AWeapon::StaticClass(), SpawnPointTransform));
+			AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), AWeapon::StaticClass(), WeaponSpawnTransform));
 			NewWeapon->SetCurrentData(*WeaponInfo);
 			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
-			NewWeapon->FinishSpawning(SpawnPointTransform);
+			NewWeapon->FinishSpawning(WeaponSpawnTransform);
 			
-			SplinePoolComponent->StartSplineForWeapon(NewWeapon, SpawnPointTransform.GetLocation(), GetTransform().GetLocation());
+			SplinePoolComponent->StartSplineForWeapon(NewWeapon, GetTransform().GetLocation(), SpawnPointLocation);
 		}
 	}
 }

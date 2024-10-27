@@ -8,6 +8,12 @@
 #include "Kismet/GameplayStatics.h"
 
 
+void FForgeSpline::DestroySpline()
+{
+	SplineComponent = nullptr;
+	IsFree = true;
+}
+
 // Sets default values for this component's properties
 USplinePoolComponent::USplinePoolComponent()
 {
@@ -91,13 +97,51 @@ void USplinePoolComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                          FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	TArray<AWeapon*> SplineKeys;
+	WeaponSplineIndexMap.GetKeys(SplineKeys);
 	
-	for (TTuple<AWeapon*, int> Pair : WeaponSplineIndexMap)
+	for (int i = 0; i < SplineKeys.Num(); ++i)
 	{
-		TObjectPtr<USplineComponent> SplineComponent = Splines[Pair.Value].SplineComponent;
-		FVector Direction = SplineComponent->FindDirectionClosestToWorldLocation(Pair.Key->GetTransform().GetLocation(), ESplineCoordinateSpace::World);
-		Pair.Key->AddActorWorldOffset(Direction);
+		AWeapon* Key = SplineKeys[i];
+		int Value = WeaponSplineIndexMap[Key];
+		
+		TObjectPtr<USplineComponent> SplineComponent = Splines[Value].SplineComponent;
+
+		// FVector ClosestToWorldLocation = SplineComponent->FindLocationClosestToWorldLocation(Pair.Key->GetTransform().GetLocation(), ESplineCoordinateSpace::World);
+		FSplinePoint SplinePointAt = SplineComponent->GetSplinePointAt(SplineComponent->GetNumberOfSplinePoints(), ESplineCoordinateSpace::Local);
+		// (GetOwner()->GetActorLocation() + SplinePointAt.Position)   //SplinePointAt.Position returns a local pos SMH 
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, (GetOwner()->GetActorLocation() + SplinePointAt.Position).ToString());
+
+		// DOES NOT WORK
+		if ((Key->GetActorLocation() - (GetOwner()->GetActorLocation() + SplinePointAt.Position)).SquaredLength() < 100*100)
+		{
+			Splines[Value].DestroySpline();
+			WeaponSplineIndexMap.Remove(Key);
+			continue;
+		}
+
+		FVector Direction = SplineComponent->FindDirectionClosestToWorldLocation(Key->GetTransform().GetLocation(), ESplineCoordinateSpace::World);
+		Key->AddActorWorldOffset(Direction);
 	}
+	
+	// for (TTuple<AWeapon*, int> Pair : WeaponSplineIndexMap)
+	// {
+	// 	TObjectPtr<USplineComponent> SplineComponent = Splines[Pair.Value].SplineComponent;
+	//
+	// 	// FVector ClosestToWorldLocation = SplineComponent->FindLocationClosestToWorldLocation(Pair.Key->GetTransform().GetLocation(), ESplineCoordinateSpace::World);
+	// 	FSplinePoint SplinePointAt = SplineComponent->GetSplinePointAt(SplineComponent->GetNumberOfSplinePoints(), ESplineCoordinateSpace::Local);
+	// 	// (GetOwner()->GetActorLocation() + SplinePointAt.Position)   //SplinePointAt.Position returns a local pos SMH 
+	// 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, (GetOwner()->GetActorLocation() + SplinePointAt.Position).ToString());
+	// 	
+	// 	if ((Pair.Key->GetActorLocation() - SplinePointAt.Position).SquaredLength() < 100.f*100.f)
+	// 	{
+	// 		WeaponSplineIndexMap.Remove(Pair.Key);
+	// 		continue;
+	// 	}
+	//
+	// 	FVector Direction = SplineComponent->FindDirectionClosestToWorldLocation(Pair.Key->GetTransform().GetLocation(), ESplineCoordinateSpace::World);
+	// 	Pair.Key->AddActorWorldOffset(Direction);
+	// }
 
 	// ...
 }
