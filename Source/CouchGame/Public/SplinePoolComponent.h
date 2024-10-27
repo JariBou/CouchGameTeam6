@@ -15,12 +15,11 @@ struct FForgeSpline
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> SplineComponent;
 
-	UPROPERTY()
-	bool IsFree = false;
-	void DestroySpline();
+	UPROPERTY(VisibleAnywhere)
+	FVector Destination;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))

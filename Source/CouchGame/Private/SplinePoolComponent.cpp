@@ -5,14 +5,6 @@
 
 #include "Weapon.h"
 #include "Components/SplineComponent.h"
-#include "Kismet/GameplayStatics.h"
-
-
-void FForgeSpline::DestroySpline()
-{
-	SplineComponent = nullptr;
-	IsFree = true;
-}
 
 // Sets default values for this component's properties
 USplinePoolComponent::USplinePoolComponent()
@@ -36,6 +28,7 @@ TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(const FVector& S
 
 	FForgeSpline ForgeSpline;
 	ForgeSpline.SplineComponent = NewSplineComponent;
+	ForgeSpline.Destination = EndLocation;
 	
 	NewSplineComponent->ClearSplinePoints();
 	FVector Vector = (EndLocation - StartLocation) * 1/4 + FVector(0, 0, 1000) + StartLocation;
@@ -56,9 +49,9 @@ TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(const FVector& S
 void USplinePoolComponent::StartSplineForWeapon(AWeapon* ForWeapon, const FVector& FromLocation, const FVector& ToLocation)
 {
 	int SplineIndex = -1;
-	for (int i = 0; i < Splines.Num()-1; i++)
+	for (int i = 0; i < Splines.Num(); i++)
 	{
-		if (Splines[i].IsFree)
+		if ((Splines[i].Destination - ToLocation).SquaredLength() < 10)
 		{
 			// Do stuff
 			SplineIndex = i;
@@ -115,7 +108,6 @@ void USplinePoolComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		// DOES NOT WORK
 		if ((Key->GetActorLocation() - (GetOwner()->GetActorLocation() + SplinePointAt.Position)).SquaredLength() < 100*100)
 		{
-			Splines[Value].DestroySpline();
 			WeaponSplineIndexMap.Remove(Key);
 			continue;
 		}
