@@ -75,22 +75,25 @@ void USplinePoolComponent::StartSplineForWeapon(AWeapon* ForWeapon, const FVecto
 	Container.SetAllChannels(ECR_Ignore);
 	Container.SetResponse(ECC_WorldStatic, ECR_Block);
 	
-	UGameplayStatics::SuggestProjectileVelocity(GetWorld(), TossVelocity, FromLocation, ToLocation, 1000, true, 0, 1.f, ESuggestProjVelocityTraceOption::TraceFullPath, Container, {GetOwner()}, true);
+	// UGameplayStatics::SuggestProjectileVelocity(GetWorld(), TossVelocity, FromLocation, ToLocation, 1000, true, 0, 1.f, ESuggestProjVelocityTraceOption::TraceFullPath, Container, {GetOwner()}, true);
+	UGameplayStatics::SuggestProjectileVelocity_CustomArc(GetWorld(), TossVelocity, FromLocation, ToLocation, 0, 0.3f);
 
 	FPredictProjectilePathParams PredictParams;
 	PredictParams.LaunchVelocity = TossVelocity;
 	PredictParams.StartLocation = FromLocation;
-	PredictParams.OverrideGravityZ = 1.f;
+	PredictParams.OverrideGravityZ = 0;
 	PredictParams.ActorsToIgnore = {GetOwner()};
-	PredictParams.DrawDebugType = EDrawDebugTrace::None;
+	PredictParams.ObjectTypes = {EObjectTypeQuery::ObjectTypeQuery1};
+	PredictParams.DrawDebugType = EDrawDebugTrace::ForDuration;
 	PredictParams.DrawDebugTime = 3;
 	PredictParams.MaxSimTime = 3;
 
 
 	FPredictProjectilePathResult PredictResult;
 	UGameplayStatics::PredictProjectilePath(GetWorld(), PredictParams, PredictResult);
-	
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TossVelocity.ToString());
+
+	Cast<UPrimitiveComponent>(ForWeapon->GetRootComponent())->AddImpulse(TossVelocity, NAME_None, true);
 	
 	
 }
@@ -120,7 +123,7 @@ void USplinePoolComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	TArray<AWeapon*> SplineKeys;
 	WeaponSplineIndexMap.GetKeys(SplineKeys);
-	
+	return;
 	for (int i = 0; i < SplineKeys.Num(); ++i)
 	{
 		for (int j = 0; j < 4; ++j)
