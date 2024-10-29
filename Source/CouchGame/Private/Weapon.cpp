@@ -28,7 +28,7 @@ void AWeapon::Tick(float DeltaTime)
 	m_speed = (GetActorLocation() - m_lastFramePos).Length();
 	m_lastFramePos = GetActorLocation();
 
-	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::SanitizeFloat(GetDamage()));
+	//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::SanitizeFloat(GetDamage()));
 }
 
 float AWeapon::GetDamage() const
