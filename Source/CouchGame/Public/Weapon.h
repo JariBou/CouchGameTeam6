@@ -34,6 +34,9 @@ public:
 	FWeaponInfo CurrentDataRow;
 
 	UPROPERTY(BlueprintReadWrite)
+	int Speed;
+
+	UPROPERTY(BlueprintReadWrite)
 	uint8 Durability = 0;
 
 	#pragma endregion 
