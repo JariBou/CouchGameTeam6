@@ -158,7 +158,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FName BoneNameToMove;
-
+ 
 	UPROPERTY()
 	FTransform BoneTransformToMove;*/
 

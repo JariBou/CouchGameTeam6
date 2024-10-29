@@ -67,7 +67,7 @@ void ASfCharacter::BeginPlay()
 
 	CreateStateMachine();
 	InitStateMachine();
-	SetUpArmsRagdoll();
+	//SetUpArmsRagdoll();
 	
 		
 
