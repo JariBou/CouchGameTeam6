@@ -48,6 +48,9 @@ struct FWeaponInfo : public FTableRowBase
 		 
 	UPROPERTY(EditAnywhere)
 	TSoftObjectPtr<UStaticMesh> WeaponMesh;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AWeapon> WeaponBP;
 		 
 	//UPROPERTY(EditAnywhere)
 	//TSubclassOf<ASfCharacter> WeaponBP;

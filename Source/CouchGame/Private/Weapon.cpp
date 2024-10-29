@@ -24,6 +24,16 @@ void AWeapon::BeginPlay()
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	m_speed = (GetActorLocation() - m_lastFramePos).Length();
+	m_lastFramePos = GetActorLocation();
+
+	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::SanitizeFloat(GetDamage()));
+}
+
+float AWeapon::GetDamage() const
+{
+	return CurrentDataRow.WeaponStats.Damage * m_speed * CurrentDataRow.WeaponStats.DMGMultiplier;
 }
 
 FWeaponInfo& AWeapon::GetDataWeaponRowInfo(FName NameOfRow)

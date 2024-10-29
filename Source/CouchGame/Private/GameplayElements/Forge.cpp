@@ -54,7 +54,7 @@ void AForge::SpawnRandomWeapon()
 			FTransform WeaponSpawnTransform = GetActorTransform();
 			// FTransform SpawnPointTransform = FTransform();
 
-			AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), AWeapon::StaticClass(), WeaponSpawnTransform));
+			AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), WeaponInfo->WeaponBP, WeaponSpawnTransform));
 			NewWeapon->SetCurrentData(*WeaponInfo);
 			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
 			NewWeapon->FinishSpawning(WeaponSpawnTransform);
@@ -78,7 +78,7 @@ void AForge::SpawnRandomWeapon()
 			PredictParams.StartLocation = GetTransform().GetLocation();
 			PredictParams.OverrideGravityZ = 0;
 			PredictParams.ActorsToIgnore = {GetOwner()};
-			PredictParams.ObjectTypes = {EObjectTypeQuery::ObjectTypeQuery1};
+			//PredictParams.ObjectTypes = {EObjectTypeQuery::ObjectTypeQuery1};
 			PredictParams.DrawDebugType = EDrawDebugTrace::ForDuration;
 			PredictParams.DrawDebugTime = 3;
 			PredictParams.MaxSimTime = 3;
