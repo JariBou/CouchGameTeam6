@@ -58,8 +58,39 @@ void AForge::SpawnRandomWeapon()
 			NewWeapon->SetCurrentData(*WeaponInfo);
 			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
 			NewWeapon->FinishSpawning(WeaponSpawnTransform);
-			
-			SplinePoolComponent->StartSplineForWeapon(NewWeapon, GetTransform().GetLocation(), SpawnPointLocation);
+
+			// FVector TrajectVector = SpawnPointLocation - GetActorTransform().GetLocation();
+			// double Distance = TrajectVector.Length();
+			// FVector Direction = FVector(TrajectVector.X, TrajectVector.Y, 0);
+			// Direction.Normalize();
+			//
+			// FVector Normal = Direction * FVector(0, 0, 1);
+			// (Direction, FVector::UpVector);
+			//
+			//
+			// FVector WeaponImpulse = FVector(0, 0, 0);
+
+			FVector TossVelocity;
+			UGameplayStatics::SuggestProjectileVelocity_CustomArc(GetWorld(), TossVelocity, GetTransform().GetLocation(), SpawnPointLocation, 0, 0.3f);
+
+			FPredictProjectilePathParams PredictParams;
+			PredictParams.LaunchVelocity = TossVelocity;
+			PredictParams.StartLocation = GetTransform().GetLocation();
+			PredictParams.OverrideGravityZ = 0;
+			PredictParams.ActorsToIgnore = {GetOwner()};
+			PredictParams.ObjectTypes = {EObjectTypeQuery::ObjectTypeQuery1};
+			PredictParams.DrawDebugType = EDrawDebugTrace::ForDuration;
+			PredictParams.DrawDebugTime = 3;
+			PredictParams.MaxSimTime = 3;
+
+
+			FPredictProjectilePathResult PredictResult;
+			UGameplayStatics::PredictProjectilePath(GetWorld(), PredictParams, PredictResult);
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TossVelocity.ToString());
+
+			Cast<UPrimitiveComponent>(NewWeapon->GetRootComponent())->AddImpulse(TossVelocity, NAME_None, true);
+
+			//SplinePoolComponent->StartSplineForWeapon(NewWeapon, GetTransform().GetLocation(), SpawnPointLocation);
 		}
 	}
 }

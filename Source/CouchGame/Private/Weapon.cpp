@@ -9,13 +9,15 @@ AWeapon::AWeapon()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	//Cast<UPrimitiveComponent>(RootComponent)->SetSimulatePhysics(true);
 }
 
 // Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	StaticMeshComponent->SetSimulatePhysics(true);
 }
 
 // Called every frame
