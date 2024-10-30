@@ -19,6 +19,7 @@ AForge::AForge()
 
 void AForge::SpawnWeaponsAtRandomLocation(int NumberToSpawn, int SpawnDelayOfAttempts)
 {
+	ForgingsDoneThisLevel++;
 	SpawnRandomWeapon();
 	float SpawnDelay = SpawnDelayOfAttempts;
 	for (int i = 0; i < NumberToSpawn-1; i++)
@@ -100,7 +101,22 @@ void AForge::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnWeaponsAtRandomLocation(2, 5);
+	FTimerHandle SpawnDelayTimerHandle;
+	GetGameInstance()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, this, &AForge::ForgeLoop, ForgeMap[ForgeLevel].TimeBetweenForging);;
+}
+
+void AForge::ForgeLoop()
+{
+	FWeaponsRarityList WeaponsRarityList = ForgeMap[ForgeLevel];
+	SpawnWeaponsAtRandomLocation(WeaponsRarityList.NumberOfSpawnedWeapons, WeaponsRarityList.TimeBetweenSpawns);
+
+	if (ForgingsDoneThisLevel >= WeaponsRarityList.UpgradesAfterXForgings)
+	{
+		ForgeLevel = static_cast<EForgeLevel>(ForgeLevel + 1);
+	}
+	
+	FTimerHandle SpawnDelayTimerHandle;
+	GetGameInstance()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, this, &AForge::ForgeLoop, WeaponsRarityList.TimeBetweenForging);
 }
 
 // Called every frame

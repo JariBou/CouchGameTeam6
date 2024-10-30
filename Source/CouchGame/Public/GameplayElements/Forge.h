@@ -37,6 +37,18 @@ struct FWeaponsRarityList
 
 	UPROPERTY(EditAnywhere)
 	TMap<TEnumAsByte<EWeaponRarity>, FWeaponsList> WeaponListRarity;
+
+	UPROPERTY(EditAnywhere)
+	uint8 NumberOfSpawnedWeapons = 1;
+	
+	UPROPERTY(EditAnywhere)
+	float TimeBetweenSpawns = .5f;
+
+	UPROPERTY(EditAnywhere)
+	uint8 TimeBetweenForging = 15;
+
+	UPROPERTY(EditAnywhere)
+	uint8 UpgradesAfterXForgings = 3;
 	
 	FORCEINLINE       FWeaponsList& operator[](TEnumAsByte<EWeaponRarity> Key) { return WeaponListRarity[Key]; }
 	FORCEINLINE const FWeaponsList& operator[](TEnumAsByte<EWeaponRarity> Key) const { return WeaponListRarity[Key]; }
@@ -63,6 +75,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void ForgeLoop();
+
+private:
+	UPROPERTY()
+	uint8 ForgingsDoneThisLevel = 0;
 
 public:
 	// Called every frame
