@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "Components/PoseableMeshComponent.h"
@@ -64,7 +65,7 @@ void ASfCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-
+	
 	CreateStateMachine();
 	InitStateMachine();
 	//SetUpArmsRagdoll();
@@ -97,6 +98,11 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	//Set Bone transform with modifications
 	
 		
+}
+
+void ASfCharacter::SetInputData(USfCharacterInputData* NewInputData)
+{
+	InputData = NewInputData;
 }
 
 FVector2D ASfCharacter::GetInputMove() const
@@ -132,55 +138,85 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 {
 	if (InputData == nullptr) return;
 
-	if(InputData->InputActionMove)
+	if(InputData->InputActionLeftJoystick)
 	{
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionMove,
+			InputData->InputActionLeftJoystick,
 			ETriggerEvent::Started,
 			this,
 			&ASfCharacter::OnInputMove);
 
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionMove,
+			InputData->InputActionLeftJoystick,
 			ETriggerEvent::Completed,
 			this,
 			&ASfCharacter::OnInputMove);
 
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionMove,
+			InputData->InputActionLeftJoystick,
 			ETriggerEvent::Triggered,
 			this,
 			&ASfCharacter::OnInputMove);
 	}
 
-	if(InputData->InputActionRun)
+	if(InputData->InputActionLeftJoystickButton)
 	{
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionRun,
+			InputData->InputActionLeftJoystickButton,
 			ETriggerEvent::Started,
 			this,
 			&ASfCharacter::OnInputRun);
 
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionRun,
+			InputData->InputActionLeftJoystickButton,
 			ETriggerEvent::Completed,
 			this,
 			&ASfCharacter::OnInputRun);
 	}
 
-	if(InputData->InputActionSquireDash)
+	if(InputData->InputActionFaceButtonDown)
 	{
-		EnhancedInputComponent->BindAction(
-			InputData->InputActionSquireDash,
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("face button down"));
+		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Squire Dash bind"));
+			EnhancedInputComponent->BindAction(
+			InputData->InputActionFaceButtonDown,
 			ETriggerEvent::Started,
 			this,
 			&ASfCharacter::OnInputDash);
 
-		EnhancedInputComponent->BindAction(
-			InputData->InputActionSquireDash,
-			ETriggerEvent::Completed,
-			this,
-			&ASfCharacter::OnInputDash);
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionFaceButtonDown,
+				ETriggerEvent::Completed,
+				this,
+				&ASfCharacter::OnInputDash);
+		}
+	}
+
+	if(InputData->InputActionFaceButtonUp)
+	{
+		
+	}
+
+	if(InputData->InputActionFaceButtonRight)
+	{
+		
+	}
+
+	if(InputData->InputActionFaceButtonLeft)
+	{
+		
+	}
+
+	if(InputData->InputActionRightTrigger)
+	{
+		
+	}
+
+	if(InputData->InputActionLeftTrigger)
+	{
+		
 	}
 }
 
@@ -204,6 +240,11 @@ void ASfCharacter::TickStateMachine(float DeltaTime) const
 TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> ASfCharacter::GetPossibleStates()
 {
 	return PossibleStates;
+}
+
+void ASfCharacter::SetPossibleStates(TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> NewPossibleStates)
+{
+	PossibleStates = NewPossibleStates;
 }
 
 void ASfCharacter::SetUpArmsRagdoll()
@@ -235,6 +276,9 @@ void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComponent == nullptr) return;
 
+	SetInputData(GetDefault<UCharacterSettings>()->GetInputDataFromPlayerType(PlayerType));
+	SetPossibleStates(InputData->CharacterStates);
+	
 	BindInputMoveAndActions(EnhancedInputComponent);
 }
 

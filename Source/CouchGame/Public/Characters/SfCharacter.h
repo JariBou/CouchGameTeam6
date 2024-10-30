@@ -10,7 +10,6 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
-	class UPoseableMeshComponent;
 //struct FPhysicalAnimationData;
 class UPhysicalAnimationComponent;
 class USfCharacterInputData;
@@ -98,6 +97,9 @@ public:
 
 protected:
 	//void SetupMappingContextIntoController() const;
+
+private:
+	void SetInputData(USfCharacterInputData* NewInputData);
 	
 #pragma endregion
 
@@ -138,6 +140,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> PossibleStates;
+
+private:
+	void SetPossibleStates(TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> NewPossibleStates);
 	
 #pragma endregion
 
