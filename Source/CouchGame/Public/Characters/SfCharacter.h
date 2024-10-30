@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SfCharacterStateID.h"
+#include "Teams.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "TypeOfPickable.h"
@@ -63,6 +64,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<TypeOfPlayer> PlayerType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETeam> PlayerTeam;
+	
 	/**Change Player Type */
 	UFUNCTION(BlueprintCallable, meta=(TypeOfPlayer))
 	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer);
@@ -164,6 +168,21 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FPhysicalAnimationData PhysicalAnimationData;
+	
+#pragma endregion
+
+#pragma region Health
+
+private:
+	UPROPERTY(EditAnywhere)
+	uint8 MaxHealth = 100;
+
+	UPROPERTY(EditAnywhere)
+	float Health;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void TakeDamage(ASfCharacter* DmgDealer, float Amount);
 	
 #pragma endregion
 };

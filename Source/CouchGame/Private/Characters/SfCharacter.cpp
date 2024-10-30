@@ -13,7 +13,9 @@
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "Components/PoseableMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Modes/SfGameMode.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -72,6 +74,8 @@ void ASfCharacter::BeginPlay()
 		
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
+
+	Health = MaxHealth;
 	//Add Input Mapping Context
 	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	// {
@@ -223,6 +227,17 @@ void ASfCharacter::SetUpArmsRagdoll()
 	//BoneTransformToMove = GetMesh()->GetBoneTransform(BoneNameToMove);
 	
 	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Turquoise, BoneTransformToMove.ToHumanReadableString());
+}
+
+void ASfCharacter::TakeDamage(ASfCharacter* DmgDealer, float Amount)
+{
+	Health -= Amount;
+	
+	if (Health <= 0)
+	{
+		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
