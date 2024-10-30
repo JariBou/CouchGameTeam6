@@ -39,9 +39,11 @@ void ASfGameMode::BeginPlay()
 	}
 }
 
-void ASfGameMode::OnPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
+void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 {
 	TeamScoreMap[Killer->PlayerTeam]++;
+
+	Dead->Destroy();
 }
 
 bool ASfGameMode::CheckEndOfGame()

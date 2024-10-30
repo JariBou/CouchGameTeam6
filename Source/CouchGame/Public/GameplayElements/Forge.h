@@ -42,7 +42,7 @@ struct FWeaponsRarityList
 	uint8 NumberOfSpawnedWeapons = 1;
 	
 	UPROPERTY(EditAnywhere)
-	float TimeBetweenSpawns = .5f;
+	uint8 TimeBetweenSpawns = 1;
 
 	UPROPERTY(EditAnywhere)
 	uint8 TimeBetweenForging = 15;

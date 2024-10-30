@@ -170,5 +170,20 @@ protected:
 	FPhysicalAnimationData PhysicalAnimationData;
 	
 #pragma endregion
+
+#pragma region Health
+
+private:
+	UPROPERTY(EditAnywhere)
+	uint8 MaxHealth = 100;
+
+	UPROPERTY(EditAnywhere)
+	float Health;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void TakeDamage(ASfCharacter* DmgDealer, float Amount);
+	
+#pragma endregion
 };
 

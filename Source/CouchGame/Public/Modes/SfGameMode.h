@@ -17,14 +17,15 @@ class COUCHGAME_API ASfGameMode : public AGameModeBase
 {
 public:
 	ASfGameMode();
-
+	UFUNCTION(BlueprintCallable)
+	void NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead);
+	
 private:
 	GENERATED_BODY()
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	void OnPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead);
+	
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckEndOfGame();
