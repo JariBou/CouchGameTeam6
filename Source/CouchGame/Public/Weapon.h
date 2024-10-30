@@ -24,6 +24,21 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+#pragma region DamageLogic
+
+public:
+	UFUNCTION(BlueprintCallable)
+	float GetDamage() const;
+
+private:
+	UPROPERTY()
+	FVector m_lastFramePos;
+
+	UPROPERTY()
+	float m_speed;
+	
+#pragma endregion
+
 #pragma region Data Table
 public:
 	#pragma region Property
