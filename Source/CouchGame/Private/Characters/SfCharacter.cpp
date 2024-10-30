@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "SfCharacterState.h"
+#include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "Components/PoseableMeshComponent.h"
@@ -65,6 +67,8 @@ void ASfCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	InputData = GetDefault<UCharacterSettings>()->GetInputDataFromPlayerType(PlayerType);
+	
 	CreateStateMachine();
 	InitStateMachine();
 	//SetUpArmsRagdoll();
@@ -132,55 +136,58 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 {
 	if (InputData == nullptr) return;
 
-	if(InputData->InputActionMove)
+	if(InputData->InputActionLeftJoystick)
 	{
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionMove,
+			InputData->InputActionLeftJoystick,
 			ETriggerEvent::Started,
 			this,
 			&ASfCharacter::OnInputMove);
 
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionMove,
+			InputData->InputActionLeftJoystick,
 			ETriggerEvent::Completed,
 			this,
 			&ASfCharacter::OnInputMove);
 
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionMove,
+			InputData->InputActionLeftJoystick,
 			ETriggerEvent::Triggered,
 			this,
 			&ASfCharacter::OnInputMove);
 	}
 
-	if(InputData->InputActionRun)
+	if(InputData->InputActionLeftJoystickButton)
 	{
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionRun,
+			InputData->InputActionLeftJoystickButton,
 			ETriggerEvent::Started,
 			this,
 			&ASfCharacter::OnInputRun);
 
 		EnhancedInputComponent->BindAction(
-			InputData->InputActionRun,
+			InputData->InputActionLeftJoystickButton,
 			ETriggerEvent::Completed,
 			this,
 			&ASfCharacter::OnInputRun);
 	}
 
-	if(InputData->InputActionSquireDash)
+	if(InputData->InputActionFaceButtonDown)
 	{
-		EnhancedInputComponent->BindAction(
-			InputData->InputActionSquireDash,
+		if(PlayerType == TypeOfPlayer::Squire)
+		{
+			EnhancedInputComponent->BindAction(
+			InputData->InputActionFaceButtonDown,
 			ETriggerEvent::Started,
 			this,
 			&ASfCharacter::OnInputDash);
 
-		EnhancedInputComponent->BindAction(
-			InputData->InputActionSquireDash,
-			ETriggerEvent::Completed,
-			this,
-			&ASfCharacter::OnInputDash);
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionFaceButtonDown,
+				ETriggerEvent::Completed,
+				this,
+				&ASfCharacter::OnInputDash);
+		}
 	}
 }
 

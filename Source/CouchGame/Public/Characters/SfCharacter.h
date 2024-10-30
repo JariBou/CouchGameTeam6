@@ -1,14 +1,12 @@
 	// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-
-#include "CoreMinimal.h"
 #include "SfCharacterStateID.h"
-#include "GameFramework/Character.h"
-#include "Logging/LogMacros.h"
 #include "TypeOfPickable.h"
+#include "GameFramework/Character.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
+
 
 	class UPoseableMeshComponent;
 //struct FPhysicalAnimationData;
@@ -133,6 +131,7 @@ public:
 	TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> GetPossibleStates();
 
 protected:
+	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<USfCharacterStateMachine> StateMachine;
 	
