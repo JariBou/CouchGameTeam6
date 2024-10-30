@@ -6,8 +6,6 @@
 #include "Engine/DataAsset.h"
 #include "SfCharacterInputData.generated.h"
 
-class USfCharacterState;
-enum class ESfCharacterStateID : uint8;
 class UInputAction;
 /**
  * 
@@ -19,32 +17,29 @@ class COUCHGAME_API USfCharacterInputData : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionLeftJoystick;
+	TObjectPtr<UInputAction> InputActionMove;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionLeftJoystickButton;
+	TObjectPtr<UInputAction> InputActionRun;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionRightJoystick;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionFaceButtonUp;
+	TObjectPtr<UInputAction> InputActionPickUpAndThrow;
 	
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionFaceButtonRight;
+	TObjectPtr<UInputAction> InputActionKnightWeapon;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionFaceButtonLeft;
+	TObjectPtr<UInputAction> InputActionKnightDodge;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionFaceButtonDown;
+	TObjectPtr<UInputAction> InputActionSquireInteract;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionRightTrigger;
+	TObjectPtr<UInputAction> InputActionSquireDash;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UInputAction> InputActionLeftTrigger;
+	TObjectPtr<UInputAction> InputActionSquireSlap;
 
 	UPROPERTY(EditAnywhere)
-	TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> CharacterStates;
+	TObjectPtr<UInputAction> InputActionSquireTaunt;
 };

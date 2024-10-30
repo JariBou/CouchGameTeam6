@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DeveloperSettings.h"
 #include "LocalMultiplayerSettings.generated.h"
 
 UENUM()
