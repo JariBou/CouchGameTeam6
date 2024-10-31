@@ -19,7 +19,7 @@ public:
 	TObjectPtr<USplineComponent> SplineComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	FVector Destination;
+	FVector Destination = FVector::ZeroVector;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))

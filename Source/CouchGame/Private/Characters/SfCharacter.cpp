@@ -270,7 +270,7 @@ void ASfCharacter::SetUpArmsRagdoll()
 	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Turquoise, BoneTransformToMove.ToHumanReadableString());
 }
 
-void ASfCharacter::TakeDamage(ASfCharacter* DmgDealer, float Amount)
+void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
 	Health -= Amount;
 	

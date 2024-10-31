@@ -32,8 +32,11 @@ public:
 	virtual bool CanPickUp_Implementation(ASfCharacter* CouchGameCharacter) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Bitmask, BitmaskEnum = ETypeOfPickable))
-	int32 TypeOfPickable = 0;
+	int32 PickableType = 0;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<ASfCharacter> Holder;
 };

@@ -2,7 +2,6 @@
 
 
 #include "Pickable.h"
-#include "AssetTypeCategories.h"
 #include "Characters/SfCharacter.h"
 
 
@@ -34,6 +33,6 @@ void APickable::Interact_Implementation()
 bool APickable::CanPickUp_Implementation(ASfCharacter* CouchGameCharacter)
 {
 	TEnumAsByte<TypeOfPlayer> PlayerType = CouchGameCharacter->PlayerType;
-	return PlayerType & TypeOfPickable;
+	return PlayerType & PickableType;
 }
 

@@ -187,7 +187,7 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void TakeDamage(ASfCharacter* DmgDealer, float Amount);
+	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
 	
 #pragma endregion
 };
