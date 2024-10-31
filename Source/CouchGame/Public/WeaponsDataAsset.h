@@ -20,42 +20,42 @@ enum EWeaponRarity : uint8
 };
 
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FWeaponStats
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 Durability = 1;
 
-	UPROPERTY(EditAnywhere)
-	uint32 Damage = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Damage = 1;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 DMGMultiplier = 1;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FWeaponInfo : public FTableRowBase 
 {
 	GENERATED_BODY()
 		 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString WeaponName;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ID_Name;
 		 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<UStaticMesh> WeaponMesh;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AWeapon> WeaponBP;
 		 
 	//UPROPERTY(EditAnywhere)
 	//TSubclassOf<ASfCharacter> WeaponBP;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FWeaponStats WeaponStats;
 };
 
