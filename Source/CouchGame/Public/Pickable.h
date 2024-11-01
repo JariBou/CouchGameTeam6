@@ -27,7 +27,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Interact_Implementation() override;
+	void Interact_Implementation(ASfCharacter* CouchGameCharacter) override;
 
 	virtual bool CanPickUp_Implementation(ASfCharacter* CouchGameCharacter) override;
 

@@ -25,9 +25,10 @@ void APickable::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void APickable::Interact_Implementation()
+void APickable::Interact_Implementation(ASfCharacter* CouchGameCharacter)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Blue, TEXT("Interaction With Interface"));
+	if (CouchGameCharacter != nullptr) Holder = CouchGameCharacter;
 }
 
 bool APickable::CanPickUp_Implementation(ASfCharacter* CouchGameCharacter)
