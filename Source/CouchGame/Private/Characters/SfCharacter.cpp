@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Camera/CameraWorldSubsystem.h"
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
@@ -87,6 +88,8 @@ void ASfCharacter::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 
 	Health = MaxHealth;
+	
+	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->AddFollowTarget(this);
 	//Add Input Mapping Context
 	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	// {
