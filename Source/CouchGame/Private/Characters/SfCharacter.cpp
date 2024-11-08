@@ -24,6 +24,16 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // ACouchGameCharacter
 
+FVector ASfCharacter::GetFollowTarget()
+{
+	return GetActorLocation();
+}
+
+bool ASfCharacter::IsFollowable()
+{
+	return true;
+}
+
 ASfCharacter::ASfCharacter()
 {
 	// Set size for collision capsule

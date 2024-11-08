@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "TypeOfPickable.h"
+#include "Camera/CameraFollowTarget.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
@@ -26,10 +27,19 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class ASfCharacter : public ACharacter
+class ASfCharacter : public ACharacter, public ICameraFollowTarget
 {
+
+#pragma region CameraFollowTarget
+public:
+	virtual FVector GetFollowTarget() override;
+	virtual bool IsFollowable() override;
+
+#pragma endregion
+
+private:
 	GENERATED_BODY()
-	
+
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
