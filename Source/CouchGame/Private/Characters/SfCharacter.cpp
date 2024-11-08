@@ -91,8 +91,8 @@ void ASfCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (StateMachine) StateMachine->Tick(DeltaSeconds);
-
+	if (StateMachine) StateMachine->Tick(DeltaSeconds);	
+	
 	//Clamping Z location between ZLocation of bone where we apply ragdoll and its own ZLocation
 	//float ClampedZLocation = FMath::Clamp(BoneTransformToMove.GetLocation().Z, BoneTransformToApplyRagdoll.GetLocation().Z, BoneTransformToMove.GetLocation().Z);
 	//Create new vector Location
@@ -142,7 +142,7 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 {
 	if (InputData == nullptr) return;
 
-	if(InputData->InputActionLeftJoystick)
+	if(InputData->InputActionLeftJoystick) //Move
 	{
 		EnhancedInputComponent->BindAction(
 			InputData->InputActionLeftJoystick,
@@ -163,7 +163,7 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 			&ASfCharacter::OnInputMove);
 	}
 
-	if(InputData->InputActionLeftJoystickButton)
+	if(InputData->InputActionLeftJoystickButton) // Run
 	{
 		EnhancedInputComponent->BindAction(
 			InputData->InputActionLeftJoystickButton,
@@ -178,47 +178,43 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 			&ASfCharacter::OnInputRun);
 	}
 
-	if(InputData->InputActionFaceButtonDown)
+	if(InputData->InputActionFaceButtonDown) // Squire : Dash,   Knight : Dodge
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("face button down"));
-		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Squire Dash bind"));
-			EnhancedInputComponent->BindAction(
+		EnhancedInputComponent->BindAction(
+		InputData->InputActionFaceButtonDown,
+		ETriggerEvent::Started,
+		this,
+		&ASfCharacter::OnInputDash);
+
+		EnhancedInputComponent->BindAction(
 			InputData->InputActionFaceButtonDown,
-			ETriggerEvent::Started,
+			ETriggerEvent::Completed,
 			this,
 			&ASfCharacter::OnInputDash);
-
-			EnhancedInputComponent->BindAction(
-				InputData->InputActionFaceButtonDown,
-				ETriggerEvent::Completed,
-				this,
-				&ASfCharacter::OnInputDash);
-		}
+	
 	}
 
-	if(InputData->InputActionFaceButtonUp)
+	if(InputData->InputActionFaceButtonUp) // Squire : Interact
 	{
 		
 	}
 
-	if(InputData->InputActionFaceButtonRight)
+	if(InputData->InputActionFaceButtonRight) // Squire : Interact
 	{
 		
 	}
 
-	if(InputData->InputActionFaceButtonLeft)
+	if(InputData->InputActionFaceButtonLeft) // Squire : Take, Give, Throw,      Knight : Take, Throw
 	{
 		
 	}
 
-	if(InputData->InputActionRightTrigger)
+	if(InputData->InputActionRightTrigger) // Squire : Taunt
 	{
 		
 	}
 
-	if(InputData->InputActionLeftTrigger)
+	if(InputData->InputActionLeftTrigger) // Squire : Slap
 	{
 		
 	}
@@ -272,7 +268,8 @@ void ASfCharacter::SetUpArmsRagdoll()
 
 void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
-	Health -= Amount;
+	if(CanBeDamaged())
+		Health -= Amount;
 	
 	if (Health <= 0)
 	{
