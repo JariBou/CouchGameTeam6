@@ -25,7 +25,7 @@ class COUCHGAME_API IInteractions
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:	
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent, Category="Test")
-	void Interact();
+	void Interact(ASfCharacter* CouchGameCharacter);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Pickup")
 	bool CanPickUp(ASfCharacter* CouchGameCharacter);
