@@ -21,18 +21,20 @@ class COUCHGAME_API UEventHandler : public UActorComponent
 public:
 	virtual void BeginPlay() override;
 	
-	void StartNewEvent();
-	
-	void InformEndEvent();
+	virtual void StartNewEvent();
+
+	virtual void InformEndEvent();
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnEvent(FName EventName);
+	virtual void SpawnEvent(FName EventName);
 
-private:
-	FName LastEventName;
-	
+protected:
 	FTimerManager& GetTimeManager() const;
 
+	int32 StaticTimeBeforeNextEvent;
+
+	FName LastEventName;
+	
 	UPROPERTY(EditAnywhere)
 	int32 InitialDelay = 20;
 

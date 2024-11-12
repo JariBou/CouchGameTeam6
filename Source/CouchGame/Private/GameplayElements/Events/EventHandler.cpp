@@ -45,7 +45,8 @@ void UEventHandler::InformEndEvent()
 	int32 Rand = FMath::RandRange(static_cast<int32>(RandomAddedTimeRange.X),static_cast<int32>(RandomAddedTimeRange.Y));
 
 	FTimerHandle NullTimerHandle;
-	GetTimeManager().SetTimer(NullTimerHandle, this, &UEventHandler::StartNewEvent, WaitTimeBetweenEvents + Rand);
+	StaticTimeBeforeNextEvent = WaitTimeBetweenEvents + Rand;
+	GetTimeManager().SetTimer(NullTimerHandle, this, &UEventHandler::StartNewEvent, StaticTimeBeforeNextEvent);
 }
 
 void UEventHandler::SpawnEvent(FName EventName)
