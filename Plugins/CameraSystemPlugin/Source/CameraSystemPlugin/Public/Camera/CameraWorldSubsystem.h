@@ -6,6 +6,7 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "CameraWorldSubsystem.generated.h"
 
+class UCameraPluginSettings;
 class UCameraComponent;
 /**
  * 
@@ -32,7 +33,12 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UCameraComponent> CameraMain;
 
+	UPROPERTY()
+	const UCameraPluginSettings* CameraPluginSettings;
+
 	void TickUpdateCameraZoom(float DeltaTime);
+	
+	void TickUpdateCameraRotation(float DeltaTime);
 	
 	void TickUpdateCameraPosition(float DeltaTime);
 	
@@ -57,14 +63,30 @@ protected:
 
 #pragma endregion
 
+#pragma region Rotation
+
+protected:
+	UPROPERTY()
+	FVector StartForwardVector;
+	
+	UFUNCTION()
+	void InitCameraRotationParameters();	
+	
+#pragma endregion
 
 #pragma region Zoom
 protected:
-	UPROPERTY()
-	float CameraZoomYMin = 0.f;
+	// UPROPERTY()
+	// float CameraZoomYMin = 0.f;
 
 	UPROPERTY()
-	float CameraZoomYMax = 0.f;
+	FVector CameraZoomYMinLoc = FVector::Zero();
+
+	// UPROPERTY()
+	// float CameraZoomYMax = 0.f;
+
+	UPROPERTY()
+	FVector CameraZoomYMaxLoc = FVector::Zero();
 
 	UPROPERTY()
 	float CameraZoomDistanceBetweenTargetsMin = 300.f;
