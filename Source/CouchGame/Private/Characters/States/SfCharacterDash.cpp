@@ -25,6 +25,11 @@ void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 	const FVector MovementDirection = Character->GetActorRotation().Vector();
 
 	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Emerald, MovementDirection.ToString());
+
+    if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+    {
+    	Character->SetCanBeDamaged(false);	    
+    }
 	
 	Character->LaunchCharacter(MovementDirection * DashDistance, true, true);
 
@@ -35,7 +40,10 @@ void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 
 void USfCharacterDash::StateExit(ESfCharacterStateID NextStateID)
 {
-
+	if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+	{
+		Character->SetCanBeDamaged(true);	    
+	}
 }
 
 void USfCharacterDash::StateTick(float DeltaTime)

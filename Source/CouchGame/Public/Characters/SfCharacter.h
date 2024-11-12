@@ -194,7 +194,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float Health;
-
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
