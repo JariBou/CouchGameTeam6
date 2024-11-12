@@ -1,0 +1,62 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "GameplayElements/Events/EventHandler.h"
+
+#include "GameplayElements/Events/EventInfo.h"
+#include "GameplayElements/Events/EventActor.h"
+#include "Kismet/GameplayStatics.h"
+
+void UEventHandler::BeginPlay()
+{
+	Super::BeginPlay();
+
+	FTimerHandle NullTimerHandle;
+	GetTimeManager().SetTimer(NullTimerHandle, this, &UEventHandler::StartNewEvent, InitialDelay);
+}
+
+void UEventHandler::StartNewEvent()
+{
+	if (EventsDataTable == nullptr) return;
+	TArray<FName> RowNames = EventsDataTable->GetRowNames();
+	if (RowNames.Num() == 0) return;
+	int32 Rand = 0;
+	if (RowNames.Num() != 1)
+	{
+		do
+		{
+			Rand = FMath::RandRange(0,RowNames.Num());
+
+		}
+		while (RowNames[Rand] == LastEventName);
+	}
+
+	FName EventToSpawnName = RowNames[Rand];
+	SpawnEvent(EventToSpawnName);
+}
+
+FTimerManager& UEventHandler::GetTimeManager() const
+{
+	return GetOwner()->GetGameInstance()->GetTimerManager();
+}
+
+void UEventHandler::InformEndEvent()
+{
+	int32 Rand = FMath::RandRange(static_cast<int32>(RandomAddedTimeRange.X),static_cast<int32>(RandomAddedTimeRange.Y));
+
+	FTimerHandle NullTimerHandle;
+	GetTimeManager().SetTimer(NullTimerHandle, this, &UEventHandler::StartNewEvent, WaitTimeBetweenEvents + Rand);
+}
+
+void UEventHandler::SpawnEvent(FName EventName)
+{
+	const FEventInfo* EventInfo = EventsDataTable->FindRow<FEventInfo>(EventName, "");
+	LastEventName = EventName;
+
+	AEventActor* SpawnedEvent = Cast<AEventActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), EventInfo->EventBp, GetOwner()->GetActorTransform()));
+	SpawnedEvent->Config(this, *EventInfo);
+
+	SpawnedEvent->FinishSpawning(GetOwner()->GetActorTransform());
+
+	SpawnedEvent->StartEvent();
+}
