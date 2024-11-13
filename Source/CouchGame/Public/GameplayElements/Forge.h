@@ -87,6 +87,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SpawnWeapon(FName WeaponName);
+	
+private:
+	
 	UPROPERTY(EditAnywhere)
 	TEnumAsByte<EForgeLevel> ForgeLevel = Level1;
 
