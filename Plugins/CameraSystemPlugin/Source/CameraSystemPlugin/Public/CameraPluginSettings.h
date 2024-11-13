@@ -20,4 +20,11 @@ public:
 
 	UPROPERTY(Config, EditAnywhere, category = "Camera")
 	float CameraZoomDistanceBetweenTargetsMax = 1500.f;
+	
+	UPROPERTY(Config, EditAnywhere, category = "Camera")
+	float CameraRotationMaxOffsetAlpha = .3f;
+
+	UPROPERTY(Config, EditAnywhere, category = "Camera")
+	float CameraRotationSpeedAlpha = .3f;
+	
 };

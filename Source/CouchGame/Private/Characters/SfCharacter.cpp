@@ -32,7 +32,7 @@ FVector ASfCharacter::GetFollowTarget()
 
 bool ASfCharacter::IsFollowable()
 {
-	return true;
+	return Health > 0;
 }
 
 ASfCharacter::ASfCharacter()
@@ -98,6 +98,13 @@ void ASfCharacter::BeginPlay()
 	// 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	// 	}
 	// }
+}
+
+void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->RemoveFollowTarget(this);
 }
 
 void ASfCharacter::Tick(float DeltaSeconds)

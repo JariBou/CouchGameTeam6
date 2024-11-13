@@ -29,16 +29,17 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 UCLASS(config=Game)
 class ASfCharacter : public ACharacter, public ICameraFollowTarget
 {
+	GENERATED_BODY()
 
 #pragma region CameraFollowTarget
 public:
 	virtual FVector GetFollowTarget() override;
+	
 	virtual bool IsFollowable() override;
 
 #pragma endregion
 
 private:
-	GENERATED_BODY()
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -94,6 +95,8 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void Tick(float DeltaSeconds) override;
 

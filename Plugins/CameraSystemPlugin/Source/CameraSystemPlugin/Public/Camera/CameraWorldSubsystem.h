@@ -40,8 +40,6 @@ protected:
 	
 	void TickUpdateCameraRotation(float DeltaTime);
 	
-	void TickUpdateCameraPosition(float DeltaTime);
-	
 	UCameraComponent* FindCameraByTag(const FName& Tag) const;
 	
 #pragma endregion
@@ -59,7 +57,7 @@ protected:
 	
 	FVector CalculateAveragePositionBetweenTargets();
 
-	float CalculateGreatestDistanceBetweenTargets();
+	float CalculateGreatestYDistanceBetweenTargets();
 
 #pragma endregion
 
@@ -111,15 +109,7 @@ protected:
 	UPROPERTY()
 	float CameraBoundsYProjectionCenter;
 
-	AActor* FindCameraBoundsActor();
-
-	void InitCameraBounds(AActor* CameraBoundsActor);
-
-	void ClampPositionIntoCameraBounds(FVector& Position);
-
-	void GetViewportBounds(FVector2D& OutViewportBoundsMin, FVector2D& OutViewportBoundsMax);
-	
-	FVector CalculateWorldPositionFromViewportPosition(const FVector2D& ViewportPosition);
+	AActor* FindCameraBoundsActor() const;
 
 #pragma endregion
 	
