@@ -6,6 +6,7 @@
 #include "SplinePoolComponent.h"
 #include "Weapon.h"
 #include "Kismet/GameplayStatics.h"
+#include "Utils/ArrayUtils.h"
 
 
 // Sets default values
@@ -45,8 +46,12 @@ void AForge::SpawnRandomWeapon()
 	{
 		if (top - WeaponsRarityList[WeaponRarity].PercentChance <= Rand)
 		{
-			float RandWeaponIndex = FMath::RandRange(0, WeaponsRarityList[WeaponRarity].Weapons.Num()-1);
-			FName WeaponRowName = WeaponsRarityList[WeaponRarity].Weapons[RandWeaponIndex];
+			// float RandWeaponIndex = FMath::RandRange(0, WeaponsRarityList[WeaponRarity].Weapons.Num()-1);
+
+			FName WeaponRowName;
+			UArrayUtils::GetRandomElement(WeaponsRarityList[WeaponRarity].Weapons, WeaponRowName);
+			
+			// FName WeaponRowName = WeaponsRarityList[WeaponRarity].Weapons[RandWeaponIndex];
 
 			SpawnWeapon(WeaponRowName);
 
@@ -94,8 +99,12 @@ void AForge::SpawnWeapon(FName WeaponName)
 {
 	FWeaponInfo* WeaponInfo = WeaponsDataTable->FindRow<FWeaponInfo>(WeaponName, "");
 
-	float RandomSpawnpointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
-	FVector SpawnPointLocation = SpawnPoints[RandomSpawnpointIndex].GetLocation();
+	// float RandomSpawnpointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
+
+	FTransform SpawnPointTransform;
+	UArrayUtils::GetRandomElement(SpawnPoints, SpawnPointTransform);
+	
+	FVector SpawnPointLocation = SpawnPointTransform.GetLocation();
 	FTransform WeaponSpawnTransform = GetActorTransform();
 	// FTransform SpawnPointTransform = FTransform();
 
