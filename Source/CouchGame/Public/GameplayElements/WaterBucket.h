@@ -35,15 +35,27 @@ public:
 	UFUNCTION()
 	void ComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
+	UFUNCTION(BlueprintCallable)
+	void SwitchFillBucket();
+
+	void UpdateMesh();
+	
 protected:
 	UPROPERTY(EditAnywhere)
 	bool IsFilled = false;
 
 	UFUNCTION()
-	void SpawnMuddyGround(const FVector& Location, const FRotator& Rotation, const FVector& NormalVector);
+	void SpawnMuddyGround(FVector Location, const FRotator& Rotation, const FVector& NormalVector);
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AMuddyGround> MuddyClass;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMesh> FilledMesh;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMesh> EmptyMesh;
+	
 private:
 
 #pragma endregion
