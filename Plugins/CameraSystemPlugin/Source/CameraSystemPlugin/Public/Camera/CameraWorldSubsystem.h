@@ -97,20 +97,6 @@ protected:
 	
 	
 #pragma endregion
-
-#pragma region Bounds
-protected:
-	UPROPERTY()
-	FVector2D CameraBoundsMin;
-
-	UPROPERTY()
-	FVector2D CameraBoundsMax;
-
-	UPROPERTY()
-	float CameraBoundsYProjectionCenter;
-
-	AActor* FindCameraBoundsActor() const;
-
-#pragma endregion
+	
 	
 };
