@@ -43,6 +43,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float Duration = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> Plane;
 	
 private:
 
