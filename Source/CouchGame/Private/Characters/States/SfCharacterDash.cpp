@@ -22,9 +22,9 @@ void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
 	
-	const FVector MovementDirection = Character->GetActorRotation().Vector();
+	const FVector MovementDirection = Character->GetCharacterMovement()->Velocity.GetSafeNormal();
 
-	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Emerald, MovementDirection.ToString());
+	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Emerald, MovementDirection.ToString());
 
     if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
     {
