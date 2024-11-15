@@ -125,6 +125,9 @@ private:
 public:
 	FVector2D GetInputMove() const;
 
+	UPROPERTY(EditAnywhere)
+	float DashDistance = 0.f;	
+
 protected:
 	UPROPERTY()
 	FVector2D InputMove = {0.f, 0.f};
