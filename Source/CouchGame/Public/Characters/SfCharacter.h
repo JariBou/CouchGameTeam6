@@ -191,7 +191,7 @@ protected:
 
 #pragma region Health
 
-private:
+protected:
 	UPROPERTY(EditAnywhere)
 	uint8 MaxHealth = 100;
 
