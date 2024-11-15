@@ -33,6 +33,14 @@ struct FTeamInfo
 		Players.Remove(Player);
 	}
 
+	ASfCharacter* GetKnight()
+	{
+		return *Players.FindByPredicate([](const ASfCharacter* Player)
+		{
+			return Player->PlayerType == Knight;
+		});
+	}
+
 	// ~FTeamInfo() = default;
 	// // je crois que je t'emmerde Jerem
 };
