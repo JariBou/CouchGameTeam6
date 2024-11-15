@@ -66,7 +66,7 @@ void AForge::BeginPlay()
 
 void AForge::ForgeLoop()
 {
-	if (!ForgeMap.Contains(ForgeLevel))
+	while (!ForgeMap.Contains(ForgeLevel))
 	{
 		ForgeLevel = static_cast<EForgeLevel>(ForgeLevel - 1);
 	}

@@ -45,8 +45,6 @@ protected:
 	float Duration = 0.f;
 	
 private:
-	UPROPERTY()
-	TObjectPtr<UStaticMeshComponent> MuddyGroundMesh;
 
 	TMap<TObjectPtr<ASfCharacter>, float> OverlappingActorsAndSpeedOnEnter;
 	

@@ -21,7 +21,7 @@ void AMuddyGround::BeginPlay()
 	Super::BeginPlay();
 	UActorComponent* ComponentToGet = GetComponentByClass(UStaticMeshComponent::StaticClass());
 
-	MuddyGroundMesh = Cast<UStaticMeshComponent>(ComponentToGet);
+	TObjectPtr<UStaticMeshComponent> MuddyGroundMesh = Cast<UStaticMeshComponent>(ComponentToGet);
 
 	if(MuddyGroundMesh != nullptr)
 	{
