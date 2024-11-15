@@ -148,11 +148,11 @@ void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 
 void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
-	GEngine->AddOnScreenDebugMessage(
+	/*GEngine->AddOnScreenDebugMessage(
 		-1,
 		4.0f,
 		FColor::Yellow,
-		TEXT("OnInputDash"));
+		TEXT("OnInputDash"));*/
 		
 	
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
@@ -296,6 +296,20 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 	}
+}
+
+void ASfCharacter::StartFeedBackEffect(bool IsLooping)
+{
+	FForceFeedbackParameters FeedbackParams;
+	FeedbackParams.bLooping = IsLooping;
+	FeedbackParams.Tag = ForceFeedBackEffectTag;
+	
+	Cast<APlayerController>(GetController())->ClientPlayForceFeedback(ForceFeedbackEffect, FeedbackParams);
+}
+
+void ASfCharacter::StopFeedBackEffect()
+{
+	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
 }
 
 //////////////////////////////////////////////////////////////////////////

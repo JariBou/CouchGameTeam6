@@ -29,7 +29,7 @@ void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
     	Character->SetCanBeDamaged(false);	    
     }
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(Character->DashDistance));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(Character->DashDistance));
 	
 	Character->LaunchCharacter(MovementDirection * Character->DashDistance, true, true);
 

@@ -125,9 +125,6 @@ private:
 public:
 	FVector2D GetInputMove() const;
 
-	UPROPERTY(EditAnywhere)
-	float DashDistance = 0.f;	
-
 protected:
 	UPROPERTY()
 	FVector2D InputMove = {0.f, 0.f};
@@ -206,5 +203,24 @@ public:
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
 	
 #pragma endregion
+
+#pragma region InMud
+
+public:
+	UPROPERTY(EditAnywhere)
+	float DashDistance = 0.f;
+
+	void StartFeedBackEffect(bool IsLooping);
+
+	void StopFeedBackEffect();
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UForceFeedbackEffect> ForceFeedbackEffect;
+
+	UPROPERTY(EditAnywhere)
+	FName ForceFeedBackEffectTag;
+	
+#pragma endregion 
 };
 
