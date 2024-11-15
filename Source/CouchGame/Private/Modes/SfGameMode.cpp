@@ -11,7 +11,6 @@
 
 ASfGameMode::ASfGameMode()
 {
-	
 }
 
 void ASfGameMode::BeginPlay()
@@ -19,6 +18,16 @@ void ASfGameMode::BeginPlay()
 	Super::BeginPlay();
 	TeamScoreMap.Add(Team1);
 	TeamScoreMap.Add(Team2);
+
+	for (ETeam Team : {Team1, Team2})
+	{
+		FTeamInfo NewInfo {
+		.Team = Team,
+		.Players = {},
+		.Lives = TeamLives
+		};
+		TeamMap.Add(Team, NewInfo);
+	}
 	
 	CreateAndInitPlayers();
 
@@ -31,24 +40,62 @@ void ASfGameMode::BeginPlay()
 
 		ASfCharacter* NewCharacter = GetWorld()->SpawnActorDeferred<ASfCharacter>(SfCharacterBpClass,SpawnPoint->GetTransform());
 		if (NewCharacter == nullptr) continue;
-
+		
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
-		NewCharacter->PlayerTeam = i%2 > 0 ? Team2 : Team1;
+		
+		ETeam NewPlayerTeam = i%2 > 0 ? Team2 : Team1;
+		NewCharacter->PlayerTeam = NewPlayerTeam;
+		TeamMap[NewPlayerTeam].AddPlayer(NewCharacter);
+		
+		NewCharacter->PlayerType = i/2 > 0 ? Knight : Squire;
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 		i++;
 	}
+
+
+	Respawner = NewObject<URespawner>(this, URespawner::StaticClass());
+	Respawner->Initialize(this);
 }
 
 void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 {
 	TeamScoreMap[Killer->PlayerTeam]++;
 
+	--TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
+	if (CheckEndOfGame())
+	{
+		//TODO
+		// Oooh
+		return;
+	}
+
+	const FRespawnData respawnData {
+		Dead->PlayerTeam,
+		Dead->GetController(),
+	};
+	Dead->GetController()->UnPossess();
+	TeamMap[Dead->PlayerTeam].RemovePlayer(Dead);
 	Dead->Destroy();
+
+	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight);
+	
+	ASfCharacter* NewCharacter = Respawner->StartDeferredRespawn(respawnData);
+
+	TeamMap[Dead->PlayerTeam].AddPlayer(NewCharacter);
+	
+	Respawner->EndDeferredRespawn(respawnData, NewCharacter);
 }
 
 bool ASfGameMode::CheckEndOfGame()
 {
-	return TeamScoreMap[Team1] >= DeathCountTarget || TeamScoreMap[Team2] >= DeathCountTarget;
+	bool isOVer = false;
+	for (const auto& [_, TeamInfo] : TeamMap)
+	{
+		// Proceed to kill myself after that
+		isOVer |= TeamInfo.Lives <= 0 ? 1 : 0;
+	}
+	return isOVer;
+	return TeamScoreMap[Team1] >= TeamLives || TeamScoreMap[Team2] >= TeamLives;
 }
 
 void ASfGameMode::CreateAndInitPlayers() const
@@ -60,4 +107,9 @@ void ASfGameMode::CreateAndInitPlayers() const
 	if (LocalMultiplayerSubsystem == nullptr) return;
 
 	LocalMultiplayerSubsystem->CreateAndInitPlayers(ELocalMultiplayerInputMappingType::InGame);
+}
+
+const TSubclassOf<ASfCharacter>& ASfGameMode::GetSfCharacterBpClass() const
+{
+	return SfCharacterBpClass;
 }

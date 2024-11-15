@@ -20,7 +20,7 @@ public:
 
 	virtual void EndEvent();
 	
-	void Config(UEventHandler* InEventHandler, const FEventInfo InEventInfo);
+	void Config(UEventHandler* InEventHandler, const FEventInfo& InEventInfo);
 
 	void StartEvent();
 

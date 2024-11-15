@@ -6,7 +6,36 @@
 #include "Teams.h"
 #include "Characters/SfCharacter.h"
 #include "GameFramework/GameModeBase.h"
+#include "Systems/Respawner.h"
 #include "SfGameMode.generated.h"
+
+USTRUCT()
+struct FTeamInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TEnumAsByte<ETeam> Team;
+
+	UPROPERTY()
+	TArray<ASfCharacter*> Players;
+
+	UPROPERTY()
+	uint8 Lives;
+
+	void AddPlayer(ASfCharacter* Player)
+	{
+		Players.Add(Player);
+	}
+
+	void RemovePlayer(ASfCharacter* Player)
+	{
+		Players.Remove(Player);
+	}
+
+	// ~FTeamInfo() = default;
+	// // je crois que je t'emmerde Jerem
+};
 
 class ASfCharacter;
 /**
@@ -23,9 +52,10 @@ public:
 private:
 	GENERATED_BODY()
 
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere)
+	URespawner* Respawner;
 
-	
+	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckEndOfGame();
@@ -36,11 +66,21 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASfCharacter> SfCharacterBpClass;
 
+public:
+	const TSubclassOf<ASfCharacter>& GetSfCharacterBpClass() const;
+
+private:
 	UPROPERTY(EditAnywhere)
-	uint8 DeathCountTarget;
+	uint8 TeamLives;
 
 	UPROPERTY()
 	TMap<TEnumAsByte<ETeam>, uint8> TeamScoreMap = {
-		 
 	};
+
+	UPROPERTY()
+	TMap<TEnumAsByte<ETeam>, FTeamInfo> TeamMap = {
+	};
+
+	
+
 };

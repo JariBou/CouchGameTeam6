@@ -18,7 +18,7 @@ void AEventActor::EndEvent()
 	EventHandler->InformEndEvent();
 }
 
-void AEventActor::Config(UEventHandler* InEventHandler, const FEventInfo InEventInfo)
+void AEventActor::Config(UEventHandler* InEventHandler, const FEventInfo& InEventInfo)
 {
 	EventHandler = InEventHandler;
 	EventInfo = InEventInfo;

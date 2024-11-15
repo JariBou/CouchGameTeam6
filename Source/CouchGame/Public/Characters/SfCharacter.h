@@ -72,7 +72,7 @@ public:
 
 	/**Player Type */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<TypeOfPlayer> PlayerType;
+	TEnumAsByte<TypeOfPlayer> PlayerType = Squire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ETeam> PlayerTeam;
