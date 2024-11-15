@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "TypeOfPickable.h"
+#include "Camera/CameraFollowTarget.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
@@ -26,10 +27,20 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class ASfCharacter : public ACharacter
+class ASfCharacter : public ACharacter, public ICameraFollowTarget
 {
 	GENERATED_BODY()
+
+#pragma region CameraFollowTarget
+public:
+	virtual FVector GetFollowTarget() override;
 	
+	virtual bool IsFollowable() override;
+
+#pragma endregion
+
+private:
+
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -61,7 +72,7 @@ public:
 
 	/**Player Type */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<TypeOfPlayer> PlayerType;
+	TEnumAsByte<TypeOfPlayer> PlayerType = Squire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ETeam> PlayerTeam;
@@ -84,6 +95,8 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void Tick(float DeltaSeconds) override;
 

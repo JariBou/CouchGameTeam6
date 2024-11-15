@@ -6,6 +6,8 @@
 #include "Pickable.h"
 #include "WaterBucket.generated.h"
 
+class AMuddyGround;
+
 UCLASS()
 class COUCHGAME_API AWaterBucket : public APickable
 {
@@ -34,9 +36,14 @@ public:
 	void ComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 protected:
+	UPROPERTY(EditAnywhere)
 	bool IsFilled = false;
 
-	void SpawnMuddyGround(FVector Location, FRotator Rotation);
+	UFUNCTION()
+	void SpawnMuddyGround(const FVector& Location, const FRotator& Rotation, const FVector& NormalVector);
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMuddyGround> MuddyClass;
 private:
 
 #pragma endregion
