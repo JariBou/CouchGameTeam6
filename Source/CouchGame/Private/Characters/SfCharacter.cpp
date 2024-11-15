@@ -291,8 +291,9 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	if(CanBeDamaged())
 		Health -= Amount;
 	
-	if (Health <= 0)
+	if (Health <= 0 && !IsDead)
 	{
+		IsDead = true;
 		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 	}

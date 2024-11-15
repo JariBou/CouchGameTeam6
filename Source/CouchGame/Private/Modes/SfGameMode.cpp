@@ -61,13 +61,18 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 {
 	TeamScoreMap[Killer->PlayerTeam]++;
 
-	--TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Oh Fils de pute");
+	
 	if (CheckEndOfGame())
 	{
-		//TODO
+		//TODO Clément
 		// Oooh
+		Dead->Destroy();
 		return;
 	}
+	
+	--TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
+	
 
 	const FRespawnData respawnData {
 		Dead->PlayerTeam,

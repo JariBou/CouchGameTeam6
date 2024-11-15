@@ -65,7 +65,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	
+	UPROPERTY()
+	bool IsDead = false;
+
 public:
 	/** Constructeur */
 	ASfCharacter();
