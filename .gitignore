@@ -55,10 +55,11 @@ Binaries/Win64/*
 !Binaries/Win64/UnrealEditor-CouchGame.dll
 
 Plugins/*/Binaries/*
-!Plugins/LocalMultiplayerPlugin/Binaries/Win64
-Plugins/LocalMultiplayerPlugin/Binaries/Win64/*
-!Plugins/LocalMultiplayerPlugin/Binaries/Win64/UnrealEditor.modules
-!Plugins/LocalMultiplayerPlugin/Binaries/Win64/UnrealEditor-LocalMultiplayerPlugin.dll
+!Plugins/*/Binaries/Win64
+Plugins/*/Binaries/Win64/*
+
+!Plugins/*/Binaries/Win64/*.modules
+!Plugins/*/Binaries/Win64/*.dll
 
 # Builds
 Build/*

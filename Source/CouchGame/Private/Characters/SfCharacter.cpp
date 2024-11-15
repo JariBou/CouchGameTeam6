@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Camera/CameraWorldSubsystem.h"
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
@@ -23,6 +24,16 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // ACouchGameCharacter
+
+FVector ASfCharacter::GetFollowTarget()
+{
+	return GetActorLocation();
+}
+
+bool ASfCharacter::IsFollowable()
+{
+	return Health > 0;
+}
 
 ASfCharacter::ASfCharacter()
 {
@@ -77,6 +88,8 @@ void ASfCharacter::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 
 	Health = MaxHealth;
+	
+	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->AddFollowTarget(this);
 	//Add Input Mapping Context
 	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	// {
@@ -85,6 +98,13 @@ void ASfCharacter::BeginPlay()
 	// 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	// 	}
 	// }
+}
+
+void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->RemoveFollowTarget(this);
 }
 
 void ASfCharacter::Tick(float DeltaSeconds)

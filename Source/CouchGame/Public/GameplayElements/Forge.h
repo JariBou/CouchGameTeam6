@@ -23,7 +23,7 @@ struct FWeaponsList
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, meta=(GetOptions="GetWeaponNames"))
+	UPROPERTY(EditAnywhere, meta=(GetOptions="GetWeaponNames")) // <==== ici je lui dit que les options sont données par la méthode GetWeaponNames
 	TArray<FName> Weapons;
 
 	UPROPERTY(EditAnywhere)
