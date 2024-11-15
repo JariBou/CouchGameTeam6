@@ -15,8 +15,9 @@ class COUCHGAME_API UEventHandler : public UActorComponent
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-	TObjectPtr<AEventActor> CurrentEvent;
+private:
+	UFUNCTION(CallInEditor)
+	void InitializeSpawnPoints();
 
 public:
 	virtual void BeginPlay() override;
@@ -28,7 +29,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SpawnEvent(FName EventName);
 
+	UPROPERTY(EditAnywhere)
+	TArray<AActor*> SpawnPointActors;
+
 protected:
+	UPROPERTY()
+	TObjectPtr<AEventActor> CurrentEvent;
+	
 	FTimerManager& GetTimeManager() const;
 
 	int32 StaticTimeBeforeNextEvent;
@@ -46,4 +53,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UDataTable> EventsDataTable;
+
+	UPROPERTY()
+	TArray<FVector> SpawnPoints;
 };
