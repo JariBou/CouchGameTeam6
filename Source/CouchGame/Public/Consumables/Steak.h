@@ -1,13 +1,11 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Consumables.h"
+#include "Consumable.h"
 #include "Steak.generated.h"
 
 UCLASS()
-class COUCHGAME_API ASteak : public AConsumables
+class COUCHGAME_API ASteak : public AConsumable
 {
 	GENERATED_BODY()
 
@@ -22,4 +20,11 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	virtual void EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveComponent* Comp2,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	
+	UPROPERTY(EditAnywhere, meta=(UIMin = "0.0", UIMax = "100.0" ))
+	uint8 HealthToAdd = 0;
 };

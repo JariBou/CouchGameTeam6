@@ -190,17 +190,22 @@ protected:
 #pragma endregion
 
 #pragma region Health
-
-protected:
+	
 	UPROPERTY(EditAnywhere)
 	uint8 MaxHealth = 100;
 
 	UPROPERTY(EditAnywhere)
 	float Health;
+
+	UPROPERTY(EditAnywhere)
+	uint8 NumberOfTimeHealthIsUsed = 0;
 	
 public:
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
+
+	UFUNCTION()
+	void AddHealth(float HealthToAdd);
 	
 #pragma endregion
 };

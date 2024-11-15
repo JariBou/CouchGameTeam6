@@ -298,6 +298,12 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	}
 }
 
+void ASfCharacter::AddHealth(float HealthToAdd)
+{
+	Health += HealthToAdd;
+	++NumberOfTimeHealthIsUsed; //Hurm actually c'est plus opti
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
