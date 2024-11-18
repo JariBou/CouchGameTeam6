@@ -33,7 +33,7 @@ void AWeapon::Tick(float DeltaTime)
 
 float AWeapon::GetDamage() const
 {
-	if (Holder->PlayerType == Squire) return 0;
+	if (Holder != nullptr && Holder->PlayerType == Squire) return 0;
 	return CurrentDataRow.WeaponStats.Damage * m_speed * CurrentDataRow.WeaponStats.DMGMultiplier;
 }
 
