@@ -105,6 +105,8 @@ void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
+	Drop();
+
 	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->RemoveFollowTarget(this);
 }
 
@@ -227,7 +229,10 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 
 	if(InputData->InputActionFaceButtonLeft) // Squire : Take, Give, Throw,      Knight : Take, Throw
 	{
-		
+		EnhancedInputComponent->BindAction(InputData->InputActionFaceButtonLeft,
+			ETriggerEvent::Started,
+			this,
+			&ASfCharacter::PickUpAndThrowAction);
 	}
 
 	if(InputData->InputActionRightTrigger) // Squire : Taunt
@@ -381,7 +386,6 @@ void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	BindInputMoveAndActions(EnhancedInputComponent);
 
-	EnhancedInputComponent->BindAction(InputData->InputActionFaceButtonLeft, ETriggerEvent::Started, this, &ASfCharacter::PickUpAndThrowAction);
 }
 
 
