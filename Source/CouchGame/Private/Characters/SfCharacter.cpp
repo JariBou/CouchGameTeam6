@@ -237,12 +237,12 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 
 	if(InputData->InputActionRightTrigger) // Squire : Taunt
 	{
-		
+		//
 	}
 
 	if(InputData->InputActionLeftTrigger) // Squire : Slap
 	{
-		
+		//Je slap tes grosses fessiers bien rondes et dodus et soyeuses et rambombés et galbées et rebondis
 	}
 }
 
