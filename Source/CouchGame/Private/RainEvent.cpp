@@ -31,8 +31,10 @@ void ARainEvent::BeginPlay()
 	SetActorLocation(GetActorLocation() + FVector(0, 0, 100));
 
 	TArray<struct FHitResult> OutHits;
+	FCollisionQueryParams Params;
+	Params.bDebugQuery = true;
 	if (GetWorld()->LineTraceMultiByChannel(OutHits, GetActorLocation(), GetActorLocation() - FVector(0, 0, 100),
-		ECC_WorldStatic))
+	                                        ECC_WorldStatic, Params))
 	{
 		SpawnMuddyGround(OutHits[0].Location, FRotator(0,0,0), OutHits[0].Normal);
 	}
