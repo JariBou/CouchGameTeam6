@@ -22,15 +22,16 @@ void AWaterBucket::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UActorComponent* ComponentToGet = GetComponentByClass(UStaticMeshComponent::StaticClass());
+	//UActorComponent* ComponentToGet = GetComponentByClass(UStaticMeshComponent::StaticClass());
 
-	TObjectPtr<UStaticMeshComponent> BucketMesh = Cast<UStaticMeshComponent>(ComponentToGet);
+	//TObjectPtr<UStaticMeshComponent> BucketMesh = Cast<UStaticMeshComponent>(ComponentToGet);
 
-	if(BucketMesh != nullptr)
+	if(StaticMeshComponent != nullptr)
 	{
-		BucketMesh->OnComponentHit.AddDynamic(this, &AWaterBucket::ComponentHit);
+		StaticMeshComponent->OnComponentHit.AddDynamic(this, &AWaterBucket::ComponentHit);
 	}
-	
+
+	UpdateMesh();
 }
 
 // Called every frame
@@ -58,7 +59,7 @@ void AWaterBucket::ComponentHit(UPrimitiveComponent* HitComponent, AActor* Other
 		}
 		else*/
 
-			if(Hit.GetActor()->ActorHasTag("Ground"))
+		if(Hit.GetActor()->ActorHasTag("Ground"))
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Water Bucket Hit Ground");
 			SpawnMuddyGround(Hit.ImpactPoint, FRotator(0,0,0), Hit.GetActor()->GetActorUpVector());
@@ -66,11 +67,30 @@ void AWaterBucket::ComponentHit(UPrimitiveComponent* HitComponent, AActor* Other
 	}
 }
 
-void AWaterBucket::SpawnMuddyGround(const FVector& Location, const FRotator& Rotation, const FVector& NormalVector)
+void AWaterBucket::SwitchFillBucket()
+{
+	IsFilled = !IsFilled;
+
+	UpdateMesh();
+}
+
+void AWaterBucket::UpdateMesh()
+{
+	if(IsFilled)
+	{
+		StaticMeshComponent->SetStaticMesh(FilledMesh);
+	}
+	else
+	{
+		StaticMeshComponent->SetStaticMesh(EmptyMesh);
+	}
+}
+
+void AWaterBucket::SpawnMuddyGround(FVector Location, const FRotator& Rotation, const FVector& NormalVector)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Spawn Ground");
 	AActor* SpawnedActor = GetWorld()->SpawnActor<AMuddyGround>(MuddyClass, Location, Rotation);
-	SpawnedActor->SetActorLocation(SpawnedActor->GetActorLocation() + NormalVector);
+	SpawnedActor->SetActorLocation(SpawnedActor->GetActorLocation() + NormalVector * 5);
 
 	
 	FRotator NewRotation = FRotator(FMath::RadiansToDegrees(FMath::Atan2(NormalVector.Z, NormalVector.Y))-90,
@@ -79,6 +99,6 @@ void AWaterBucket::SpawnMuddyGround(const FVector& Location, const FRotator& Rot
 	//GEngine->AddOnScreenDebugMessage(	-1, 5.f, FColor::Red, NewRotation.ToString()	);
 
 	SpawnedActor->SetActorRotation(FRotator(0,0,0));
-	IsFilled = false;
+	SwitchFillBucket();
 }
 

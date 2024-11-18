@@ -9,7 +9,7 @@
 #include "Systems/Respawner.h"
 #include "SfGameMode.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FTeamInfo
 {
 	GENERATED_BODY()
@@ -21,7 +21,7 @@ struct FTeamInfo
 	TArray<ASfCharacter*> Players;
 
 	UPROPERTY()
-	uint8 Lives;
+	uint8 Lives; // <==== UINT8
 
 	void AddPlayer(ASfCharacter* Player)
 	{
@@ -31,6 +31,14 @@ struct FTeamInfo
 	void RemovePlayer(ASfCharacter* Player)
 	{
 		Players.Remove(Player);
+	}
+
+	ASfCharacter* GetKnight()
+	{
+		return *Players.FindByPredicate([](const ASfCharacter* Player)
+		{
+			return Player->PlayerType == Knight;
+		});
 	}
 
 	// ~FTeamInfo() = default;
@@ -77,7 +85,7 @@ private:
 	TMap<TEnumAsByte<ETeam>, uint8> TeamScoreMap = {
 	};
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TMap<TEnumAsByte<ETeam>, FTeamInfo> TeamMap = {
 	};
 

@@ -21,6 +21,8 @@ ASfCharacter* URespawner::StartDeferredRespawn(FRespawnData RespawnData)
 	ASfCharacter* Character = Cast<ASfCharacter>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), GameMode->GetSfCharacterBpClass(), RespawnPoint, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn));
 
 	// RespawnMap.Add(RespawnData, Character);
+	Character->PlayerTeam = RespawnData.Team;
+	Character->PlayerType = Squire;
 
 	return Character;
 }
