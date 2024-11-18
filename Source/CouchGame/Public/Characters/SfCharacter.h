@@ -65,14 +65,16 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	
+	UPROPERTY()
+	bool IsDead = false;
+
 public:
 	/** Constructeur */
 	ASfCharacter();
 
 	/**Player Type */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<TypeOfPlayer> PlayerType;
+	TEnumAsByte<TypeOfPlayer> PlayerType = Squire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ETeam> PlayerTeam;

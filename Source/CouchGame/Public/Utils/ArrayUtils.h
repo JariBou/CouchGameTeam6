@@ -21,6 +21,6 @@ public:
 };
 
 
-#if CPP
+#if CPP 
 #include "ArrayUtils.inl"
 #endif

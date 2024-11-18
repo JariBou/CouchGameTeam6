@@ -16,7 +16,7 @@ class COUCHGAME_API UTransformUtils : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "TransformUtils")
-	static FTransform MakeTransformFromLocation(FVector& Location){
+	static FTransform MakeTransformFromLocation(const FVector& Location){
 		FTransform Transform;
 		Transform.SetLocation(Location);
 		return Transform;
