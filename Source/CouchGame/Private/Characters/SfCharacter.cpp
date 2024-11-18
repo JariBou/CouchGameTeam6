@@ -306,36 +306,18 @@ void ASfCharacter::AddHealth(float HealthToAdd)
 	++NumberOfTimeHealthIsUsed; //Hurm actually c'est plus opti
 }
 
-void ASfCharacter::PickUpAndThrow(const FInputActionInstance& Instance)
+void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
+{
+	PickUpAndThrow();
+}
+
+void ASfCharacter::PickUpAndThrow()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 6.f, FColor::Emerald, TEXT("PICK UP DE FOU CA MARCHE STP"));
 
 	if(IsCarrying) //Si il porte un objet
 	{
-		#pragma region DetachPickable
-		
-		const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
-		CurrentPickable->DetachFromActor(DeTransformRules);
-		IsCarrying = false;
-		
-		#pragma endregion
-
-		#pragma region Get Vel And Impulse
-
-		FVector CurrentVelocity = FVector(this->GetCharacterMovement()->GetLastUpdateVelocity().X,this->GetCharacterMovement()->GetLastUpdateVelocity().Y,0.f);
-		if(CurrentVelocity.Length() > 0.f) //Velocity supérieur a 0
-		{
-			//Get Impulse
-
-			FVector ImpulseDirection = FVector(this->GetActorForwardVector().X * 500.f, this->GetActorForwardVector().Y * 500.f, 1.f * 200.f); //IMPULSE DIRECTION (NO GD FRIENDLY)
-			ImpulseDirection += this->GetVelocity();
-			CurrentPickable->StaticMeshComponent->AddImpulse(ImpulseDirection, FName(""), true); //IMPULSE
-		}
-		CurrentPickable->StaticMeshComponent->SetSimulatePhysics(true);
-		CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
-		CurrentPickable = nullptr;
-
-		#pragma endregion 
+		Drop();
 	} else //Si il n'en a pas dans les mains
 	{
 		if(CurrentPickable != nullptr)
@@ -356,6 +338,34 @@ void ASfCharacter::PickUpAndThrow(const FInputActionInstance& Instance)
 	}
 }
 
+void ASfCharacter::Drop()
+{
+#pragma region DetachPickable
+		
+	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
+	CurrentPickable->DetachFromActor(DeTransformRules);
+	IsCarrying = false;
+		
+#pragma endregion
+
+#pragma region Get Vel And Impulse
+
+	FVector CurrentVelocity = FVector(this->GetCharacterMovement()->GetLastUpdateVelocity().X,this->GetCharacterMovement()->GetLastUpdateVelocity().Y,0.f);
+	if(CurrentVelocity.Length() > 0.f) //Velocity supérieur a 0
+	{
+		//Get Impulse
+
+		FVector ImpulseDirection = FVector(this->GetActorForwardVector().X * 500.f, this->GetActorForwardVector().Y * 500.f, 1.f * 200.f); //IMPULSE DIRECTION (NO GD FRIENDLY)
+		ImpulseDirection += this->GetVelocity();
+		CurrentPickable->StaticMeshComponent->AddImpulse(ImpulseDirection, FName(""), true); //IMPULSE
+	}
+	CurrentPickable->StaticMeshComponent->SetSimulatePhysics(true);
+	CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+	CurrentPickable = nullptr;
+
+#pragma endregion 
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -371,13 +381,17 @@ void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	BindInputMoveAndActions(EnhancedInputComponent);
 
-	EnhancedInputComponent->BindAction(InputData->InputActionFaceButtonLeft, ETriggerEvent::Started, this, &ASfCharacter::PickUpAndThrow);
+	EnhancedInputComponent->BindAction(InputData->InputActionFaceButtonLeft, ETriggerEvent::Started, this, &ASfCharacter::PickUpAndThrowAction);
 }
 
 
 void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 {
 	PlayerType = TypeOfPlayer;
+	if (TypeOfPlayer == Knight)
+	{
+		if (IsCarrying) Drop();
+	}
 }
 
 void ASfCharacter::Move(const FInputActionValue& Value)

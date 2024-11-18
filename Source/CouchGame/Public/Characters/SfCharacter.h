@@ -216,7 +216,13 @@ public:
 #pragma region PickUpAndThrow
 protected:
 	UFUNCTION()
-	void PickUpAndThrow(const FInputActionInstance& Instance);
+	void PickUpAndThrowAction(const FInputActionInstance& Instance);
+
+	UFUNCTION()
+	void PickUpAndThrow();
+
+	UFUNCTION()
+	void Drop();
 
 	UPROPERTY(BlueprintReadWrite)
 	bool IsCarrying = false;
