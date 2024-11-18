@@ -12,6 +12,8 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+class APickable;
+struct FInputActionInstance;
 //struct FPhysicalAnimationData;
 class UPhysicalAnimationComponent;
 class USfCharacterInputData;
@@ -192,18 +194,38 @@ protected:
 #pragma endregion
 
 #pragma region Health
-
-private:
+	
 	UPROPERTY(EditAnywhere)
 	uint8 MaxHealth = 100;
 
 	UPROPERTY(EditAnywhere)
 	float Health;
+
+	UPROPERTY(EditAnywhere)
+	uint8 NumberOfTimeHealthIsUsed = 0;
 	
 public:
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
+
+	UFUNCTION()
+	void AddHealth(float HealthToAdd);
 	
 #pragma endregion
+
+#pragma region PickUpAndThrow
+protected:
+	UFUNCTION()
+	void PickUpAndThrow(const FInputActionInstance& Instance);
+
+	UPROPERTY(BlueprintReadWrite)
+	bool IsCarrying = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<APickable> CurrentPickable;
+	
+
+#pragma endregion 
+
 };
 
