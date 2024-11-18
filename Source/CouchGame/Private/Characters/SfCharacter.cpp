@@ -391,6 +391,7 @@ void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 {
+	if (PlayerType == TypeOfPlayer) return;
 	PlayerType = TypeOfPlayer;
 	if (TypeOfPlayer == Knight)
 	{
