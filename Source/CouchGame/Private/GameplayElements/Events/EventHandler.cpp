@@ -68,7 +68,7 @@ void UEventHandler::InformEndEvent()
 	GetTimeManager().SetTimer(NullTimerHandle, this, &UEventHandler::StartNewEvent, StaticTimeBeforeNextEvent);
 }
 
-void UEventHandler::SpawnEvent(FName EventName)
+void UEventHandler::SpawnEvent(const FName EventName)
 {
 	const FEventInfo* EventInfo = EventsDataTable->FindRow<FEventInfo>(EventName, "");
 	LastEventName = EventName;

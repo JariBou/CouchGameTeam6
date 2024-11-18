@@ -12,6 +12,8 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+class APickable;
+struct FInputActionInstance;
 //struct FPhysicalAnimationData;
 class UPhysicalAnimationComponent;
 class USfCharacterInputData;
@@ -65,14 +67,16 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	
+	UPROPERTY()
+	bool IsDead = false;
+
 public:
 	/** Constructeur */
 	ASfCharacter();
 
 	/**Player Type */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<TypeOfPlayer> PlayerType;
+	TEnumAsByte<TypeOfPlayer> PlayerType = Squire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ETeam> PlayerTeam;
@@ -190,18 +194,44 @@ protected:
 #pragma endregion
 
 #pragma region Health
-
-protected:
+	
 	UPROPERTY(EditAnywhere)
 	uint8 MaxHealth = 100;
 
 	UPROPERTY(EditAnywhere)
 	float Health;
+
+	UPROPERTY(EditAnywhere)
+	uint8 NumberOfTimeHealthIsUsed = 0;
 	
 public:
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
+
+	UFUNCTION()
+	void AddHealth(float HealthToAdd);
 	
 #pragma endregion
+
+#pragma region PickUpAndThrow
+protected:
+	UFUNCTION()
+	void PickUpAndThrowAction(const FInputActionInstance& Instance);
+
+	UFUNCTION()
+	void PickUpAndThrow();
+
+	UFUNCTION()
+	void Drop();
+
+	UPROPERTY(BlueprintReadWrite)
+	bool IsCarrying = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<APickable> CurrentPickable;
+	
+
+#pragma endregion 
+
 };
 
