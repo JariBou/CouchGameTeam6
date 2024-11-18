@@ -75,5 +75,10 @@ void AMuddyGround::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	OverlappingActorsAndSpeedOnEnter.Remove(Character);
 }
 
+void AMuddyGround::SetDuration(float inDuration)
+{
+	Duration = inDuration;
+}
+
 
 

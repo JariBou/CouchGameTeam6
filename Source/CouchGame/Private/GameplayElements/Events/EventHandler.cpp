@@ -13,9 +13,10 @@ void UEventHandler::InitializeSpawnPoints()
 {
 	while(SpawnPointActors.Num() > 0)
 	{
-		const AActor* Element = SpawnPointActors[0];
+		AActor* Element = SpawnPointActors[0];
 		SpawnPoints.Add(Element->GetActorLocation());
-		
+
+		GetWorld()->DestroyActor(Element);
 		SpawnPointActors.RemoveAt(0);
 	}
 	// for (const AActor* Element : SpawnPointActors)
@@ -45,7 +46,6 @@ void UEventHandler::StartNewEvent()
 		do
 		{
 			Rand = FMath::RandRange(0,RowNames.Num());
-
 		}
 		while (RowNames[Rand] == LastEventName);
 	}
@@ -73,14 +73,25 @@ void UEventHandler::SpawnEvent(const FName EventName)
 	const FEventInfo* EventInfo = EventsDataTable->FindRow<FEventInfo>(EventName, "");
 	LastEventName = EventName;
 
-	FVector spawnLocation;
-	UArrayUtils::GetRandomElement(SpawnPoints, spawnLocation);
-	FTransform SpawnTransform = UTransformUtils::MakeTransformFromLocation(spawnLocation);
+	TArray<FVector> UsedSpawnLocations;
+	for (int i = 0; i < EventInfo->EventSpawnCount; ++i)
+	{
+		FVector spawnLocation;
+		do {
+			UArrayUtils::GetRandomElement(SpawnPoints, spawnLocation);
+		}
+		while (UsedSpawnLocations.Contains(spawnLocation));
+		
+		FTransform SpawnTransform = UTransformUtils::MakeTransformFromLocation(spawnLocation);
 
-	AEventActor* SpawnedEvent = Cast<AEventActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), EventInfo->EventBp, SpawnTransform));
-	SpawnedEvent->Config(this, *EventInfo);
+		AEventActor* SpawnedEvent = Cast<AEventActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), EventInfo->EventBp, SpawnTransform));
+		SpawnedEvent->Config(this, *EventInfo);
 
-	SpawnedEvent->FinishSpawning(SpawnTransform);
+		SpawnedEvent->FinishSpawning(SpawnTransform);
 
-	SpawnedEvent->StartEvent();
+		SpawnedEvent->StartEvent();
+
+		UsedSpawnLocations.Add(spawnLocation);
+	}
+	
 }
