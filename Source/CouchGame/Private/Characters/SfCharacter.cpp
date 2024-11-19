@@ -289,7 +289,10 @@ void ASfCharacter::SetUpArmsRagdoll()
 void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
 	if(CanBeDamaged())
+	{
 		Health -= Amount;
+		OnHealthValueChange.Broadcast(this);
+	}
 	
 	if (Health <= 0 && !IsDead)
 	{

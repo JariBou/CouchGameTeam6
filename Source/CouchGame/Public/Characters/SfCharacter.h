@@ -193,14 +193,22 @@ protected:
 
 #pragma region Health
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthValueChange, class ASfCharacter*, CallingCharacter);
+
 protected:
-	UPROPERTY(EditAnywhere)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	uint8 MaxHealth = 100;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Health;
+
+	//ASfCharacter CallingCharacter = this;
 	
 public:
+	UPROPERTY(BlueprintAssignable, Category="Event")
+	FOnHealthValueChange OnHealthValueChange;
+	
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
 	
