@@ -60,10 +60,28 @@ void AForge::SpawnRandomWeapon()
 	}
 }
 
+void AForge::InitializeSpawnPoints()
+{
+	while(SpawnPointActors.Num() > 0)
+	{
+		AActor* Element = SpawnPointActors[0];
+		SpawnPoints.Add(Element->GetActorLocation());
+
+		GetWorld()->DestroyActor(Element);
+		SpawnPointActors.RemoveAt(0);
+	}
+	// for (const AActor* Element : SpawnPointActors)
+	// {
+	// 	SpawnPoints.Add(Element->GetActorLocation());
+	// }
+	SpawnPointActors.Empty();
+}
+
 // Called when the game starts or when spawned
 void AForge::BeginPlay()
 {
 	Super::BeginPlay();
+	InitializeSpawnPoints();
 
 	FTimerHandle SpawnDelayTimerHandle;
 	GetGameInstance()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, this, &AForge::ForgeLoop, ForgeMap[ForgeLevel].TimeBetweenForging);;
@@ -101,10 +119,9 @@ void AForge::SpawnWeapon(FName WeaponName)
 
 	// float RandomSpawnpointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
 
-	FTransform SpawnPointTransform;
-	UArrayUtils::GetRandomElement(SpawnPoints, SpawnPointTransform);
+	FVector SpawnPointLocation;
+	UArrayUtils::GetRandomElement(SpawnPoints, SpawnPointLocation);
 	
-	FVector SpawnPointLocation = SpawnPointTransform.GetLocation();
 	FTransform WeaponSpawnTransform = GetActorTransform();
 	// FTransform SpawnPointTransform = FTransform();
 

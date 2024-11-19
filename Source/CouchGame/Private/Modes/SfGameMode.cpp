@@ -63,7 +63,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Oh Fils de pute");
 	
-	if (CheckEndOfGame())
+	if (isGameOver)
 	{
 		//TODO Clément
 		// Oooh
@@ -89,17 +89,19 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	TeamMap[Dead->PlayerTeam].AddPlayer(NewCharacter);
 	
 	Respawner->EndDeferredRespawn(respawnData, NewCharacter);
+
+	CheckEndOfGame();
 }
 
 bool ASfGameMode::CheckEndOfGame()
 {
-	bool isOVer = false;
+	isGameOver = false;
 	for (const auto& [_, TeamInfo] : TeamMap)
 	{
 		// Proceed to kill myself after that
-		isOVer |= TeamInfo.Lives <= 0 ? 1 : 0;
+		isGameOver |= TeamInfo.Lives <= 0 ? 1 : 0;
 	}
-	return isOVer;
+	return isGameOver;
 	return TeamScoreMap[Team1] >= TeamLives || TeamScoreMap[Team2] >= TeamLives;
 }
 
