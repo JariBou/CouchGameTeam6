@@ -9,7 +9,7 @@
 
 class UEventHandler;
 
-UCLASS()
+UCLASS(Abstract)
 class COUCHGAME_API AEventActor : public AActor
 {
 	GENERATED_BODY()
@@ -32,7 +32,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
+protected:
 	UPROPERTY()
 	TObjectPtr<UEventHandler> EventHandler;
 
