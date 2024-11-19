@@ -6,11 +6,31 @@
 #include "GameplayElements/Events/EventInfo.h"
 #include "GameplayElements/Events/EventActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Utils/ArrayUtils.h"
+#include "Utils/TransformUtils.h"
+
+void UEventHandler::InitializeSpawnPoints()
+{
+	while(SpawnPointActors.Num() > 0)
+	{
+		AActor* Element = SpawnPointActors[0];
+		SpawnPoints.Add(Element->GetActorLocation());
+
+		GetWorld()->DestroyActor(Element);
+		SpawnPointActors.RemoveAt(0);
+	}
+	// for (const AActor* Element : SpawnPointActors)
+	// {
+	// 	SpawnPoints.Add(Element->GetActorLocation());
+	// }
+	SpawnPointActors.Empty();
+}
 
 void UEventHandler::BeginPlay()
 {
 	Super::BeginPlay();
-
+	InitializeSpawnPoints();
+	
 	FTimerHandle NullTimerHandle;
 	GetTimeManager().SetTimer(NullTimerHandle, this, &UEventHandler::StartNewEvent, InitialDelay);
 }
@@ -26,7 +46,6 @@ void UEventHandler::StartNewEvent()
 		do
 		{
 			Rand = FMath::RandRange(0,RowNames.Num());
-
 		}
 		while (RowNames[Rand] == LastEventName);
 	}
@@ -49,15 +68,30 @@ void UEventHandler::InformEndEvent()
 	GetTimeManager().SetTimer(NullTimerHandle, this, &UEventHandler::StartNewEvent, StaticTimeBeforeNextEvent);
 }
 
-void UEventHandler::SpawnEvent(FName EventName)
+void UEventHandler::SpawnEvent(const FName EventName)
 {
 	const FEventInfo* EventInfo = EventsDataTable->FindRow<FEventInfo>(EventName, "");
 	LastEventName = EventName;
 
-	AEventActor* SpawnedEvent = Cast<AEventActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), EventInfo->EventBp, GetOwner()->GetActorTransform()));
-	SpawnedEvent->Config(this, *EventInfo);
+	TArray<FVector> UsedSpawnLocations;
+	for (int i = 0; i < EventInfo->EventSpawnCount; ++i)
+	{
+		FVector spawnLocation;
+		do {
+			UArrayUtils::GetRandomElement(SpawnPoints, spawnLocation);
+		}
+		while (UsedSpawnLocations.Contains(spawnLocation));
+		
+		FTransform SpawnTransform = UTransformUtils::MakeTransformFromLocation(spawnLocation);
 
-	SpawnedEvent->FinishSpawning(GetOwner()->GetActorTransform());
+		AEventActor* SpawnedEvent = Cast<AEventActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), EventInfo->EventBp, SpawnTransform));
+		SpawnedEvent->Config(this, *EventInfo);
 
-	SpawnedEvent->StartEvent();
+		SpawnedEvent->FinishSpawning(SpawnTransform);
+
+		SpawnedEvent->StartEvent();
+
+		UsedSpawnLocations.Add(spawnLocation);
+	}
+	
 }

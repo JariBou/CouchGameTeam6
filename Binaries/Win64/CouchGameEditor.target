@@ -34,6 +34,18 @@
 			"Type": "RequiredResource"
 		},
 		{
+			"Path": "$(ProjectDir)/Plugins/CameraSystemPlugin/Binaries/Win64/UnrealEditor-CameraSystemPlugin.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/CameraSystemPlugin/Binaries/Win64/UnrealEditor-CameraSystemPlugin.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/CameraSystemPlugin/Binaries/Win64/UnrealEditor.modules",
+			"Type": "RequiredResource"
+		},
+		{
 			"Path": "$(ProjectDir)/Plugins/LocalMultiplayerPlugin/Binaries/Win64/UnrealEditor-LocalMultiplayerPlugin.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -6245,6 +6257,10 @@
 	"RuntimeDependencies": [
 		{
 			"Path": "$(ProjectDir)/CouchGame.uproject",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/CameraSystemPlugin/CameraSystemPlugin.uplugin",
 			"Type": "UFS"
 		},
 		{

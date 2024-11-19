@@ -43,6 +43,13 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float Duration = 0.f;
+
+public:
+	void SetDuration(float inDuration);
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> Plane;
 	
 private:
 

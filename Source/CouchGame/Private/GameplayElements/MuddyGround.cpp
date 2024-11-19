@@ -6,6 +6,7 @@
 #include "Characters/SfCharacter.h"
 #include "DynamicMesh/ColliderMesh.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Misc/MapErrors.h"
 
 
 // Sets default values
@@ -13,6 +14,7 @@ AMuddyGround::AMuddyGround()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	Plane = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Plane"));
 }
 
 // Called when the game starts or when spawned
@@ -39,7 +41,7 @@ void AMuddyGround::Tick(float DeltaTime)
 	{
 		for (TTuple<TObjectPtr<ASfCharacter>, float> CharacterAndSpeed : OverlappingActorsAndSpeedOnEnter)
 		{
-			CharacterAndSpeed.Key->GetCharacterMovement()->MaxWalkSpeed = CharacterAndSpeed.Value * (SlowPercent / 100.0f);
+			if(SlowPercent > 0.0f) CharacterAndSpeed.Key->GetCharacterMovement()->MaxWalkSpeed = CharacterAndSpeed.Value * (SlowPercent / 100.0f);
 		}
 	}
 
@@ -71,6 +73,11 @@ void AMuddyGround::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	Character->GetCharacterMovement()->MaxWalkSpeed = OverlappingActorsAndSpeedOnEnter.FindRef(Character);
 
 	OverlappingActorsAndSpeedOnEnter.Remove(Character);
+}
+
+void AMuddyGround::SetDuration(float inDuration)
+{
+	Duration = inDuration;
 }
 
 
