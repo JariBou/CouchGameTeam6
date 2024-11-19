@@ -105,7 +105,7 @@ void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	Drop();
+	if (IsCarrying) Drop();
 
 	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->RemoveFollowTarget(this);
 }
@@ -391,6 +391,7 @@ void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 {
+	if (PlayerType == TypeOfPlayer) return;
 	PlayerType = TypeOfPlayer;
 	if (TypeOfPlayer == Knight)
 	{
