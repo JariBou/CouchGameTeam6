@@ -18,6 +18,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/PoseableMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameplayElements/Events/VisualEventHandler.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Modes/SfGameMode.h"
@@ -347,7 +348,22 @@ void ASfCharacter::AddHealth(float HealthToAdd)
 
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {
+	TArray<AActor*> ListOfActorFromCollision;
+	//Btw si j'avais dit de créer un BP du puits c'est pas pour rien....
+	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, UVisualEventHandler::StaticClass());
 	PickUpAndThrow();
+
+	// if(ListOfActorFromCollision.IsEmpty())
+	// {
+	// }
+	// else
+	// {
+	// 	for (AActor* Well : ListOfActorFromCollision)
+	// 	{
+	// 		//Cast<UWell>(Well)
+	// 		//Do My Shit
+	// 	}
+	// }
 }
 
 AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable)

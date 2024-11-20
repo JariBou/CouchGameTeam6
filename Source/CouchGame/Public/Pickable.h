@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interactions.h"
-#include "TypeOfPickable.h"
 #include "Components/StaticMeshComponent.h"
 #include "Pickable.generated.h"
 

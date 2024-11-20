@@ -4,7 +4,6 @@
 #include "RainEvent.h"
 
 #include "GameplayElements/MuddyGround.h"
-#include "Kismet/GameplayStatics.h"
 
 
 void ARainEvent::EndEvent()
