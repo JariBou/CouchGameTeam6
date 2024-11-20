@@ -15,7 +15,9 @@
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
+#include "Components/BoxComponent.h"
 #include "Components/PoseableMeshComponent.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Modes/SfGameMode.h"
@@ -64,6 +66,10 @@ ASfCharacter::ASfCharacter()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+
+	//Create Sphere Coll For Object Detection
+	CollisionForObject = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
+	CollisionForObject->SetupAttachment(RootComponent);
 
 	// Create a follow camera
 /*
@@ -344,6 +350,23 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	PickUpAndThrow();
 }
 
+AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable)
+{
+	float MinDistance = FLT_MAX;
+	AActor* ClosestPickable = nullptr;
+	float CurrentDistance = 0.f;
+	for (AActor* Pickable : ArrayOfPickable)
+	{
+		CurrentDistance = (Pickable->GetActorLocation() - this->GetActorLocation()).SquaredLength();
+		if(CurrentDistance < MinDistance)
+		{
+			MinDistance = CurrentDistance;
+			ClosestPickable = Pickable;
+		}
+	}
+	return ClosestPickable;
+}
+
 void ASfCharacter::PickUpAndThrow()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 6.f, FColor::Emerald, TEXT("PICK UP DE FOU CA MARCHE STP"));
@@ -353,6 +376,10 @@ void ASfCharacter::PickUpAndThrow()
 		Drop();
 	} else //Si il n'en a pas dans les mains
 	{
+		TArray<AActor*> ArrayOfOverlappingObjects;
+		CollisionForObject->GetOverlappingActors(ArrayOfOverlappingObjects, APickable::StaticClass());
+		CurrentPickable = Cast<APickable>(GetClosestActorToCharacterInArray(ArrayOfOverlappingObjects));
+		
 		if(CurrentPickable != nullptr)
 		{
 			if(CurrentPickable->Implements<UInteractions>()) //Si il contient l'interface
@@ -369,6 +396,12 @@ void ASfCharacter::PickUpAndThrow()
 			}
 		}
 	}
+}
+
+void ASfCharacter::OnPickableCollisionTimeout()
+{
+	if(LastPickable != nullptr)	LastPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
 
 void ASfCharacter::Drop()
@@ -394,6 +427,14 @@ void ASfCharacter::Drop()
 	}
 	CurrentPickable->StaticMeshComponent->SetSimulatePhysics(true);
 	CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+
+	CurrentPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, true);
+
+	//Timer Delegate
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindUObject(this, &ASfCharacter::OnPickableCollisionTimeout);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerForObjectCollisionWithPlayer, false);
+	LastPickable = CurrentPickable;
 	CurrentPickable = nullptr;
 #pragma endregion 
 }

@@ -12,6 +12,7 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+	class UBoxComponent;
 class APickable;
 struct FInputActionInstance;
 //struct FPhysicalAnimationData;
@@ -235,17 +236,33 @@ protected:
 	UFUNCTION()
 	void PickUpAndThrowAction(const FInputActionInstance& Instance);
 
+	AActor* GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable);
+	
 	UFUNCTION()
 	void PickUpAndThrow();
 
+	void OnPickableCollisionTimeout();
+	
 	UFUNCTION()
 	void Drop();
 
+public:
 	UPROPERTY(BlueprintReadWrite)
 	bool IsCarrying = false;
 
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<APickable> CurrentPickable;
+
+	UPROPERTY()
+	TObjectPtr<APickable> LastPickable;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UBoxComponent> CollisionForObject;
+	
+	FTimerHandle TimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float TimerForObjectCollisionWithPlayer = 1.f;
 	
 
 #pragma endregion 
