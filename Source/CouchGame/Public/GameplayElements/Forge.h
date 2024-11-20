@@ -28,6 +28,7 @@ struct FWeaponsList
 
 	UPROPERTY(EditAnywhere)
 	float PercentChance = 0;
+	//recompile stp
 };
 
 USTRUCT()
