@@ -120,8 +120,27 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	//Set new Location
 	//BoneTransformToMove.SetLocation(NewClampedLocation);
 	//Set Bone transform with modifications
-	
+
+	if(DashCooldownTimer > 0.f && !CanDash)
+	{
+		DashCooldownTimer -= DeltaSeconds;
 		
+		if(DashCooldownTimer <= 0.f)
+		{
+			CanDash = true;
+		}
+	}
+	if(CanDash)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("TRUE"), false);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("FALSE"), false);
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, FString::SanitizeFloat(DashCooldownTimer), false);
+
 }
 
 void ASfCharacter::SetInputData(USfCharacterInputData* NewInputData)
@@ -238,6 +257,12 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 	{
 		
 	}
+}
+
+void ASfCharacter::StartDashCooldownTimer()
+{
+	CanDash = false;
+	DashCooldownTimer = DashCooldown;
 }
 
 void ASfCharacter::CreateStateMachine()

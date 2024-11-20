@@ -21,18 +21,22 @@ void USfCharacterDash::StateInit(USfCharacterStateMachine* InStateMachine)
 void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
+
+	if(Character->CanDash)
+	{
+		const FVector MovementDirection = Character->GetCharacterMovement()->Velocity.GetSafeNormal();
+
+		if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+		{
+			Character->SetCanBeDamaged(false);	    
+		}
+
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(Character->DashDistance));
 	
-	const FVector MovementDirection = Character->GetCharacterMovement()->Velocity.GetSafeNormal();
-
-    if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
-    {
-    	Character->SetCanBeDamaged(false);	    
-    }
-
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(Character->DashDistance));
+		Character->LaunchCharacter(MovementDirection * Character->DashDistance, true, true);
+		Character->StartDashCooldownTimer();
+	}
 	
-	Character->LaunchCharacter(MovementDirection * Character->DashDistance, true, true);
-
 	//Peut a changer plus tard, rajouter un timer si besoin en fonction des intéractions qu'il y aura	
 	StateMachine->ChangeState(ESfCharacterStateID::Walk);
 }

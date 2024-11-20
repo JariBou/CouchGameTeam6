@@ -127,9 +127,18 @@ private:
 public:
 	FVector2D GetInputMove() const;
 
+	void StartDashCooldownTimer();
+
+	bool CanDash = true;
+
 protected:
 	UPROPERTY()
 	FVector2D InputMove = {0.f, 0.f};
+
+	UPROPERTY(EditAnywhere)
+	float DashCooldown = 0.f;
+
+	float DashCooldownTimer = 0.f;
 
 private:
 	void OnInputMove(const FInputActionValue& InputActionValue);
