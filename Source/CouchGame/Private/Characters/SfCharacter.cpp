@@ -357,6 +357,12 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 	}));
 }
 
+void ASfCharacter::SetupHealth(uint8 inMaxHealth)
+{
+	MaxHealth = inMaxHealth;
+	Health = MaxHealth;
+}
+
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {
 	TArray<AActor*> ListOfActorFromCollision;

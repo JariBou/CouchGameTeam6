@@ -19,6 +19,9 @@ struct FCharacterSettingsData
 
 	UPROPERTY(EditAnywhere)
 	TSoftObjectPtr<USkeletalMesh> Mesh;
+
+	UPROPERTY(EditAnywhere)
+	uint8 MaxHealth;
 };
 
 /**

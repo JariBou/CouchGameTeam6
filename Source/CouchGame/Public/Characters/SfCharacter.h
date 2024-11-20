@@ -231,6 +231,9 @@ public:
 
 	UFUNCTION()
 	void ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const;
+
+	UFUNCTION()
+	void SetupHealth(uint8 inMaxHealth);
 	
 #pragma endregion
 

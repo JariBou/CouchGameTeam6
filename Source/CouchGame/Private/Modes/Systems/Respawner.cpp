@@ -24,7 +24,7 @@ ASfCharacter* URespawner::StartDeferredRespawn(FRespawnData RespawnData)
 
 	// RespawnMap.Add(RespawnData, Character);
 	Character->PlayerTeam = RespawnData.Team;
-	Character->PlayerType = Squire;
+	Character->PlayerType = RespawnData.TypeOfPlayer;
 
 	return Character;
 }
@@ -33,8 +33,11 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 {
 	RespawnData.PlayerController->Possess(Character);
 
-	USkeletalMesh* SkeletalMesh = GetDefault<UCharacterSettings>()->CharacterInputDatas[Squire].Mesh.LoadSynchronous();
+	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
+	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Squire].Mesh.LoadSynchronous();
 	Character->ChangeSkeletalMesh(SkeletalMesh);
+
+	Character->SetupHealth(CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].MaxHealth);
 
 	Character->FinishSpawning(RespawnPoint);
 	// RespawnMap.Remove(RespawnData);
