@@ -20,7 +20,7 @@ void USfCharacterState::StateInit(USfCharacterStateMachine* InStateMachine)
 {
 	StateMachine = InStateMachine;
 	Character = InStateMachine->GetCharacter();
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("Init State %d"), GetStateID()));
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("Init State %d"), GetStateID()));
 }
 
 void USfCharacterState::StateEnter(ESfCharacterStateID PreviousStateID)

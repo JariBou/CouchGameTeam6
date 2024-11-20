@@ -15,24 +15,14 @@ void USfCharacterStateIdle::StateEnter(ESfCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::Blue,
-		TEXT("ENTER StateIdle")
-	);
+	//GEngine->AddOnScreenDebugMessage(-1,3.f, FColor::Blue,TEXT("ENTER StateIdle"));
 }
 
 void USfCharacterStateIdle::StateExit(ESfCharacterStateID NextStateID)
 {
 	Super::StateExit(NextStateID);
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		3.f,
-		FColor::Red,
-		TEXT("EXIT StateIdle")
-	);
+	//GEngine->AddOnScreenDebugMessage(-1,3.f,FColor::Red,TEXT("EXIT StateIdle"));
 }
 
 void USfCharacterStateIdle::StateTick(float DeltaTime)
