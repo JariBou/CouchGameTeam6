@@ -70,8 +70,8 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 		Dead->Destroy();
 		return;
 	}
-	
-	--TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
+
+	if (Killer->PlayerType == Knight) --TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
 	
 
 	const FRespawnData respawnData {
@@ -85,10 +85,10 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight);
 	
 	ASfCharacter* NewCharacter = Respawner->StartDeferredRespawn(respawnData);
-
-	TeamMap[Dead->PlayerTeam].AddPlayer(NewCharacter);
 	
 	Respawner->EndDeferredRespawn(respawnData, NewCharacter);
+
+	TeamMap[Dead->PlayerTeam].AddPlayer(NewCharacter);
 
 	CheckEndOfGame();
 }

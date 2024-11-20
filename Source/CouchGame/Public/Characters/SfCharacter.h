@@ -228,6 +228,9 @@ public:
 
 	UFUNCTION()
 	void AddHealth(float HealthToAdd);
+
+	UFUNCTION()
+	void ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const;
 	
 #pragma endregion
 

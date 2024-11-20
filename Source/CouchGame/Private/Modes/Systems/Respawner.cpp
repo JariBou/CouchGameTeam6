@@ -3,6 +3,7 @@
 
 #include "Modes/Systems/Respawner.h"
 
+#include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Modes/SfGameMode.h"
@@ -18,7 +19,8 @@ void URespawner::Initialize(ASfGameMode* inGameMode)
 
 ASfCharacter* URespawner::StartDeferredRespawn(FRespawnData RespawnData)
 {
-	ASfCharacter* Character = Cast<ASfCharacter>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), GameMode->GetSfCharacterBpClass(), RespawnPoint, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn));
+	ASfCharacter* Character = GetWorld()->SpawnActorDeferred<ASfCharacter>(GameMode->GetSfCharacterBpClass(), RespawnPoint, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+	// ASfCharacter* Character = Cast<ASfCharacter>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), GameMode->GetSfCharacterBpClass(), RespawnPoint, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn));
 
 	// RespawnMap.Add(RespawnData, Character);
 	Character->PlayerTeam = RespawnData.Team;
@@ -30,7 +32,10 @@ ASfCharacter* URespawner::StartDeferredRespawn(FRespawnData RespawnData)
 void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Character)
 {
 	RespawnData.PlayerController->Possess(Character);
-	
+
+	USkeletalMesh* SkeletalMesh = GetDefault<UCharacterSettings>()->CharacterInputDatas[Squire].Mesh.LoadSynchronous();
+	Character->ChangeSkeletalMesh(SkeletalMesh);
+
 	Character->FinishSpawning(RespawnPoint);
 	// RespawnMap.Remove(RespawnData);
 }

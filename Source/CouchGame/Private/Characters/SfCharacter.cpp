@@ -346,6 +346,17 @@ void ASfCharacter::AddHealth(float HealthToAdd)
 	++NumberOfTimeHealthIsUsed; //Hurm actually c'est plus opti
 }
 
+void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
+{
+	GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationCustomMode);
+	GetMesh()->SetSkeletalMesh(SkeletalMesh);
+
+	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
+	{
+		GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
+	}));
+}
+
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {
 	TArray<AActor*> ListOfActorFromCollision;

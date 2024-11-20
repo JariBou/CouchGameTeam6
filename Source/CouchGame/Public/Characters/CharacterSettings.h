@@ -9,6 +9,18 @@
 class USfCharacterInputData;
 enum TypeOfPlayer : uint8;
 
+USTRUCT(BlueprintType)
+struct FCharacterSettingsData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<USfCharacterInputData> InputData;
+
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<USkeletalMesh> Mesh;
+};
+
 /**
  * 
  */
@@ -21,5 +33,5 @@ public:
 	TObjectPtr<USfCharacterInputData> GetInputDataFromPlayerType(TEnumAsByte<TypeOfPlayer> Type) const;
 
 	UPROPERTY(Config, EditAnywhere, Category="Settings")
-	TMap<TEnumAsByte<TypeOfPlayer>, TSoftObjectPtr<USfCharacterInputData>> CharacterInputDatas;
+	TMap<TEnumAsByte<TypeOfPlayer>, FCharacterSettingsData> CharacterInputDatas;
 };
