@@ -118,3 +118,8 @@ const TSubclassOf<ASfCharacter>& ASfGameMode::GetSfCharacterBpClass() const
 {
 	return SfCharacterBpClass;
 }
+
+const TMap<TEnumAsByte<ETeam>, FTeamInfo>& ASfGameMode::GetTeamMap() const
+{
+	return TeamMap;
+}

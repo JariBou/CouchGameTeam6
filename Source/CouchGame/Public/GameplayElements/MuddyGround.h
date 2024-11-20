@@ -42,6 +42,9 @@ protected:
 	float SlowPercent = 0.f;
 
 	UPROPERTY(EditAnywhere)
+	float DashDistancePercent = 0.f;
+
+	UPROPERTY(EditAnywhere)
 	float Duration = 0.f;
 
 public:
@@ -54,6 +57,8 @@ protected:
 private:
 
 	TMap<TObjectPtr<ASfCharacter>, float> OverlappingActorsAndSpeedOnEnter;
+	
+	TMap<TObjectPtr<ASfCharacter>, float> OverlappingActorsAndDashDistancedOnEnter;
 	
 #pragma endregion
 };

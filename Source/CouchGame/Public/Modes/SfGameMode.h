@@ -14,13 +14,13 @@ struct FTeamInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<ETeam> Team;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TArray<ASfCharacter*> Players;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	uint8 Lives; // <==== UINT8
 
 	void AddPlayer(ASfCharacter* Player)
@@ -89,6 +89,8 @@ private:
 	TMap<TEnumAsByte<ETeam>, FTeamInfo> TeamMap = {
 	};
 
+public:
+	UFUNCTION(BlueprintCallable)
+	const TMap<TEnumAsByte<ETeam>, FTeamInfo>& GetTeamMap() const;
 	
-
 };

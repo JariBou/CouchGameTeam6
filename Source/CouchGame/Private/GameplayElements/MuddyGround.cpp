@@ -41,7 +41,11 @@ void AMuddyGround::Tick(float DeltaTime)
 	{
 		for (TTuple<TObjectPtr<ASfCharacter>, float> CharacterAndSpeed : OverlappingActorsAndSpeedOnEnter)
 		{
+			//Change speed to speed * slow value
 			if(SlowPercent > 0.0f) CharacterAndSpeed.Key->GetCharacterMovement()->MaxWalkSpeed = CharacterAndSpeed.Value * (SlowPercent / 100.0f);
+
+			//Change dash distance value to dash distance * dash percentage
+			if(DashDistancePercent > 0.0f) CharacterAndSpeed.Key->DashDistance = OverlappingActorsAndDashDistancedOnEnter.FindRef(CharacterAndSpeed.Key) * (DashDistancePercent / 100.0f);
 		}
 	}
 
@@ -60,7 +64,13 @@ void AMuddyGround::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
 	if(Character == nullptr) return;
 
+	Character->StartFeedBackEffect(true);
+
+	//Add character in list of overlapping characters, character as key and speed as value
 	OverlappingActorsAndSpeedOnEnter.Add(Character, Character->GetCharacterMovement()->MaxWalkSpeed);
+
+	//Add character in list of overlapping characters, character as key and dash distance as value
+	OverlappingActorsAndDashDistancedOnEnter.Add(Character, Character->DashDistance);
 }
 
 void AMuddyGround::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -70,9 +80,15 @@ void AMuddyGround::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 	if(Character == nullptr) return;
 
-	Character->GetCharacterMovement()->MaxWalkSpeed = OverlappingActorsAndSpeedOnEnter.FindRef(Character);
+	Character->StopFeedBackEffect();
 
+	//Set character speed to its value before entering and remove it from overlapping characters list
+	Character->GetCharacterMovement()->MaxWalkSpeed = OverlappingActorsAndSpeedOnEnter.FindRef(Character);
 	OverlappingActorsAndSpeedOnEnter.Remove(Character);
+
+	//Set character dash distance to its value before entering and remove it from overlapping characters list
+	Character->DashDistance = OverlappingActorsAndDashDistancedOnEnter.FindRef(Character);
+	OverlappingActorsAndDashDistancedOnEnter.Remove(Character);
 }
 
 void AMuddyGround::SetDuration(float inDuration)
