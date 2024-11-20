@@ -21,19 +21,31 @@ void USfCharacterDash::StateInit(USfCharacterStateMachine* InStateMachine)
 void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
+
+	if(Character->CanDash)
+	{
+		FVector MovementDirection;
+
+		if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+		{
+			Character->SetCanBeDamaged(false);	    
+		}
+
+		if(Character->GetCharacterMovement()->Velocity == FVector::ZeroVector)
+		{
+			MovementDirection = Character->GetActorRotation().Vector();
+		}
+		else
+		{
+			MovementDirection = Character->GetCharacterMovement()->Velocity.GetSafeNormal();
+		}
+		
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(Character->DashDistance));
 	
-	const FVector MovementDirection = Character->GetCharacterMovement()->Velocity.GetSafeNormal();
-
-	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Emerald, MovementDirection.ToString());
-
-    if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
-    {
-    	Character->SetCanBeDamaged(false);	    
-    }
+		Character->LaunchCharacter(MovementDirection * Character->DashDistance, true, true);
+		Character->StartDashCooldownTimer();
+	}
 	
-	Character->LaunchCharacter(MovementDirection * DashDistance, true, true);
-
-
 	//Peut a changer plus tard, rajouter un timer si besoin en fonction des intéractions qu'il y aura	
 	StateMachine->ChangeState(ESfCharacterStateID::Walk);
 }
