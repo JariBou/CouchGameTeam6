@@ -1,11 +1,11 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameplayElements/Events/Well.h"
+#include "GameplayElements/Events/VisualEventHandler.h"
 
 
 // Sets default values for this component's properties
-UWell::UWell()
+UVisualEventHandler::UVisualEventHandler()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -16,7 +16,7 @@ UWell::UWell()
 
 
 // Called when the game starts
-void UWell::BeginPlay()
+void UVisualEventHandler::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -24,23 +24,23 @@ void UWell::BeginPlay()
 	
 }
 
-void UWell::InformEndEvent()
+void UVisualEventHandler::InformEndEvent()
 {
 	Super::InformEndEvent();
 
 	FTimerHandle NullTimerHandle;
-	GetTimeManager().SetTimer(NullTimerHandle, this, &UWell::StartVisualEffect, StaticTimeBeforeNextEvent - VisualEffectOffsetTime);
+	GetTimeManager().SetTimer(NullTimerHandle, this, &UVisualEventHandler::StartVisualEffect, StaticTimeBeforeNextEvent - VisualEffectOffsetTime);
 
 }
 
-void UWell::StartVisualEffect()
+void UVisualEventHandler::StartVisualEffect()
 {
 	PlayVisualFeedback();
 	FTimerHandle NullTimerHandle;
-	GetTimeManager().SetTimer(NullTimerHandle, this, &UWell::EndVisualEffect, VisualEffectOffsetTime);
+	GetTimeManager().SetTimer(NullTimerHandle, this, &UVisualEventHandler::EndVisualEffect, VisualEffectOffsetTime);
 }
 
-void UWell::EndVisualEffect()
+void UVisualEventHandler::EndVisualEffect()
 {
 	StopVisualFeedback();
 	PlaySpawningVisualEffect();
@@ -48,7 +48,7 @@ void UWell::EndVisualEffect()
 
 
 // Called every frame
-void UWell::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UVisualEventHandler::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
