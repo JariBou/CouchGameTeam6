@@ -18,6 +18,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/PoseableMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameplayElements/Events/Well.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Modes/SfGameMode.h"
@@ -347,7 +348,20 @@ void ASfCharacter::AddHealth(float HealthToAdd)
 
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {
-	PickUpAndThrow();
+	TArray<AActor*> ListOfActorFromCollision;
+	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, UWell::StaticClass());
+	if(ListOfActorFromCollision.IsEmpty())
+	{
+		PickUpAndThrow();
+	}
+	else
+	{
+		for (AActor* Well : ListOfActorFromCollision)
+		{
+			//Cast<UWell>(Well)
+			//Do My Shit
+		}
+	}
 }
 
 AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable)
