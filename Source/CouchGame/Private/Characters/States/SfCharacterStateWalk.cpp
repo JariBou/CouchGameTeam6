@@ -24,24 +24,24 @@ void USfCharacterStateWalk::StateEnter(ESfCharacterStateID PreviousStateID)
 
 	Character->GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 
-	GEngine->AddOnScreenDebugMessage(
+	/*GEngine->AddOnScreenDebugMessage(
 		-1,
 		3.f,
 		FColor::Green,
 		TEXT("ENTER StateWalk")
-	);
+	);*/
 }
 
 void USfCharacterStateWalk::StateExit(ESfCharacterStateID NextStateID)
 {
 	Super::StateExit(NextStateID);
 
-	GEngine->AddOnScreenDebugMessage(
+	/*GEngine->AddOnScreenDebugMessage(
 		-1,
 		3.f,
 		FColor::Red,
 		TEXT("EXIT StateWalk")
-	);
+	);*/
 }
 
 void USfCharacterStateWalk::StateTick(float DeltaTime)

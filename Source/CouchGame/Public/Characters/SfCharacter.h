@@ -129,9 +129,18 @@ private:
 public:
 	FVector2D GetInputMove() const;
 
+	void StartDashCooldownTimer();
+
+	bool CanDash = true;
+
 protected:
 	UPROPERTY()
 	FVector2D InputMove = {0.f, 0.f};
+
+	UPROPERTY(EditAnywhere)
+	float DashCooldown = 0.f;
+
+	float DashCooldownTimer = 0.f;
 
 private:
 	void OnInputMove(const FInputActionValue& InputActionValue);
@@ -194,17 +203,25 @@ protected:
 #pragma endregion
 
 #pragma region Health
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthValueChange, class ASfCharacter*, CallingCharacter);
+
+protected:
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	uint8 MaxHealth = 100;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Health;
 
 	UPROPERTY(EditAnywhere)
 	uint8 NumberOfTimeHealthIsUsed = 0;
+	//ASfCharacter CallingCharacter = this;
 	
 public:
+	UPROPERTY(BlueprintAssignable, Category="Event")
+	FOnHealthValueChange OnHealthValueChange;
+	
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
 
@@ -233,5 +250,23 @@ protected:
 
 #pragma endregion 
 
+#pragma region InMud
+
+public:
+	UPROPERTY(EditAnywhere)
+	float DashDistance = 0.f;
+
+	void StartFeedBackEffect(bool IsLooping);
+
+	void StopFeedBackEffect();
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UForceFeedbackEffect> ForceFeedbackEffect;
+
+	UPROPERTY(EditAnywhere)
+	FName ForceFeedBackEffectTag;
+	
+#pragma endregion 
 };
 

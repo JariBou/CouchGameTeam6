@@ -123,8 +123,27 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	//Set new Location
 	//BoneTransformToMove.SetLocation(NewClampedLocation);
 	//Set Bone transform with modifications
-	
+
+	if(DashCooldownTimer > 0.f && !CanDash)
+	{
+		DashCooldownTimer -= DeltaSeconds;
 		
+		if(DashCooldownTimer <= 0.f)
+		{
+			CanDash = true;
+		}
+	}
+	if(CanDash)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("TRUE"), false);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("FALSE"), false);
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, FString::SanitizeFloat(DashCooldownTimer), false);
+
 }
 
 void ASfCharacter::SetInputData(USfCharacterInputData* NewInputData)
@@ -151,11 +170,11 @@ void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 
 void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
-	GEngine->AddOnScreenDebugMessage(
+	/*GEngine->AddOnScreenDebugMessage(
 		-1,
 		4.0f,
 		FColor::Yellow,
-		TEXT("OnInputDash"));
+		TEXT("OnInputDash"));*/
 		
 	
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
@@ -246,6 +265,12 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 	}
 }
 
+void ASfCharacter::StartDashCooldownTimer()
+{
+	CanDash = false;
+	DashCooldownTimer = DashCooldown;
+}
+
 void ASfCharacter::CreateStateMachine()
 {
 	StateMachine = NewObject<USfCharacterStateMachine>(this);
@@ -295,7 +320,10 @@ void ASfCharacter::SetUpArmsRagdoll()
 void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
 	if(CanBeDamaged())
+	{
 		Health -= Amount;
+		OnHealthValueChange.Broadcast(this);
+	}
 	
 	if (Health <= 0 && !IsDead)
 	{
@@ -369,6 +397,18 @@ void ASfCharacter::Drop()
 	CurrentPickable = nullptr;
 
 #pragma endregion 
+void ASfCharacter::StartFeedBackEffect(bool IsLooping)
+{
+	FForceFeedbackParameters FeedbackParams;
+	FeedbackParams.bLooping = IsLooping;
+	FeedbackParams.Tag = ForceFeedBackEffectTag;
+	
+	Cast<APlayerController>(GetController())->ClientPlayForceFeedback(ForceFeedbackEffect, FeedbackParams);
+}
+
+void ASfCharacter::StopFeedBackEffect()
+{
+	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
 }
 
 //////////////////////////////////////////////////////////////////////////

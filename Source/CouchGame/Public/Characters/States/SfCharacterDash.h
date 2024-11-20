@@ -26,8 +26,8 @@ public:
 	
 	virtual void StateTick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
-	float DashDistance = 500.f;
+	/*UPROPERTY(EditAnywhere)
+	float DashDistance = 500.f;*/
 
 	UPROPERTY()
 	TObjectPtr<UCharacterMovementComponent> MovementComponent;
