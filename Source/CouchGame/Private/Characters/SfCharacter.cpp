@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Pickable.h"
 #include "Camera/CameraWorldSubsystem.h"
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacterInputData.h"
@@ -103,6 +104,8 @@ void ASfCharacter::BeginPlay()
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+	if (IsCarrying) Drop();
 
 	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->RemoveFollowTarget(this);
 }
@@ -245,17 +248,20 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 
 	if(InputData->InputActionFaceButtonLeft) // Squire : Take, Give, Throw,      Knight : Take, Throw
 	{
-		
+		EnhancedInputComponent->BindAction(InputData->InputActionFaceButtonLeft,
+			ETriggerEvent::Started,
+			this,
+			&ASfCharacter::PickUpAndThrowAction);
 	}
 
 	if(InputData->InputActionRightTrigger) // Squire : Taunt
 	{
-		
+		//
 	}
 
 	if(InputData->InputActionLeftTrigger) // Squire : Slap
 	{
-		
+		//Je slap tes grosses fessiers bien rondes et dodus et soyeuses et rambombés et galbées et rebondis
 	}
 }
 
@@ -327,6 +333,70 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	}
 }
 
+void ASfCharacter::AddHealth(float HealthToAdd)
+{
+	Health += HealthToAdd;
+	++NumberOfTimeHealthIsUsed; //Hurm actually c'est plus opti
+}
+
+void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
+{
+	PickUpAndThrow();
+}
+
+void ASfCharacter::PickUpAndThrow()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 6.f, FColor::Emerald, TEXT("PICK UP DE FOU CA MARCHE STP"));
+
+	if(IsCarrying) //Si il porte un objet
+	{
+		Drop();
+	} else //Si il n'en a pas dans les mains
+	{
+		if(CurrentPickable != nullptr)
+		{
+			if(CurrentPickable->Implements<UInteractions>()) //Si il contient l'interface
+			{
+				if(CurrentPickable->CanPickUp_Implementation(this))
+				{
+					CurrentPickable->Holder = this;
+					CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+					CurrentPickable->StaticMeshComponent->SetSimulatePhysics(false);
+					const FAttachmentTransformRules TransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget,EAttachmentRule::KeepRelative, true);
+					CurrentPickable->AttachToComponent(this->GetMesh(),TransformRules,FName("hr"));
+					IsCarrying = true;
+				}
+			}
+		}
+	}
+}
+
+void ASfCharacter::Drop()
+{
+#pragma region DetachPickable
+		
+	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
+	CurrentPickable->DetachFromActor(DeTransformRules);
+	IsCarrying = false;
+		
+#pragma endregion
+
+#pragma region Get Vel And Impulse
+
+	FVector CurrentVelocity = FVector(this->GetCharacterMovement()->GetLastUpdateVelocity().X,this->GetCharacterMovement()->GetLastUpdateVelocity().Y,0.f);
+	if(CurrentVelocity.Length() > 0.f) //Velocity supérieur a 0
+	{
+		//Get Impulse
+
+		FVector ImpulseDirection = FVector(this->GetActorForwardVector().X * 500.f, this->GetActorForwardVector().Y * 500.f, 1.f * 200.f); //IMPULSE DIRECTION (NO GD FRIENDLY)
+		ImpulseDirection += this->GetVelocity();
+		CurrentPickable->StaticMeshComponent->AddImpulse(ImpulseDirection, FName(""), true); //IMPULSE
+	}
+	CurrentPickable->StaticMeshComponent->SetSimulatePhysics(true);
+	CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+	CurrentPickable = nullptr;
+
+#pragma endregion 
 void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 {
 	FForceFeedbackParameters FeedbackParams;
@@ -355,12 +425,18 @@ void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	SetPossibleStates(InputData->CharacterStates);
 	
 	BindInputMoveAndActions(EnhancedInputComponent);
+
 }
 
 
 void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 {
+	if (PlayerType == TypeOfPlayer) return;
 	PlayerType = TypeOfPlayer;
+	if (TypeOfPlayer == Knight)
+	{
+		if (IsCarrying) Drop();
+	}
 }
 
 void ASfCharacter::Move(const FInputActionValue& Value)
