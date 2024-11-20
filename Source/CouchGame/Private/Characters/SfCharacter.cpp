@@ -395,8 +395,9 @@ void ASfCharacter::Drop()
 	CurrentPickable->StaticMeshComponent->SetSimulatePhysics(true);
 	CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	CurrentPickable = nullptr;
-
 #pragma endregion 
+}
+
 void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 {
 	FForceFeedbackParameters FeedbackParams;
