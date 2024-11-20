@@ -27,7 +27,7 @@ struct FWeaponsList
 	TArray<FName> Weapons;
 
 	UPROPERTY(EditAnywhere)
-	uint8 PercentChance = 0;
+	float PercentChance = 0;
 };
 
 USTRUCT()
