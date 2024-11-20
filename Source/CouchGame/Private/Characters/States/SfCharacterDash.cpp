@@ -24,13 +24,22 @@ void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 
 	if(Character->CanDash)
 	{
-		const FVector MovementDirection = Character->GetCharacterMovement()->Velocity.GetSafeNormal();
+		FVector MovementDirection;
 
 		if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
 		{
 			Character->SetCanBeDamaged(false);	    
 		}
 
+		if(Character->GetCharacterMovement()->Velocity == FVector::ZeroVector)
+		{
+			MovementDirection = Character->GetActorRotation().Vector();
+		}
+		else
+		{
+			MovementDirection = Character->GetCharacterMovement()->Velocity.GetSafeNormal();
+		}
+		
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(Character->DashDistance));
 	
 		Character->LaunchCharacter(MovementDirection * Character->DashDistance, true, true);
