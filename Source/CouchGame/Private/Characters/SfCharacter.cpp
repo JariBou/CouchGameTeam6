@@ -18,6 +18,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/PoseableMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameplayElements/WaterBucket.h"
 #include "GameplayElements/Events/VisualEventHandler.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
@@ -374,12 +375,46 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	//C reel ca, mais va y c la faute de clément chef
 
 	//CHECK OBJ
-	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, AActor::StaticClass()); //La Faute A clem ptn
-
-	//Interact
+	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, AActor::StaticClass()); //La Faute de clem ptn
 	
-	//GiveToKnight
-
+	//Setup FriendlyKnight && Well PAS OPTI
+	for (AActor* ActorFromCollision : ListOfActorFromCollision)
+	{
+		if(Cast<ASfCharacter>(ActorFromCollision) != nullptr) FriendlyKnight = Cast<ASfCharacter>(ActorFromCollision);
+		//if(Cast<AWell>(ActorFromCollision) != nullptr) WellInRange = Cast<AWell>(ActorFromCollision);
+	}
+	
+	AActor* ClosestActor = GetClosestActorToCharacterInArray(ListOfActorFromCollision);
+	
+	AWaterBucket* MyWaterBucket = Cast<AWaterBucket>(CurrentPickable);
+	if(MyWaterBucket == nullptr && CurrentPickable != nullptr) //OUI JE LE SAIS TOMÉ JE LE FAIS DEJA APRES M'EN VEUX PAS STP
+	{
+		if(FriendlyKnight != nullptr) GiveToKnight(FriendlyKnight);
+		if(Cast<APickable>(ClosestActor) != nullptr) //Switch
+		{
+			//A checker car la on joue avec des pointeurs
+			LastPickable = CurrentPickable;
+			Drop();
+			CurrentPickable = LastPickable;
+			Give();
+		}
+	}
+	else
+	{
+		if (MyWaterBucket->IsFilled)
+		{
+			Drop();
+		}
+		else
+		{
+			/*
+			if (HasWell)
+			{
+				MyWaterBucket->SwitchFillBucket();
+			}
+			*/
+		}
+	}
 
 	//PUAT
 	PickUpAndThrow(ListOfActorFromCollision);
@@ -411,11 +446,8 @@ void ASfCharacter::PickUpAndThrow(TArray<AActor*>& ArrayOfPickable)
 		Drop();
 	} else //Si il n'en a pas dans les mains
 	{
-		TArray<AActor*> ArrayOfOverlappingObjects;
-		CollisionForObject->GetOverlappingActors(ArrayOfOverlappingObjects, APickable::StaticClass());
-		CurrentPickable = Cast<APickable>(GetClosestActorToCharacterInArray(ArrayOfOverlappingObjects));
-		
-		Give();
+		CurrentPickable = Cast<APickable>(GetClosestActorToCharacterInArray(ArrayOfPickable));
+		if(CurrentPickable != nullptr) Give();
 	}
 }
 
@@ -478,6 +510,12 @@ void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 	Drop(); //Lache Son Arme
 	FriendlyKnight->CurrentPickable = LastPickable; //Setup L'arme dans le bras de l'autre
 	FriendlyKnight->Give(); //Met l'arme dans sa main
+}
+
+void ASfCharacter::Interact()
+{
+	Drop();
+	//Interaction Event sur Puit a coder
 }
 
 void ASfCharacter::StartFeedBackEffect(bool IsLooping)

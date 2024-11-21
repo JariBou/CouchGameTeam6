@@ -253,6 +253,8 @@ protected:
 
 	void GiveToKnight(ASfCharacter* FriendlyKnight);
 
+	void Interact();
+
 public:
 	UPROPERTY(BlueprintReadWrite)
 	bool IsCarrying = false;
@@ -276,6 +278,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Pickable")
 	FString RightHandBoneName;
+
+	/*
+	UPROPERTY()
+	TObjectPtr<AWell> WellInRange;
+	*/
+
+	UPROPERTY()
+	TObjectPtr<ASfCharacter> FriendlyKnight;
+			
 
 #pragma endregion 
 
