@@ -83,8 +83,14 @@ void AForge::BeginPlay()
 	Super::BeginPlay();
 	InitializeSpawnPoints();
 
-	FTimerHandle SpawnDelayTimerHandle;
-	GetGameInstance()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, this, &AForge::ForgeLoop, ForgeMap[ForgeLevel].TimeBetweenForging);;
+	if (InitialSpawnDelay > 0)
+	{
+		FTimerHandle SpawnDelayTimerHandle;
+		GetGameInstance()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, this, &AForge::ForgeLoop, InitialSpawnDelay);;
+	} else
+	{
+		ForgeLoop();
+	}
 }
 
 void AForge::ForgeLoop()

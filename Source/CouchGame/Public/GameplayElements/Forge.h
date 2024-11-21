@@ -42,10 +42,10 @@ struct FWeaponsRarityList
 	UPROPERTY(EditAnywhere)
 	uint8 NumberOfSpawnedWeapons = 1;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ToolTip = "Time between spawn of number of spawned weapons"))
 	uint8 TimeBetweenSpawns = 1;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ToolTip = "Time between spawn cycles"))
 	uint8 TimeBetweenForging = 15;
 
 	UPROPERTY(EditAnywhere)
@@ -97,10 +97,12 @@ public:
 	TArray<AActor*> SpawnPointActors;
 	
 private:
-	
 	UPROPERTY(EditAnywhere)
 	TEnumAsByte<EForgeLevel> ForgeLevel = Level1;
 
+	UPROPERTY(EditAnywhere)
+	uint8 InitialSpawnDelay = 1;
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UDataTable> WeaponsDataTable;
 
