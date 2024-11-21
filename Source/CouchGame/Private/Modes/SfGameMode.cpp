@@ -71,15 +71,12 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	
 	if (isGameOver)
 	{
-		//TODO Clément
-		// Oooh
 		Dead->Destroy();
 		return;
 	}
 
 	if (Killer->PlayerType == Knight) --TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
 	
-
 	const FRespawnData respawnData {
 		Dead->PlayerTeam,
 		Dead->GetController(),
@@ -96,7 +93,10 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 
 	TeamMap[Dead->PlayerTeam].AddPlayer(NewCharacter);
 
-	CheckEndOfGame();
+	if (CheckEndOfGame())
+	{
+		OnEndOfGame();
+	}
 }
 
 bool ASfGameMode::CheckEndOfGame()
@@ -109,6 +109,11 @@ bool ASfGameMode::CheckEndOfGame()
 	}
 	return isGameOver;
 	return TeamScoreMap[Team1] >= TeamLives || TeamScoreMap[Team2] >= TeamLives;
+}
+
+void ASfGameMode::OnEndOfGame()
+{
+	//TODO Clément
 }
 
 void ASfGameMode::CreateAndInitPlayers() const

@@ -67,7 +67,10 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckEndOfGame();
-
+	
+	UFUNCTION(BlueprintCallable)
+	void OnEndOfGame();
+	
 private:
 	void CreateAndInitPlayers() const;
 
