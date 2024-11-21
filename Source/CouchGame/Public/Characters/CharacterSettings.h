@@ -21,6 +21,9 @@ struct FCharacterSettingsData
 	TSoftObjectPtr<USkeletalMesh> Mesh;
 
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<UAnimInstance> AnimBlueprint;
+
+	UPROPERTY(EditAnywhere)
 	uint8 MaxHealth;
 };
 

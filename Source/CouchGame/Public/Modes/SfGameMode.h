@@ -60,7 +60,7 @@ public:
 private:
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	URespawner* Respawner;
 
 	virtual void BeginPlay() override;

@@ -91,13 +91,17 @@ void ASfCharacter::BeginPlay()
 	InitStateMachine();
 	//SetUpArmsRagdoll();
 	
-		
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
-
-	Health = MaxHealth;
 	
 	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->AddFollowTarget(this);
+	
+	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
+
+	SetupHealth(CharacterSettings->CharacterInputDatas[PlayerType].MaxHealth);
+	
+	// USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[PlayerType].Mesh.LoadSynchronous();
+	// ChangeSkeletalMesh(SkeletalMesh);
 	//Add Input Mapping Context
 	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	// {
@@ -348,13 +352,14 @@ void ASfCharacter::AddHealth(float HealthToAdd)
 
 void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 {
-	GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationCustomMode);
+	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
 	GetMesh()->SetSkeletalMesh(SkeletalMesh);
+	GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
+	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
 
-	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
-	{
-		GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
-	}));
+	// GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
+	// {
+	// }));
 }
 
 void ASfCharacter::SetupHealth(uint8 inMaxHealth)

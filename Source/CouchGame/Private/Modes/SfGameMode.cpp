@@ -5,6 +5,7 @@
 
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.h"
+#include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacter.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
@@ -46,8 +47,13 @@ void ASfGameMode::BeginPlay()
 		ETeam NewPlayerTeam = i%2 > 0 ? Team2 : Team1;
 		NewCharacter->PlayerTeam = NewPlayerTeam;
 		TeamMap[NewPlayerTeam].AddPlayer(NewCharacter);
-		
-		NewCharacter->PlayerType = i/2 > 0 ? Knight : Squire;
+
+		TypeOfPlayer TypeOfPlayer = i/2 > 0 ? Knight : Squire;
+		NewCharacter->PlayerType = TypeOfPlayer;
+
+		const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
+		NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
+
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 		i++;
 	}
