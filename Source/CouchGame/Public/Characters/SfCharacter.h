@@ -92,9 +92,7 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
-
-protected:
+	
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
@@ -245,31 +243,39 @@ protected:
 	AActor* GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable);
 	
 	UFUNCTION()
-	void PickUpAndThrow();
+	void PickUpAndThrow(TArray<AActor*>& ArrayOfPickable);
 
 	void OnPickableCollisionTimeout();
 	
-	UFUNCTION()
-	void Drop();
+	void Drop(); //Drop Object
+
+	void Give(); //Give Object TO Player = THIS
+
+	void GiveToKnight(ASfCharacter* FriendlyKnight);
 
 public:
 	UPROPERTY(BlueprintReadWrite)
 	bool IsCarrying = false;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category= "Pickable")
 	TObjectPtr<APickable> CurrentPickable;
 
 	UPROPERTY()
 	TObjectPtr<APickable> LastPickable;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Pickable")
 	TObjectPtr<UBoxComponent> CollisionForObject;
+
+	UPROPERTY()
+	TArray<AActor*> ListOfActorFromCollision;
 	
 	FTimerHandle TimerHandle;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category= "Pickable")
 	float TimerForObjectCollisionWithPlayer = 1.f;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Pickable")
+	FString RightHandBoneName;
 
 #pragma endregion 
 

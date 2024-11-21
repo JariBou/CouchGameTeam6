@@ -365,22 +365,19 @@ void ASfCharacter::SetupHealth(uint8 inMaxHealth)
 
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {
-	TArray<AActor*> ListOfActorFromCollision;
 	//Btw si j'avais dit de créer un BP du puits c'est pas pour rien....
-	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, UVisualEventHandler::StaticClass());
-	PickUpAndThrow();
+	//C reel ca, mais va y c la faute de clément chef
 
-	// if(ListOfActorFromCollision.IsEmpty())
-	// {
-	// }
-	// else
-	// {
-	// 	for (AActor* Well : ListOfActorFromCollision)
-	// 	{
-	// 		//Cast<UWell>(Well)
-	// 		//Do My Shit
-	// 	}
-	// }
+	//CHECK OBJ
+	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, AActor::StaticClass()); //La Faute A clem ptn
+
+	//Interact
+	
+	//GiveToKnight
+
+
+	//PUAT
+	PickUpAndThrow(ListOfActorFromCollision);
 }
 
 AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable)
@@ -400,7 +397,7 @@ AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOf
 	return ClosestPickable;
 }
 
-void ASfCharacter::PickUpAndThrow()
+void ASfCharacter::PickUpAndThrow(TArray<AActor*>& ArrayOfPickable)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 6.f, FColor::Emerald, TEXT("PICK UP DE FOU CA MARCHE STP"));
 
@@ -413,21 +410,7 @@ void ASfCharacter::PickUpAndThrow()
 		CollisionForObject->GetOverlappingActors(ArrayOfOverlappingObjects, APickable::StaticClass());
 		CurrentPickable = Cast<APickable>(GetClosestActorToCharacterInArray(ArrayOfOverlappingObjects));
 		
-		if(CurrentPickable != nullptr)
-		{
-			if(CurrentPickable->Implements<UInteractions>()) //Si il contient l'interface
-			{
-				if(CurrentPickable->CanPickUp_Implementation(this))
-				{
-					CurrentPickable->Holder = this;
-					CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-					CurrentPickable->StaticMeshComponent->SetSimulatePhysics(false);
-					const FAttachmentTransformRules TransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget,EAttachmentRule::KeepRelative, true);
-					CurrentPickable->AttachToComponent(this->GetMesh(),TransformRules,FName("hr"));
-					IsCarrying = true;
-				}
-			}
-		}
+		Give();
 	}
 }
 
@@ -439,28 +422,23 @@ void ASfCharacter::OnPickableCollisionTimeout()
 
 void ASfCharacter::Drop()
 {
-#pragma region DetachPickable
-		
+	//Detach Pickable
 	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
 	CurrentPickable->DetachFromActor(DeTransformRules);
 	IsCarrying = false;
 		
-#pragma endregion
-
-#pragma region Get Vel And Impulse
-
+	//Get Vel and Impulse
 	FVector CurrentVelocity = FVector(this->GetCharacterMovement()->GetLastUpdateVelocity().X,this->GetCharacterMovement()->GetLastUpdateVelocity().Y,0.f);
+	CurrentPickable->StaticMeshComponent->SetSimulatePhysics(true);
 	if(CurrentVelocity.Length() > 0.f) //Velocity supérieur a 0
 	{
 		//Get Impulse
-
-		FVector ImpulseDirection = FVector(this->GetActorForwardVector().X * 500.f, this->GetActorForwardVector().Y * 500.f, 1.f * 200.f); //IMPULSE DIRECTION (NO GD FRIENDLY)
+		USkeletalMeshComponent* wow = this->GetMesh();
+		FVector ImpulseDirection = FVector(wow->GetForwardVector().X * 500.f, wow->GetForwardVector().Y * 500.f, 1.f * 200.f); //IMPULSE DIRECTION (NO GD FRIENDLY)
 		ImpulseDirection += this->GetVelocity();
 		CurrentPickable->StaticMeshComponent->AddImpulse(ImpulseDirection, FName(""), true); //IMPULSE
 	}
-	CurrentPickable->StaticMeshComponent->SetSimulatePhysics(true);
 	CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
-
 	CurrentPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, true);
 
 	//Timer Delegate
@@ -469,7 +447,32 @@ void ASfCharacter::Drop()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerForObjectCollisionWithPlayer, false);
 	LastPickable = CurrentPickable;
 	CurrentPickable = nullptr;
-#pragma endregion 
+}
+
+void ASfCharacter::Give()
+{
+	if(CurrentPickable != nullptr)
+	{
+		if(CurrentPickable->Implements<UInteractions>()) //Si il contient l'interface
+		{
+			if(CurrentPickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
+			{
+				CurrentPickable->Holder = this;
+				CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+				CurrentPickable->StaticMeshComponent->SetSimulatePhysics(false);
+				const FAttachmentTransformRules TransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget,EAttachmentRule::KeepRelative, true);
+				CurrentPickable->AttachToComponent(this->GetMesh(),TransformRules,FName(RightHandBoneName));
+				IsCarrying = true;
+			}
+		}
+	}
+}
+
+void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
+{
+	Drop(); //Lache Son Arme
+	FriendlyKnight->CurrentPickable = LastPickable; //Setup L'arme dans le bras de l'autre
+	FriendlyKnight->Give(); //Met l'arme dans sa main
 }
 
 void ASfCharacter::StartFeedBackEffect(bool IsLooping)
