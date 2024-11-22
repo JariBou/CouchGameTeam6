@@ -245,11 +245,13 @@ protected:
 	UFUNCTION()
 	void PickUpAndThrow(TArray<AActor*>& ArrayOfPickable);
 
-	void OnPickableCollisionTimeout();
+	// void OnPickableCollisionTimeout();
 	
-	void Drop(); //Drop Object
+	void OnPickableCollisionTimeout(APickable* Pickable);
 
-	void Give(); //Give Object TO Player = THIS
+	APickable* Drop(); //Drop Object
+
+	void PickupObject(APickable* Pickable); //Give Object TO Player = THIS
 
 	void GiveToKnight();
 
@@ -268,8 +270,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Pickable")
 	TObjectPtr<UBoxComponent> CollisionForObject;
 
-	UPROPERTY()
-	TArray<AActor*> ListOfActorFromCollision;
+	// UPROPERTY()
+	// TArray<AActor*> ListOfActorFromCollision;
 	
 	FTimerHandle TimerHandle;
 

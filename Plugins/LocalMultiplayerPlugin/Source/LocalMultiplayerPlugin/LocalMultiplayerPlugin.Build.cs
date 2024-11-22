@@ -24,7 +24,8 @@ public class LocalMultiplayerPlugin : ModuleRules
 				"Engine",
 				"InputCore",
 				"Slate",
-				"SlateCore"
+				"SlateCore",
+				"EnhancedInput"
 			}
 		);
 	}

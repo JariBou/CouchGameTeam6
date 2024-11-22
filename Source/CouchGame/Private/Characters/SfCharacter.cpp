@@ -374,15 +374,21 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	//Btw si j'avais dit de créer un BP du puits c'est pas pour rien....
 	//C reel ca, mais va y c la faute de clément chef
 
+	TArray<AActor*> ListOfActorFromCollision;
 	//CHECK OBJ
 	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, AActor::StaticClass()); //La Faute de clem ptn
-	
+	ListOfActorFromCollision.RemoveAll([&](const AActor* Actor){return Actor == this;});
 	//Setup FriendlyKnight && Well PAS OPTI
 	for (AActor* ActorFromCollision : ListOfActorFromCollision)
 	{
-		if(Cast<ASfCharacter>(ActorFromCollision) != nullptr) FriendlyKnight = Cast<ASfCharacter>(ActorFromCollision);
-		//if(Cast<AWell>(ActorFromCollision) != nullptr) WellInRange = Cast<AWell>(ActorFromCollision);
+		// Warning: does not take into account if it's a friendly character or self
+		if(ASfCharacter* Character = Cast<ASfCharacter>(ActorFromCollision); Character != nullptr)
+		{
+			FriendlyKnight = Character;
+		}
+		//else if(Cast<AWell>(ActorFromCollision) != nullptr) WellInRange = Cast<AWell>(ActorFromCollision);
 	}
+
 	
 	AActor* ClosestActor = GetClosestActorToCharacterInArray(ListOfActorFromCollision);
 	
@@ -396,15 +402,15 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 		else if(Cast<APickable>(ClosestActor) != nullptr) //Switch
 		{
 			//A checker car la on joue avec des pointeurs
-			LastPickable = CurrentPickable;
-			Drop();
-			CurrentPickable = LastPickable;
-			Give();
+			// To check 'cause I have no clue wtf is going on here
+			// Drop() then Give()??
+			APickable* DroppedPickable = Drop();
+			PickupObject(DroppedPickable);
 		}
 	}
 	else
 	{
-		if (MyWaterBucket->IsFilled)
+		if (MyWaterBucket != nullptr && MyWaterBucket->IsFilled)
 		{
 			Drop();
 		}
@@ -449,18 +455,24 @@ void ASfCharacter::PickUpAndThrow(TArray<AActor*>& ArrayOfPickable)
 		Drop();
 	} else //Si il n'en a pas dans les mains
 	{
-		CurrentPickable = Cast<APickable>(GetClosestActorToCharacterInArray(ArrayOfPickable));
-		if(CurrentPickable != nullptr) Give();
+		APickable* PickableObject = Cast<APickable>(GetClosestActorToCharacterInArray(ArrayOfPickable));
+		if(PickableObject != nullptr) PickupObject(PickableObject);
 	}
 }
 
-void ASfCharacter::OnPickableCollisionTimeout()
+// void ASfCharacter::OnPickableCollisionTimeout()
+// {
+// 	if(LastPickable != nullptr)	LastPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
+// 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+// }
+
+void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 {
-	if(LastPickable != nullptr)	LastPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
+	if(Pickable != nullptr)	Pickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
 
-void ASfCharacter::Drop()
+APickable* ASfCharacter::Drop()
 {
 	//Detach Pickable
 	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
@@ -483,26 +495,31 @@ void ASfCharacter::Drop()
 
 	//Timer Delegate
 	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUObject(this, &ASfCharacter::OnPickableCollisionTimeout);
+	APickable* DroppedPickable = CurrentPickable;
+	TimerDelegate.BindUObject<ASfCharacter>(this, &ASfCharacter::OnPickableCollisionTimeout, DroppedPickable);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerForObjectCollisionWithPlayer, false);
-	LastPickable = CurrentPickable;
+	// LastPickable = DroppedPickable;
 	CurrentPickable = nullptr;
+	return DroppedPickable;
 }
 
-void ASfCharacter::Give()
+void ASfCharacter::PickupObject(APickable* Pickable)
 {
-	if(CurrentPickable != nullptr)
+	if(Pickable != nullptr)
 	{
-		if(CurrentPickable->Implements<UInteractions>()) //Si il contient l'interface
+		// APickable inherits from IInteractions (~=UIntereactions) so shouldn't be needed to check if implements
+		// Leaving it for now since it is 1:34am and I have no clue how to test that
+		if(Pickable->Implements<UInteractions>()) //Si il contient l'interface
 		{
-			if(CurrentPickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
+			if(Pickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
 			{
-				CurrentPickable->Holder = this;
-				CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-				CurrentPickable->StaticMeshComponent->SetSimulatePhysics(false);
+				Pickable->Holder = this;
+				Pickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+				Pickable->StaticMeshComponent->SetSimulatePhysics(false);
 				const FAttachmentTransformRules TransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget,EAttachmentRule::KeepRelative, true);
-				CurrentPickable->AttachToComponent(this->GetMesh(),TransformRules,FName(RightHandBoneName));
+				Pickable->AttachToComponent(this->GetMesh(),TransformRules,FName(RightHandBoneName));
 				IsCarrying = true;
+				CurrentPickable = Pickable;
 			}
 		}
 	}
@@ -512,9 +529,8 @@ void ASfCharacter::GiveToKnight()
 {
 	if(FriendlyKnight != nullptr)
 	{
-		Drop(); //Lache Son Arme
-		FriendlyKnight->CurrentPickable = LastPickable; //Setup L'arme dans le bras de l'autre
-		FriendlyKnight->Give(); //Met l'arme dans sa main
+		APickable* DroppedPickable = Drop(); //Lache Son Arme
+		FriendlyKnight->PickupObject(DroppedPickable); //Met l'arme dans sa main
 	}
 }
 
