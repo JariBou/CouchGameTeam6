@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TypeOfPickable.h"
 #include "UObject/Object.h"
 #include "Respawner.generated.h"
 
@@ -21,6 +22,9 @@ struct FRespawnData
 
 	UPROPERTY()
 	AController* PlayerController;
+
+	UPROPERTY()
+	TEnumAsByte<TypeOfPlayer> TypeOfPlayer = Squire;
 };
 
 /**

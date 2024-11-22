@@ -6,5 +6,5 @@
 
 TObjectPtr<USfCharacterInputData> UCharacterSettings::GetInputDataFromPlayerType(TEnumAsByte<TypeOfPlayer> Type) const
 {
-	return CharacterInputDatas.Find(Type)->LoadSynchronous();
+	return CharacterInputDatas.Find(Type)->InputData.LoadSynchronous();
 }

@@ -5,6 +5,7 @@
 
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.h"
+#include "GameFramework/PlayerInput.h"
 #include "Kismet/GameplayStatics.h"
 
 void ULocalMultiplayerGameViewportClient::PostInitProperties()
@@ -49,8 +50,14 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
 
 	if (PlayerIndex != -1)
 	{
-		return UGameplayStatics::GetPlayerController(GetGameInstance()->GetWorld(), PlayerIndex)->InputKey(EventArgs.Key,
-			EventArgs.Event, EventArgs.AmountDepressed, EventArgs.IsGamepad());
+		FInputKeyParams KeyParams(
+			EventArgs.Key,
+			EventArgs.Event,
+			static_cast<double>(EventArgs.AmountDepressed),
+			EventArgs.IsGamepad()
+		);
+		
+		return UGameplayStatics::GetPlayerController(GetGameInstance()->GetWorld(), PlayerIndex)->InputKey(KeyParams);
 	}
 
 	// Need this for esc to work
@@ -76,7 +83,14 @@ bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInpu
 
 	if (PlayerIndex != -1)
 	{
-		UGameplayStatics::GetPlayerController(GetGameInstance()->GetWorld(), PlayerIndex)->InputAxis(Key, Delta, DeltaTime, NumSamples, bGamepad);
+		FInputKeyParams KeyParams(
+			Key,
+			Delta,
+			DeltaTime,
+			NumSamples,
+			bGamepad
+		);
+		UGameplayStatics::GetPlayerController(GetGameInstance()->GetWorld(), PlayerIndex)->InputKey(KeyParams);
 	}
 	
 	return true;
