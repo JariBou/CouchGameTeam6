@@ -375,6 +375,7 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	//C reel ca, mais va y c la faute de clément chef
 
 	TArray<AActor*> ListOfActorFromCollision;
+	UEventHandler* FoundWell = nullptr;
 	//CHECK OBJ
 	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, AActor::StaticClass()); //La Faute de clem ptn
 	ListOfActorFromCollision.RemoveAll([&](const AActor* Actor){return Actor == this;});
@@ -385,6 +386,10 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 		if(ASfCharacter* Character = Cast<ASfCharacter>(ActorFromCollision); Character != nullptr)
 		{
 			FriendlyKnight = Character;
+		}
+		else if(UEventHandler* Well = Cast<UEventHandler>(ActorFromCollision->GetComponentByClass(UEventHandler::StaticClass())); Well != nullptr)
+		{
+			FoundWell = Well;
 		}
 		//else if(Cast<AWell>(ActorFromCollision) != nullptr) WellInRange = Cast<AWell>(ActorFromCollision);
 	}
@@ -399,34 +404,31 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 		{
 			GiveToKnight();
 		}
-		else if(Cast<APickable>(ClosestActor) != nullptr) //Switch
+		else if(APickable* obj = Cast<APickable>(ClosestActor); obj != nullptr) //Switch
 		{
 			//A checker car la on joue avec des pointeurs
 			// To check 'cause I have no clue wtf is going on here
 			// Drop() then Give()??
-			APickable* DroppedPickable = Drop();
-			PickupObject(DroppedPickable);
+			Drop();
+			PickupObject(obj);
+		}
+	}
+	else if(MyWaterBucket != nullptr)
+	{
+		if(FoundWell != nullptr && !MyWaterBucket->IsFilled)
+		{
+			MyWaterBucket->SwitchFillBucket();
+		}
+		else if(FoundWell == nullptr)
+		{
+			Drop();
 		}
 	}
 	else
 	{
-		if (MyWaterBucket != nullptr && MyWaterBucket->IsFilled)
-		{
-			Drop();
-		}
-		else
-		{
-			/*
-			if (HasWell)
-			{
-				MyWaterBucket->SwitchFillBucket();
-			}
-			*/
-		}
+		//PUAT
+		PickUpAndThrow(ListOfActorFromCollision);
 	}
-
-	//PUAT
-	PickUpAndThrow(ListOfActorFromCollision);
 }
 
 AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable) const
