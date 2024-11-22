@@ -40,10 +40,10 @@ public:
 
 	void UpdateMesh();
 	
-protected:
 	UPROPERTY(EditAnywhere)
 	bool IsFilled = false;
 
+protected:
 	UFUNCTION()
 	void SpawnMuddyGround(FVector Location, const FRotator& Rotation, const FVector& NormalVector);
 

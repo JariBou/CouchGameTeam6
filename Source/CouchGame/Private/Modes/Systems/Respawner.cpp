@@ -34,10 +34,10 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	RespawnData.PlayerController->Possess(Character);
 
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
-	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Squire].Mesh.LoadSynchronous();
+	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].Mesh.LoadSynchronous();
 	Character->ChangeSkeletalMesh(SkeletalMesh);
-
-	Character->SetupHealth(CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].MaxHealth);
+	//
+	// Character->SetupHealth(CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].MaxHealth);
 
 	Character->FinishSpawning(RespawnPoint);
 	// RespawnMap.Remove(RespawnData);
