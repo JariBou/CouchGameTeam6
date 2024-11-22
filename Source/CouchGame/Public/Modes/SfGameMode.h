@@ -60,14 +60,17 @@ public:
 private:
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	URespawner* Respawner;
 
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckEndOfGame();
-
+	
+	UFUNCTION(BlueprintCallable)
+	void OnEndOfGame();
+	
 private:
 	void CreateAndInitPlayers() const;
 

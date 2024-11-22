@@ -2,8 +2,6 @@
 
 
 #include "GameplayElements/WaterBucket.h"
-
-#include "NavigationSystemTypes.h"
 #include "GameFramework/PlayerState.h"
 #include "GameplayElements/MuddyGround.h"
 #include "Kismet/GameplayStatics.h"
