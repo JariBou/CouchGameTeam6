@@ -27,7 +27,8 @@ struct FWeaponsList
 	TArray<FName> Weapons;
 
 	UPROPERTY(EditAnywhere)
-	uint8 PercentChance = 0;
+	float PercentChance = 0;
+	//recompile stp
 };
 
 USTRUCT()
@@ -72,6 +73,8 @@ public:
 	void SpawnWeaponsAtRandomLocation(int NumberToSpawn, int SpawnDelayOfAttempts);
 	void SpawnRandomWeapon();
 
+	void InitializeSpawnPoints();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -89,6 +92,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnWeapon(FName WeaponName);
+
+	UPROPERTY(EditAnywhere)
+	TArray<AActor*> SpawnPointActors;
 	
 private:
 	
@@ -98,8 +104,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UDataTable> WeaponsDataTable;
 
-	UPROPERTY(EditAnywhere)
-	TArray<FTransform> SpawnPoints;
+	// UPROPERTY(EditAnywhere)
+	// TArray<FTransform> SpawnPoints;
 
 	UPROPERTY(EditAnywhere)
 	TMap<TEnumAsByte<EForgeLevel>, FWeaponsRarityList> ForgeMap;
@@ -109,4 +115,7 @@ private:
 
 	UFUNCTION()
 	TArray<FName> GetWeaponNames() const;
+
+	UPROPERTY()
+	TArray<FVector> SpawnPoints;
 };

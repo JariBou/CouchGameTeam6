@@ -78,6 +78,9 @@ public:
 	const TSubclassOf<ASfCharacter>& GetSfCharacterBpClass() const;
 
 private:
+	UPROPERTY()
+	bool isGameOver = false;
+
 	UPROPERTY(EditAnywhere)
 	uint8 TeamLives;
 

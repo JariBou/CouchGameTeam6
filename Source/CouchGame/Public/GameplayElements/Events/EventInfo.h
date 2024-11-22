@@ -20,4 +20,7 @@ struct COUCHGAME_API FEventInfo : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AEventActor> EventBp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 EventSpawnCount;
 };

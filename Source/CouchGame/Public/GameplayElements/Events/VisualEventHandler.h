@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "EventHandler.h"
-#include "Well.generated.h"
+#include "VisualEventHandler.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class COUCHGAME_API UWell : public UEventHandler
+class COUCHGAME_API UVisualEventHandler : public UEventHandler
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UWell();
+	UVisualEventHandler();
 
 protected:
 	// Called when the game starts
