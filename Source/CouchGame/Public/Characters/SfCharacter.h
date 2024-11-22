@@ -240,7 +240,7 @@ protected:
 	UFUNCTION()
 	void PickUpAndThrowAction(const FInputActionInstance& Instance);
 
-	AActor* GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable);
+	AActor* GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable) const;
 	
 	UFUNCTION()
 	void PickUpAndThrow(TArray<AActor*>& ArrayOfPickable);
@@ -251,7 +251,7 @@ protected:
 
 	void Give(); //Give Object TO Player = THIS
 
-	void GiveToKnight(ASfCharacter* FriendlyKnight);
+	void GiveToKnight();
 
 	void Interact();
 

@@ -389,8 +389,11 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	AWaterBucket* MyWaterBucket = Cast<AWaterBucket>(CurrentPickable);
 	if(MyWaterBucket == nullptr && CurrentPickable != nullptr) //OUI JE LE SAIS TOMÉ JE LE FAIS DEJA APRES M'EN VEUX PAS STP
 	{
-		if(FriendlyKnight != nullptr) GiveToKnight(FriendlyKnight);
-		if(Cast<APickable>(ClosestActor) != nullptr) //Switch
+		if(FriendlyKnight != nullptr)
+		{
+			GiveToKnight();
+		}
+		else if(Cast<APickable>(ClosestActor) != nullptr) //Switch
 		{
 			//A checker car la on joue avec des pointeurs
 			LastPickable = CurrentPickable;
@@ -420,7 +423,7 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	PickUpAndThrow(ListOfActorFromCollision);
 }
 
-AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable)
+AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOfPickable) const
 {
 	float MinDistance = FLT_MAX;
 	AActor* ClosestPickable = nullptr;
@@ -505,11 +508,14 @@ void ASfCharacter::Give()
 	}
 }
 
-void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
+void ASfCharacter::GiveToKnight()
 {
-	Drop(); //Lache Son Arme
-	FriendlyKnight->CurrentPickable = LastPickable; //Setup L'arme dans le bras de l'autre
-	FriendlyKnight->Give(); //Met l'arme dans sa main
+	if(FriendlyKnight != nullptr)
+	{
+		Drop(); //Lache Son Arme
+		FriendlyKnight->CurrentPickable = LastPickable; //Setup L'arme dans le bras de l'autre
+		FriendlyKnight->Give(); //Met l'arme dans sa main
+	}
 }
 
 void ASfCharacter::Interact()
