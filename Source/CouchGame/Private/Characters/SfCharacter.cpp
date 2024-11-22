@@ -111,6 +111,14 @@ void ASfCharacter::BeginPlay()
 	// 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	// 	}
 	// }
+
+	//ENBIE DE TIE c pourri
+	UMaterialInstanceDynamic* DynMat = UMaterialInstanceDynamic::Create(Material, this);
+	UMaterialInstanceDynamic* DynMat2 = UMaterialInstanceDynamic::Create(Material, this);
+	DynMat->SetVectorParameterValue("ColorParam", FColor::Green);
+	DynMat2->SetVectorParameterValue("ColorParam", FColor::Purple);
+	if(PlayerTeam == ETeam::Team1) GetMesh()->SetMaterial(0, DynMat);
+	if(PlayerTeam == ETeam::Team2) GetMesh()->SetMaterial(0, DynMat2);
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)

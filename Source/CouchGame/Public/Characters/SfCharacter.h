@@ -34,6 +34,10 @@ class ASfCharacter : public ACharacter, public ICameraFollowTarget
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* Material;
+
 #pragma region CameraFollowTarget
 public:
 	virtual FVector GetFollowTarget() override;
