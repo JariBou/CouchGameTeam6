@@ -111,6 +111,9 @@ void ASfCharacter::BeginPlay()
 	// 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	// 	}
 	// }
+
+	//ENBIE DE TIE c pourri
+	
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -357,7 +360,12 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 	GetMesh()->SetSkeletalMesh(SkeletalMesh);
 	GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
-
+	UMaterialInstanceDynamic* DynMat = UMaterialInstanceDynamic::Create(Material, nullptr);
+	UMaterialInstanceDynamic* DynMat2 = UMaterialInstanceDynamic::Create(Material, nullptr);
+	DynMat->SetVectorParameterValue("ColorParam", FColor::Green);
+	DynMat2->SetVectorParameterValue("ColorParam", FColor::Purple);
+	if(PlayerTeam == ETeam::Team1) GetMesh()->SetMaterial(0, DynMat);
+	if(PlayerTeam == ETeam::Team2) GetMesh()->SetMaterial(0, DynMat2);
 	// GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
 	// {
 	// }));
@@ -581,6 +589,8 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 	if (TypeOfPlayer == Knight)
 	{
 		if (IsCarrying) Drop();
+		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
+		ChangeSkeletalMesh(Settings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
 	}
 }
 
