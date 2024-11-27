@@ -67,7 +67,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 {
 	TeamScoreMap[Killer->PlayerTeam]++;
 
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Oh Fils de pute");
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "respawn");
 	
 	if (isGameOver)
 	{

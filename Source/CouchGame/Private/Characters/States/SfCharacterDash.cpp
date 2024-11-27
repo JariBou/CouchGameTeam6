@@ -6,6 +6,7 @@
 #include "Characters/SfCharacter.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ESfCharacterStateID USfCharacterDash::GetStateID() const
 {
@@ -28,7 +29,12 @@ void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 
 		if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
 		{
-			Character->SetCanBeDamaged(false);	    
+			Character->SetCanBeDamaged(false);
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDashSound, Character->GetActorLocation());
+		}
+		else if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDashSound, Character->GetActorLocation());
 		}
 
 		if(Character->GetCharacterMovement()->Velocity == FVector::ZeroVector)
