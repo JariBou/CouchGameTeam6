@@ -3,6 +3,8 @@
 
 #include "Modes/SfGameMode.h"
 
+#include <Systems/CharacterSelectionSubsystem.h>
+
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.h"
 #include "Characters/CharacterSettings.h"
@@ -29,7 +31,10 @@ void ASfGameMode::BeginPlay()
 		};
 		TeamMap.Add(Team, NewInfo);
 	}
-	
+
+	UCharacterSelectionSubsystem* CharacterSelectionSubsystem = GetGameInstance()->GetSubsystem<UCharacterSelectionSubsystem>();
+
+	//TODO this should go to the MenuSelectionGamemode
 	CreateAndInitPlayers();
 
 	TArray<AActor*> outPlayerStarts;
