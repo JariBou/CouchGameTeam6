@@ -21,6 +21,7 @@
 #include "GameplayElements/WaterBucket.h"
 #include "GameplayElements/Events/VisualEventHandler.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Modes/SfGameMode.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
@@ -112,8 +113,10 @@ void ASfCharacter::BeginPlay()
 	// 	}
 	// }
 
-	//ENBIE DE TIE c pourri
-	
+	//SetBaseRotationOfActor
+
+	CurrentAngle = GetActorRotation().Yaw;
+	DestinationAngle = CurrentAngle;
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -129,15 +132,9 @@ void ASfCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (StateMachine) StateMachine->Tick(DeltaSeconds);	
-	
-	//Clamping Z location between ZLocation of bone where we apply ragdoll and its own ZLocation
-	//float ClampedZLocation = FMath::Clamp(BoneTransformToMove.GetLocation().Z, BoneTransformToApplyRagdoll.GetLocation().Z, BoneTransformToMove.GetLocation().Z);
-	//Create new vector Location
-	//FVector NewClampedLocation = FVector(BoneTransformToMove.GetLocation().X, BoneTransformToMove.GetLocation().Y, ClampedZLocation);
-	//Set new Location
-	//BoneTransformToMove.SetLocation(NewClampedLocation);
-	//Set Bone transform with modifications
+	if (StateMachine) StateMachine->Tick(DeltaSeconds);
+
+	ManageCharacterRotation(DeltaSeconds);
 
 	if(DashCooldownTimer > 0.f && !CanDash)
 	{
@@ -193,6 +190,38 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 		
 	
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
+}
+
+void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
+{
+	FVector2d TempInputRJValue = InputActionValue.Get<FVector2D>(); //Case of Stick Length >= Dead Zone
+	if(TempInputRJValue.SquaredLength() > InputRightJoystickDeadZone * InputRightJoystickDeadZone)
+	{
+		TempInputRJValue = InputRJ;
+		InputRJ = InputActionValue.Get<FVector2D>();
+		
+		// float DotResult = FVector2D::DotProduct(InputRJ, TempInputRJValue);
+		// float DeltaAngle = FMath::Acos(DotResult);
+		// FVector InputRJ3D(InputRJ.X, InputRJ.Y, 0.f);
+		// FVector TempInputRJ3D(TempInputRJValue.X, TempInputRJValue.Y, 0.f);
+		// FVector CrossProduct = FVector::CrossProduct(InputRJ3D, TempInputRJ3D);
+		// if(FVector::DotProduct(-FVector::UpVector, CrossProduct) < 0.f)
+		// {
+		// 	DeltaAngle = -DeltaAngle;
+		// }
+		
+		float DeltaAngle = FMath::Atan2(InputRJ.Y, InputRJ.X) - FMath::Atan2(TempInputRJValue.Y, TempInputRJValue.X);
+		
+		/* Bon Calcul mais bug donc RLERP
+		float DeltaAnglePlusCircle = FMath::Atan2(InputRJ.Y, InputRJ.X) - FMath::Atan2(TempInputRJValue.Y, TempInputRJValue.X)  + 2*PI;
+		if (DeltaAnglePlusCircle < DeltaAngle)
+		{
+			DeltaAngle = DeltaAnglePlusCircle;
+		}
+		*/
+		DestinationAngle += DeltaAngle;
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("DeltaAngle = %f"), FMath::Atan2(InputRJ.Y, InputRJ.X)));
+	}
 }
 
 void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
@@ -277,6 +306,14 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 	if(InputData->InputActionLeftTrigger) // Squire : Slap
 	{
 		//Je slap tes grosses fessiers bien rondes et dodus et soyeuses et rambombés et galbées et rebondis
+	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Triggered,
+		this,
+		&ASfCharacter::RightJoystickInput);
 	}
 }
 
@@ -562,6 +599,20 @@ void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 void ASfCharacter::StopFeedBackEffect()
 {
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
+}
+
+void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
+{
+	FRotator DestinationRotator = GetActorRotation();
+	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
+	SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
+	
+	/*CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
+	float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
+	FRotator NewActorRotator = GetActorRotation();
+	NewActorRotator.Yaw = ActorConvertedAngle;
+	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
+	*/
 }
 
 //////////////////////////////////////////////////////////////////////////
