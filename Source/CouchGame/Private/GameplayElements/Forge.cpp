@@ -77,6 +77,22 @@ void AForge::InitializeSpawnPoints()
 	SpawnPointActors.Empty();
 }
 
+TArray<AActor*> AForge::GetAllSpawnPoints_Implementation()
+{
+	return SpawnPointActors;
+}
+
+// G pas les mots faut forcément mettre const et &...
+void AForge::SetSpawnPoints_Implementation(const TArray<AActor*>& NewRespawnPoints)
+{
+	SpawnPointActors = NewRespawnPoints;
+}
+
+void AForge::AddSpawnPoint_Implementation(AActor* NewSpawnPoint)
+{
+	SpawnPointActors.Add(NewSpawnPoint);
+}
+
 // Called when the game starts or when spawned
 void AForge::BeginPlay()
 {
