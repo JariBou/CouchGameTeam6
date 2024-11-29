@@ -200,25 +200,10 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 		TempInputRJValue = InputRJ;
 		InputRJ = InputActionValue.Get<FVector2D>();
 		
-		// float DotResult = FVector2D::DotProduct(InputRJ, TempInputRJValue);
-		// float DeltaAngle = FMath::Acos(DotResult);
-		// FVector InputRJ3D(InputRJ.X, InputRJ.Y, 0.f);
-		// FVector TempInputRJ3D(TempInputRJValue.X, TempInputRJValue.Y, 0.f);
-		// FVector CrossProduct = FVector::CrossProduct(InputRJ3D, TempInputRJ3D);
-		// if(FVector::DotProduct(-FVector::UpVector, CrossProduct) < 0.f)
-		// {
-		// 	DeltaAngle = -DeltaAngle;
-		// }
+		//float DeltaAngle = FMath::Atan2(InputRJ.Y, InputRJ.X) - FMath::Atan2(TempInputRJValue.Y, TempInputRJValue.X);
+
+		float DeltaAngle = FMath::Atan2(InputRJ.Y*TempInputRJValue.X - InputRJ.X*TempInputRJValue.Y, InputRJ.X*TempInputRJValue.X + InputRJ.Y*TempInputRJValue.Y);
 		
-		float DeltaAngle = FMath::Atan2(InputRJ.Y, InputRJ.X) - FMath::Atan2(TempInputRJValue.Y, TempInputRJValue.X);
-		
-		/* Bon Calcul mais bug donc RLERP
-		float DeltaAnglePlusCircle = FMath::Atan2(InputRJ.Y, InputRJ.X) - FMath::Atan2(TempInputRJValue.Y, TempInputRJValue.X)  + 2*PI;
-		if (DeltaAnglePlusCircle < DeltaAngle)
-		{
-			DeltaAngle = DeltaAnglePlusCircle;
-		}
-		*/
 		DestinationAngle += DeltaAngle;
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("DeltaAngle = %f"), FMath::Atan2(InputRJ.Y, InputRJ.X)));
 	}
@@ -605,14 +590,14 @@ void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
 {
 	FRotator DestinationRotator = GetActorRotation();
 	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
-	SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
+	//SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
 	
-	/*CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
+	CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
 	float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
 	FRotator NewActorRotator = GetActorRotation();
 	NewActorRotator.Yaw = ActorConvertedAngle;
 	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
-	*/
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
