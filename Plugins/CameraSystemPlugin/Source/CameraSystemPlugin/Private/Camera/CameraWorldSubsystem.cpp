@@ -20,6 +20,7 @@ void UCameraWorldSubsystem::PostInitialize()
 void UCameraWorldSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
 	CameraMain = FindCameraByTag(TEXT("CameraMain"));
+	if (CameraMain == nullptr) return;
 	CameraPluginSettings = GetDefault<UCameraPluginSettings>();
 	
 	InitCameraRotationParameters();
@@ -136,6 +137,7 @@ UCameraComponent* UCameraWorldSubsystem::FindCameraByTag(const FName& Tag) const
 
 void UCameraWorldSubsystem::Tick(float DeltaTime)
 {
+	if (CameraMain == nullptr) return;
 	Super::Tick(DeltaTime);
 	TickUpdateCameraZoom(DeltaTime);
 	TickUpdateCameraRotation(DeltaTime);
