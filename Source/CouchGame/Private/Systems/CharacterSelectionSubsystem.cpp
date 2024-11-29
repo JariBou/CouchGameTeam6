@@ -5,29 +5,42 @@
 
 FPlayerSelectionInfo& UCharacterSelectionSubsystem::InitializePlayerSelectionInfo(APlayerController* PlayerController)
 {
-	int32 ControllerID = UGameplayStatics::GetPlayerControllerID(PlayerController);
+	// int32 ControllerID = UGameplayStatics::GetPlayerControllerID(PlayerController);
 	FPlayerSelectionInfo Info = FPlayerSelectionInfo();
-	Info.Id = ControllerID;
+	uint8 InfoIndex = m_newControllerIndex;
+	Info.Id = InfoIndex;
 	Info.PlayerController = PlayerController;
-	m_playerIdToInfoMap.Add(ControllerID, Info);
-	return m_playerIdToInfoMap[ControllerID];
+	m_playerInfoArray.Add(Info);
+	m_newControllerIndex++;
+	return m_playerInfoArray[InfoIndex];
 }
 
-FPlayerSelectionInfo& UCharacterSelectionSubsystem::InitializePlayerSelectionInfoForId(uint8 PlayerId)
+FPlayerSelectionInfo& UCharacterSelectionSubsystem::InitializePlayerSelectionInfoForId(uint8 ControllerId)
 {
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), PlayerId);
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), ControllerId);
 	return InitializePlayerSelectionInfo(PlayerController);
 }
 
 const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo(APlayerController* PlayerController)
 {
+	for (FPlayerSelectionInfo Info : m_playerInfoArray)
+	{
+		if (Info.PlayerController == PlayerController) return Info;
+	}
+	throw;
 	int32 ControllerID = UGameplayStatics::GetPlayerControllerID(PlayerController);
 	return GetPlayerSelectionInfo(ControllerID);
 }
 
-const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo(uint8 PlayerId)
+const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo(uint8 ControllerId)
 {
-	return m_playerIdToInfoMap[PlayerId];
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), ControllerId);
+	return GetPlayerSelectionInfo(PlayerController);
+}
+
+const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfoFromArray(uint8 ArrayIndex)
+{
+	return m_playerInfoArray[ArrayIndex];
 }
 
 void UCharacterSelectionSubsystem::ChangePlayerTeam(APlayerController* PlayerController, TEnumAsByte<ETeam> NewTeam)
@@ -36,7 +49,8 @@ void UCharacterSelectionSubsystem::ChangePlayerTeam(APlayerController* PlayerCon
 	ChangePlayerTeam(ControllerID, NewTeam);
 }
 
-void UCharacterSelectionSubsystem::ChangePlayerTeam(uint8 PlayerId, TEnumAsByte<ETeam> NewTeam)
+void UCharacterSelectionSubsystem::ChangePlayerTeam(uint8 ControllerId, TEnumAsByte<ETeam> NewTeam)
 {
-	m_playerIdToInfoMap[PlayerId].PlayerTeam = NewTeam;
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), ControllerId);
+	return ChangePlayerTeam(PlayerController, NewTeam);
 }
