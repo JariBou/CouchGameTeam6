@@ -117,6 +117,7 @@ void ASfCharacter::BeginPlay()
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
+	InputRJ = FVector2d(1.f,0.f);
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
