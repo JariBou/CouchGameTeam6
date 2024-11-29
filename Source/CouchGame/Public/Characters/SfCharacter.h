@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "SfCharacterStateID.h"
 #include "Teams.h"
 #include "GameFramework/Character.h"
@@ -37,6 +38,7 @@ class ASfCharacter : public ACharacter, public ICameraFollowTarget
 public:
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* Material;
+
 
 #pragma region CameraFollowTarget
 public:
@@ -74,6 +76,14 @@ private:
 
 	UPROPERTY()
 	bool IsDead = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	float InputRightJoystickDeadZone = 0.5f;
+	
+	FVector2D InputRJ;
+
+	float CurrentAngle; //Current Yaw Rotation Of Actor
+	float DestinationAngle; //Destination Rotation Based On RightJoystick
 
 public:
 	/** Constructeur */
@@ -151,6 +161,8 @@ private:
 	void OnInputRun(const FInputActionValue& InputActionValue);
 
 	void OnInputDash(const FInputActionValue& InputActionValue);
+
+	void RightJoystickInput(const FInputActionValue& InputActionValue);
 	
 	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 	
@@ -315,6 +327,16 @@ protected:
 	
 #pragma endregion
 
+#pragma region CharacterRotation
+private:
+	void ManageCharacterRotation(float DeltaSeconds);
+
+public:
+	UPROPERTY(EditAnywhere)
+	int RotationSpeed = 1.f;
+	
+#pragma endregion
+	
 #pragma region Sounds
 
 	UPROPERTY(EditAnywhere)
