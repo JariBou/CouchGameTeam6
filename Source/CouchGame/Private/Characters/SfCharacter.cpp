@@ -31,6 +31,12 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // ACouchGameCharacter
 
+void ASfCharacter::OnDelegateStickCircleLate()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Black, TEXT("Fin de Stick Delay"));
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+}
+
 FVector ASfCharacter::GetFollowTarget()
 {
 	return GetActorLocation();
@@ -101,19 +107,6 @@ void ASfCharacter::BeginPlay()
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 
 	SetupHealth(CharacterSettings->CharacterInputDatas[PlayerType].MaxHealth);
-	
-	// USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[PlayerType].Mesh.LoadSynchronous();
-	// ChangeSkeletalMesh(SkeletalMesh);
-	//Add Input Mapping Context
-	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	// {
-	// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	// 	{
-	// 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
-	// 	}
-	// }
-
-	//SetBaseRotationOfActor
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
@@ -204,10 +197,26 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 		//float DeltaAngle = FMath::Atan2(InputRJ.Y, InputRJ.X) - FMath::Atan2(TempInputRJValue.Y, TempInputRJValue.X);
 
 		float DeltaAngle = FMath::Atan2(InputRJ.Y*TempInputRJValue.X - InputRJ.X*TempInputRJValue.Y, InputRJ.X*TempInputRJValue.X + InputRJ.Y*TempInputRJValue.Y);
+
+		CurrentDeltaMadeByStick += DeltaAngle;
+		NumberOfRotationMadeByStick = int(CurrentDeltaMadeByStick / (2 * PI));
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::FromInt(NumberOfRotationMadeByStick));
 		
 		DestinationAngle += DeltaAngle;
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("DeltaAngle = %f"), FMath::Atan2(InputRJ.Y, InputRJ.X)));
 	}
+}
+
+void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
+{
+	FTimerDelegate TimerDelegateForStickCircleCount;
+	TimerDelegateForStickCircleCount.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleLate);
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleForCircle, TimerDelegateForStickCircleCount, 1.5f, false);
+}
+
+void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
+{
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
 
 void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
@@ -301,6 +310,30 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 		this,
 		&ASfCharacter::RightJoystickInput);
 	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Started,
+		this,
+		&ASfCharacter::RightJoystickStarted);
+	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Completed,
+		this,
+		&ASfCharacter::RightJoystickEnded);
+	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Canceled,
+		this,
+		&ASfCharacter::RightJoystickEnded);
+	}
 }
 
 void ASfCharacter::StartDashCooldownTimer()
@@ -389,9 +422,6 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 	DynMat2->SetVectorParameterValue("ColorParam", FColor::Purple);
 	if(PlayerTeam == ETeam::Team1) GetMesh()->SetMaterial(0, DynMat);
 	if(PlayerTeam == ETeam::Team2) GetMesh()->SetMaterial(0, DynMat2);
-	// GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
-	// {
-	// }));
 }
 
 void ASfCharacter::SetupHealth(uint8 inMaxHealth)
@@ -527,10 +557,10 @@ APickable* ASfCharacter::Drop()
 	CurrentPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, true);
 
 	//Timer Delegate
-	FTimerDelegate TimerDelegate;
+	FTimerDelegate TimerDelegateForHandCollision;
 	APickable* DroppedPickable = CurrentPickable;
-	TimerDelegate.BindUObject<ASfCharacter>(this, &ASfCharacter::OnPickableCollisionTimeout, DroppedPickable);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerForObjectCollisionWithPlayer, false);
+	TimerDelegateForHandCollision.BindUObject<ASfCharacter>(this, &ASfCharacter::OnPickableCollisionTimeout, DroppedPickable);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegateForHandCollision, TimerForObjectCollisionWithPlayer, false);
 	// LastPickable = DroppedPickable;
 	CurrentPickable = nullptr;
 	return DroppedPickable;
