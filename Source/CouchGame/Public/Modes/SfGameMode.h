@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <Utils/ArrayUtils.h>
+
 #include "CoreMinimal.h"
 #include "Teams.h"
 #include "Characters/SfCharacter.h"
@@ -26,6 +28,13 @@ struct FTeamInfo
 	void AddPlayer(ASfCharacter* Player)
 	{
 		Players.Add(Player);
+	}
+
+	void SelectRandomKnight() const
+	{
+		ASfCharacter* RandomPlayer;
+		UArrayUtils::GetRandomElement(Players, RandomPlayer);
+		RandomPlayer->ChangePlayerType(Knight);
 	}
 
 	void RemovePlayer(ASfCharacter* Player)

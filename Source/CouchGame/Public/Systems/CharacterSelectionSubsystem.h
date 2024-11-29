@@ -35,10 +35,10 @@ class COUCHGAME_API UCharacterSelectionSubsystem : public UGameInstanceSubsystem
 	public:
 	FPlayerSelectionInfo& InitializePlayerSelectionInfo(APlayerController* PlayerController);
 	FPlayerSelectionInfo& InitializePlayerSelectionInfoForId(uint8 ControllerId);
-	
-	const FPlayerSelectionInfo& GetPlayerSelectionInfo(APlayerController* PlayerController);
-	const FPlayerSelectionInfo& GetPlayerSelectionInfo(uint8 PlayerId);
-	const FPlayerSelectionInfo& GetPlayerSelectionInfoFromArray(uint8 ArrayIndex);
+
+	FPlayerSelectionInfo& GetPlayerSelectionInfo(APlayerController* PlayerController);
+	FPlayerSelectionInfo& GetPlayerSelectionInfo(uint8 PlayerId);
+	FPlayerSelectionInfo& GetPlayerSelectionInfoFromArray(uint8 ArrayIndex);
 	
 	void ChangePlayerTeam(APlayerController* PlayerController, TEnumAsByte<ETeam> NewTeam);
 	void ChangePlayerTeam(uint8 PlayerId, TEnumAsByte<ETeam> NewTeam);

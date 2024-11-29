@@ -21,9 +21,9 @@ FPlayerSelectionInfo& UCharacterSelectionSubsystem::InitializePlayerSelectionInf
 	return InitializePlayerSelectionInfo(PlayerController);
 }
 
-const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo(APlayerController* PlayerController)
+FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo(APlayerController* PlayerController)
 {
-	for (FPlayerSelectionInfo Info : m_playerInfoArray)
+	for (FPlayerSelectionInfo& Info : m_playerInfoArray)
 	{
 		if (Info.PlayerController == PlayerController) return Info;
 	}
@@ -32,13 +32,13 @@ const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo
 	return GetPlayerSelectionInfo(ControllerID);
 }
 
-const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo(uint8 ControllerId)
+FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo(uint8 ControllerId)
 {
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), ControllerId);
 	return GetPlayerSelectionInfo(PlayerController);
 }
 
-const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfoFromArray(uint8 ArrayIndex)
+FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfoFromArray(uint8 ArrayIndex)
 {
 	return m_playerInfoArray[ArrayIndex];
 }
@@ -46,11 +46,11 @@ const FPlayerSelectionInfo& UCharacterSelectionSubsystem::GetPlayerSelectionInfo
 void UCharacterSelectionSubsystem::ChangePlayerTeam(APlayerController* PlayerController, TEnumAsByte<ETeam> NewTeam)
 {
 	int32 ControllerID = UGameplayStatics::GetPlayerControllerID(PlayerController);
-	ChangePlayerTeam(ControllerID, NewTeam);
+	GetPlayerSelectionInfo(PlayerController).PlayerTeam = NewTeam;
 }
 
 void UCharacterSelectionSubsystem::ChangePlayerTeam(uint8 ControllerId, TEnumAsByte<ETeam> NewTeam)
 {
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), ControllerId);
-	return ChangePlayerTeam(PlayerController, NewTeam);
+	ChangePlayerTeam(PlayerController, NewTeam);
 }

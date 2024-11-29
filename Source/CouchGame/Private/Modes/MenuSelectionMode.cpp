@@ -1,9 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include <Modes/MenuSelectionMode.h>
 #include <LocalMultiplayerSettings.h>
 #include <LocalMultiplayerSubsystem.h>
-#include <Modes/MenuSelectionMode.h>
 
 void AMenuSelectionMode::BeginPlay()
 {
