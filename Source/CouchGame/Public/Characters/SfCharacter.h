@@ -232,13 +232,22 @@ protected:
 	UPROPERTY(EditAnywhere)
 	uint8 NumberOfTimeHealthIsUsed = 0;
 	//ASfCharacter CallingCharacter = this;
+
+	UPROPERTY()
+	bool IsUnderInvincibilityTime;
 	
 public:
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthValueChange OnHealthValueChange;
+
+	UFUNCTION(BlueprintCallable)
+	bool CanBeDamagedCustom();
 	
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
+
+	UFUNCTION()
+	void RemoveInvincibility();
 
 	UFUNCTION()
 	void AddHealth(float HealthToAdd);

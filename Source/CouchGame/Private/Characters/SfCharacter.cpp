@@ -206,7 +206,7 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 		float DeltaAngle = FMath::Atan2(InputRJ.Y*TempInputRJValue.X - InputRJ.X*TempInputRJValue.Y, InputRJ.X*TempInputRJValue.X + InputRJ.Y*TempInputRJValue.Y);
 		
 		DestinationAngle += DeltaAngle;
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("DeltaAngle = %f"), FMath::Atan2(InputRJ.Y, InputRJ.X)));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("DeltaAngle = %f"), FMath::Atan2(InputRJ.Y, InputRJ.X)));
 	}
 }
 
@@ -355,12 +355,29 @@ void ASfCharacter::SetUpArmsRagdoll()
 	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Turquoise, BoneTransformToMove.ToHumanReadableString());
 }
 
+bool ASfCharacter::CanBeDamagedCustom()
+{
+	// Actually I'm not sure we really use this CanBeDamaged() but well, it works
+	return CanBeDamaged() && !IsUnderInvincibilityTime;
+}
+
 void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
-	if(CanBeDamaged())
+	if(CanBeDamagedCustom())
 	{
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
+		IsUnderInvincibilityTime = true;
+
+		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
+		FVector Direction = GetActorLocation() - DmgDealer->GetActorLocation();
+		Direction.Normalize();
+		Direction *= Amount * Settings->CharacterInputDatas[PlayerType].ForcePerDmg;
+		LaunchCharacter(Direction, false, false);
+		// Cast<UPrimitiveComponent>(GetRootComponent())->AddImpulse(Direction, NAME_None, true);
+
+		FTimerHandle NullHandle;
+		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->CharacterInputDatas[PlayerType].InvincibilityTime);
 	}
 	
 	if (Health <= 0 && !IsDead)
@@ -375,6 +392,11 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 	}
+}
+
+void ASfCharacter::RemoveInvincibility()
+{
+	IsUnderInvincibilityTime = false;
 }
 
 void ASfCharacter::AddHealth(float HealthToAdd)
