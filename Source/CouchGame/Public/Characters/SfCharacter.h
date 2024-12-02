@@ -273,9 +273,11 @@ protected:
 	// void OnPickableCollisionTimeout();
 	
 	void OnPickableCollisionTimeout(APickable* Pickable);
-
+	
+	public:
 	APickable* Drop(); //Drop Object
-
+	
+	protected:
 	void PickupObject(APickable* Pickable); //Give Object TO Player = THIS
 
 	void GiveToKnight();

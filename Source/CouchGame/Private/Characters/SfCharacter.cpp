@@ -370,11 +370,13 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		IsUnderInvincibilityTime = true;
 
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
-		FVector Direction = GetActorLocation() - DmgDealer->GetActorLocation();
-		Direction.Normalize();
-		Direction *= Amount * Settings->CharacterInputDatas[PlayerType].ForcePerDmg;
-		LaunchCharacter(Direction, false, false);
-		// Cast<UPrimitiveComponent>(GetRootComponent())->AddImpulse(Direction, NAME_None, true);
+		if (DmgDealer != nullptr)
+		{
+			FVector Direction = GetActorLocation() - DmgDealer->GetActorLocation();
+			Direction.Normalize();
+			Direction *= Amount * Settings->CharacterInputDatas[PlayerType].ForcePerDmg;
+			LaunchCharacter(Direction, false, false);
+		}
 
 		FTimerHandle NullHandle;
 		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->CharacterInputDatas[PlayerType].InvincibilityTime);

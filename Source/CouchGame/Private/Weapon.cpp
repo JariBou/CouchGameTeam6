@@ -37,6 +37,16 @@ float AWeapon::GetDamage() const
 	return CurrentDataRow.WeaponStats.Damage * m_speed * CurrentDataRow.WeaponStats.DMGMultiplier;
 }
 
+void AWeapon::DealtDamage()
+{
+	Durability--;
+	if (Durability <= 0)
+	{
+		Holder->Drop();
+		Destroy();
+	}
+}
+
 FWeaponInfo& AWeapon::GetDataWeaponRowInfo(FName NameOfRow)
 {
 	return *Weapon.DataTable->FindRow<FWeaponInfo>(NameOfRow, "");
