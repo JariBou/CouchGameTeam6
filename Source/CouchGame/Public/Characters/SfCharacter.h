@@ -42,6 +42,10 @@ public:
 	UFUNCTION()
 	void OnDelegateStickCircleLate();
 
+	UFUNCTION()
+	void OnDelegateStickCicleThrustEnd();
+
+
 
 #pragma region CameraFollowTarget
 public:
@@ -166,7 +170,7 @@ private:
 	void OnInputDash(const FInputActionValue& InputActionValue);
 
 	void RightJoystickInput(const FInputActionValue& InputActionValue);
-
+	
 	void RightJoystickStarted(const FInputActionValue& InputActionValue);
 
 	void RightJoystickEnded(const FInputActionValue& InputActionValue);
@@ -307,6 +311,7 @@ public:
 	
 	FTimerHandle TimerHandle;
 	FTimerHandle TimerHandleForCircle;
+	FTimerHandle TimerHandleForThrust;
 
 	UPROPERTY(EditAnywhere, Category= "Pickable")
 	float TimerForObjectCollisionWithPlayer = 1.f;
@@ -349,12 +354,25 @@ private:
 	void ManageCharacterRotation(float DeltaSeconds);
 
 	float CurrentDeltaMadeByStick = 0.f;
-	UPROPERTY(VisibleAnywhere)
+	
+	UPROPERTY(VisibleAnywhere, Category="Rotation")
 	int NumberOfRotationMadeByStick = 0;
 
+	bool IsRotationAnimLaunched = false;
+
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Rotation")
 	int RotationSpeed = 1.f;
+
+	UPROPERTY(EditAnywhere, Category="Rotation")
+	int NumberOfRotationNeeded = 1;
+
+	UPROPERTY(EditAnywhere, Category="Rotation")
+	float TimeNeededForRotation = 1.f;
+
+	UPROPERTY(EditAnywhere, Category="Rotation")
+	float TimeNeedForThrust = 0.5f;
+	
 	
 #pragma endregion
 	

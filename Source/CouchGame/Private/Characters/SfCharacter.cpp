@@ -33,7 +33,14 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 void ASfCharacter::OnDelegateStickCircleLate()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Black, TEXT("Fin de Stick Delay"));
+	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded)
+	{
+		// Réussite du stick toupie lol
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		IsRotationAnimLaunched = true;
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
+	CurrentDeltaMadeByStick = 0.f;
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
 
@@ -200,22 +207,40 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 
 		CurrentDeltaMadeByStick += DeltaAngle;
 		NumberOfRotationMadeByStick = int(CurrentDeltaMadeByStick / (2 * PI));
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::FromInt(NumberOfRotationMadeByStick));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::FromInt(NumberOfRotationMadeByStick));
 		
 		DestinationAngle += DeltaAngle;
 	}
 }
 
+void ASfCharacter::OnDelegateStickCicleThrustEnd()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForThrust);
+
+}
+
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
 {
+	CurrentDeltaMadeByStick = 0.f;
+	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
-	TimerDelegateForStickCircleCount.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleLate);
+	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
-	GetWorld()->GetTimerManager().SetTimer(TimerHandleForCircle, TimerDelegateForStickCircleCount, 1.5f, false);
+	TimerDelegateForStickCircleCount.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleLate);
+	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCicleThrustEnd);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleForCircle, TimerDelegateForStickCircleCount, TimeNeededForRotation, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleForThrust, TimerDelegateForStickCirlceThrust, TimeNeedForThrust, false);
 }
 
 void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 {
+	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && IsRotationAnimLaunched == false)
+	{
+		// Réussite du stick toupie lol
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
 
@@ -550,12 +575,6 @@ void ASfCharacter::PickUpAndThrow(TArray<AActor*>& ArrayOfPickable)
 		if(PickableObject != nullptr) PickupObject(PickableObject);
 	}
 }
-
-// void ASfCharacter::OnPickableCollisionTimeout()
-// {
-// 	if(LastPickable != nullptr)	LastPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
-// 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-// }
 
 void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 {
