@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SpawnPointToolUser.h"
 #include "SplinePoolComponent.h"
 #include "WeaponsDataAsset.h"
 #include "GameFramework/Actor.h"
@@ -56,7 +57,7 @@ struct FWeaponsRarityList
 };
 
 UCLASS()
-class COUCHGAME_API AForge : public AActor
+class COUCHGAME_API AForge : public AActor, public ISpawnPointToolUser
 {
 	GENERATED_BODY()
 
@@ -74,6 +75,12 @@ public:
 	void SpawnRandomWeapon();
 
 	void InitializeSpawnPoints();
+
+	virtual TArray<AActor*> GetAllSpawnPoints_Implementation() override;
+
+	virtual void SetSpawnPoints_Implementation(const TArray<AActor*>& NewRespawnPoints) override;
+
+	virtual void AddSpawnPoint_Implementation(AActor* NewSpawnPoint) override;
 
 protected:
 	// Called when the game starts or when spawned

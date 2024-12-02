@@ -25,6 +25,13 @@ struct FCharacterSettingsData
 
 	UPROPERTY(EditAnywhere)
 	uint8 MaxHealth;
+	
+	UPROPERTY(EditAnywhere)
+	float InvincibilityTime;
+
+	UPROPERTY(EditAnywhere)
+	float ForcePerDmg;
+	
 };
 
 /**

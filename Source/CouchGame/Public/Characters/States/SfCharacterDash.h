@@ -31,4 +31,10 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UCharacterMovementComponent> MovementComponent;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> KnightDashSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> SquireDashSound;
 };

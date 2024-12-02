@@ -388,20 +388,48 @@ void ASfCharacter::SetUpArmsRagdoll()
 	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Turquoise, BoneTransformToMove.ToHumanReadableString());
 }
 
+bool ASfCharacter::CanBeDamagedCustom()
+{
+	// Actually I'm not sure we really use this CanBeDamaged() but well, it works
+	return CanBeDamaged() && !IsUnderInvincibilityTime;
+}
+
 void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
-	if(CanBeDamaged())
+	if(CanBeDamagedCustom())
 	{
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
+		IsUnderInvincibilityTime = true;
+
+		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
+		FVector Direction = GetActorLocation() - DmgDealer->GetActorLocation();
+		Direction.Normalize();
+		Direction *= Amount * Settings->CharacterInputDatas[PlayerType].ForcePerDmg;
+		LaunchCharacter(Direction, false, false);
+		// Cast<UPrimitiveComponent>(GetRootComponent())->AddImpulse(Direction, NAME_None, true);
+
+		FTimerHandle NullHandle;
+		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->CharacterInputDatas[PlayerType].InvincibilityTime);
 	}
 	
 	if (Health <= 0 && !IsDead)
 	{
 		IsDead = true;
+
+		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDeathSound,GetActorLocation());
+		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDeathSound,GetActorLocation());
+		
 		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 	}
+}
+
+void ASfCharacter::RemoveInvincibility()
+{
+	IsUnderInvincibilityTime = false;
 }
 
 void ASfCharacter::AddHealth(float HealthToAdd)
@@ -537,6 +565,12 @@ void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 
 APickable* ASfCharacter::Drop()
 {
+	//Play Drop sound
+	if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDropSound, GetActorLocation());
+	else if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDropSound, GetActorLocation());
+	
 	//Detach Pickable
 	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
 	CurrentPickable->DetachFromActor(DeTransformRules);

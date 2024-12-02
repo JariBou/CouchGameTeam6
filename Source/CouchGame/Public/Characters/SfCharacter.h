@@ -239,13 +239,22 @@ protected:
 	UPROPERTY(EditAnywhere)
 	uint8 NumberOfTimeHealthIsUsed = 0;
 	//ASfCharacter CallingCharacter = this;
+
+	UPROPERTY()
+	bool IsUnderInvincibilityTime;
 	
 public:
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthValueChange OnHealthValueChange;
+
+	UFUNCTION(BlueprintCallable)
+	bool CanBeDamagedCustom();
 	
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
+
+	UFUNCTION()
+	void RemoveInvincibility();
 
 	UFUNCTION()
 	void AddHealth(float HealthToAdd);
@@ -346,6 +355,22 @@ private:
 public:
 	UPROPERTY(EditAnywhere)
 	int RotationSpeed = 1.f;
+	
+#pragma endregion
+	
+#pragma region Sounds
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> KnightDropSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> SquireDropSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> KnightDeathSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> SquireDeathSound;
 	
 #pragma endregion 
 };

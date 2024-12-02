@@ -3,6 +3,8 @@
 
 #include "Modes/SfGameMode.h"
 
+#include <Systems/CharacterSelectionSubsystem.h>
+
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.h"
 #include "Characters/CharacterSettings.h"
@@ -29,7 +31,10 @@ void ASfGameMode::BeginPlay()
 		};
 		TeamMap.Add(Team, NewInfo);
 	}
-	
+
+	UCharacterSelectionSubsystem* CharacterSelectionSubsystem = GetGameInstance()->GetSubsystem<UCharacterSelectionSubsystem>();
+
+	//TODO this should go to the MenuSelectionGamemode
 	CreateAndInitPlayers();
 
 	TArray<AActor*> outPlayerStarts;
@@ -42,8 +47,17 @@ void ASfGameMode::BeginPlay()
 		ASfCharacter* NewCharacter = GetWorld()->SpawnActorDeferred<ASfCharacter>(SfCharacterBpClass,SpawnPoint->GetTransform());
 		if (NewCharacter == nullptr) continue;
 		
+
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
-		
+		/*
+		const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromArray(i);
+		SelectionInfo.PlayerTeam;
+		SelectionInfo.PlayerController->Possess(NewCharacter);
+
+		// Remove autoposses
+		// RemoveSetting player type in here, handled by DesignRandomKnight()
+		*/
+
 		ETeam NewPlayerTeam = i%2 > 0 ? Team2 : Team1;
 		NewCharacter->PlayerTeam = NewPlayerTeam;
 		TeamMap[NewPlayerTeam].AddPlayer(NewCharacter);
@@ -58,6 +72,9 @@ void ASfGameMode::BeginPlay()
 		i++;
 	}
 
+	TeamMap[Team1].SelectRandomKnight();
+	TeamMap[Team2].SelectRandomKnight();
+
 
 	Respawner = NewObject<URespawner>(this, URespawner::StaticClass());
 	Respawner->Initialize(this);
@@ -67,7 +84,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 {
 	TeamScoreMap[Killer->PlayerTeam]++;
 
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "Oh Fils de pute");
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "respawn");
 	
 	if (isGameOver)
 	{
