@@ -11,20 +11,6 @@ void ULocalMultiplayerSubsystem::CreateAndInitPlayers(ELocalMultiplayerInputMapp
 {
 	const ULocalMultiplayerSettings* LocalMultiplayerSettings = GetDefault<ULocalMultiplayerSettings>();
 
-	// for (int i = 0; i < LocalMultiplayerSettings->KeyboardProfilesData.Num(); ++i)
-	// {
-	// 	APlayerController* PlayerController = UGameplayStatics::CreatePlayer(GetWorld(), i);
-	// 	if (PlayerIndexFromKeyboardProfileIndex.Contains(i))
-	// 	{
-	// 		// Reassign doode
-	// 		AssignKeyboardMapping(PlayerIndexFromKeyboardProfileIndex[i], i, MappingType);
-	// 	}
-	// 	else
-	// 	{
-	// 		
-	// 	}
-	// }
-
 	for (int i = 0; i < LocalMultiplayerSettings->GetNbKeyboardProfiles() + LocalMultiplayerSettings->nbMaxGamepads; ++i)
 	{
 		APlayerController* PlayerController = UGameplayStatics::CreatePlayer(GetWorld(), i);

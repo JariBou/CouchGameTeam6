@@ -21,6 +21,7 @@
 #include "GameplayElements/WaterBucket.h"
 #include "GameplayElements/Events/VisualEventHandler.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Modes/SfGameMode.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
@@ -112,8 +113,11 @@ void ASfCharacter::BeginPlay()
 	// 	}
 	// }
 
-	//ENBIE DE TIE c pourri
-	
+	//SetBaseRotationOfActor
+
+	CurrentAngle = GetActorRotation().Yaw;
+	DestinationAngle = CurrentAngle;
+	InputRJ = FVector2d(1.f,0.f);
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -129,15 +133,9 @@ void ASfCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (StateMachine) StateMachine->Tick(DeltaSeconds);	
-	
-	//Clamping Z location between ZLocation of bone where we apply ragdoll and its own ZLocation
-	//float ClampedZLocation = FMath::Clamp(BoneTransformToMove.GetLocation().Z, BoneTransformToApplyRagdoll.GetLocation().Z, BoneTransformToMove.GetLocation().Z);
-	//Create new vector Location
-	//FVector NewClampedLocation = FVector(BoneTransformToMove.GetLocation().X, BoneTransformToMove.GetLocation().Y, ClampedZLocation);
-	//Set new Location
-	//BoneTransformToMove.SetLocation(NewClampedLocation);
-	//Set Bone transform with modifications
+	if (StateMachine) StateMachine->Tick(DeltaSeconds);
+
+	ManageCharacterRotation(DeltaSeconds);
 
 	if(DashCooldownTimer > 0.f && !CanDash)
 	{
@@ -193,6 +191,23 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 		
 	
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
+}
+
+void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
+{
+	FVector2d TempInputRJValue = InputActionValue.Get<FVector2D>(); //Case of Stick Length >= Dead Zone
+	if(TempInputRJValue.SquaredLength() > InputRightJoystickDeadZone * InputRightJoystickDeadZone)
+	{
+		TempInputRJValue = InputRJ;
+		InputRJ = InputActionValue.Get<FVector2D>();
+		
+		//float DeltaAngle = FMath::Atan2(InputRJ.Y, InputRJ.X) - FMath::Atan2(TempInputRJValue.Y, TempInputRJValue.X);
+
+		float DeltaAngle = FMath::Atan2(InputRJ.Y*TempInputRJValue.X - InputRJ.X*TempInputRJValue.Y, InputRJ.X*TempInputRJValue.X + InputRJ.Y*TempInputRJValue.Y);
+		
+		DestinationAngle += DeltaAngle;
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("DeltaAngle = %f"), FMath::Atan2(InputRJ.Y, InputRJ.X)));
+	}
 }
 
 void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
@@ -278,6 +293,14 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 	{
 		//Je slap tes grosses fessiers bien rondes et dodus et soyeuses et rambombés et galbées et rebondis
 	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Triggered,
+		this,
+		&ASfCharacter::RightJoystickInput);
+	}
 }
 
 void ASfCharacter::StartDashCooldownTimer()
@@ -332,12 +355,29 @@ void ASfCharacter::SetUpArmsRagdoll()
 	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Turquoise, BoneTransformToMove.ToHumanReadableString());
 }
 
+bool ASfCharacter::CanBeDamagedCustom()
+{
+	// Actually I'm not sure we really use this CanBeDamaged() but well, it works
+	return CanBeDamaged() && !IsUnderInvincibilityTime;
+}
+
 void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
-	if(CanBeDamaged())
+	if(CanBeDamagedCustom())
 	{
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
+		IsUnderInvincibilityTime = true;
+
+		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
+		FVector Direction = GetActorLocation() - DmgDealer->GetActorLocation();
+		Direction.Normalize();
+		Direction *= Amount * Settings->CharacterInputDatas[PlayerType].ForcePerDmg;
+		LaunchCharacter(Direction, false, false);
+		// Cast<UPrimitiveComponent>(GetRootComponent())->AddImpulse(Direction, NAME_None, true);
+
+		FTimerHandle NullHandle;
+		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->CharacterInputDatas[PlayerType].InvincibilityTime);
 	}
 	
 	if (Health <= 0 && !IsDead)
@@ -352,6 +392,11 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 	}
+}
+
+void ASfCharacter::RemoveInvincibility()
+{
+	IsUnderInvincibilityTime = false;
 }
 
 void ASfCharacter::AddHealth(float HealthToAdd)
@@ -574,6 +619,20 @@ void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 void ASfCharacter::StopFeedBackEffect()
 {
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
+}
+
+void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
+{
+	FRotator DestinationRotator = GetActorRotation();
+	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
+	//SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
+	
+	CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
+	float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
+	FRotator NewActorRotator = GetActorRotation();
+	NewActorRotator.Yaw = ActorConvertedAngle;
+	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
