@@ -94,7 +94,8 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 
 	if (Killer != nullptr)
 	{
-		if (Killer->PlayerType == Knight && Dead->PlayerTeam != Killer->PlayerTeam && Dead->PlayerTeam == Knight) --TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
+		
+		if ((Killer->PlayerType == Knight) && (Dead->PlayerTeam != Killer->PlayerTeam) && (Dead->PlayerTeam == Knight)) --TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
 	}
 	
 	const FRespawnData respawnData {

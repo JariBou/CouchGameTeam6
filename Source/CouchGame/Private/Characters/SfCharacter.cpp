@@ -622,9 +622,9 @@ void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 APickable* ASfCharacter::Drop()
 {
 	//Play Drop sound
-	if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+	if(PlayerType == TypeOfPlayer::Knight)
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDropSound, GetActorLocation());
-	else if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
+	else if(PlayerType == TypeOfPlayer::Squire)
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDropSound, GetActorLocation());
 	
 	//Detach Pickable

@@ -24,6 +24,7 @@ void AWeapon::BeginPlay()
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (Holder == nullptr) return;
 
 	m_speed = (GetActorLocation() - m_lastFramePos).Length();
 	m_lastFramePos = GetActorLocation();
@@ -40,6 +41,8 @@ float AWeapon::GetDamage() const
 
 void AWeapon::DealtDamage()
 {
+	if (Holder == nullptr) return;
+	
 	Durability--;
 	if (Durability <= 0)
 	{
