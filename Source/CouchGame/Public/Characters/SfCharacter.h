@@ -372,6 +372,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	float TimeNeedForThrust = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category="Rotation")
+	int MaxAngleForThrust = 10;
 	
 	
 #pragma endregion

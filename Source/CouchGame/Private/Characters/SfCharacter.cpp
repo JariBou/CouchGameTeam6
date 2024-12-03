@@ -215,9 +215,10 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 
 void ASfCharacter::OnDelegateStickCicleThrustEnd()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
+	if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForThrust);
-
 }
 
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
