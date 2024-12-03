@@ -21,6 +21,7 @@
 #include "GameplayElements/WaterBucket.h"
 #include "GameplayElements/Events/VisualEventHandler.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Modes/SfGameMode.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
@@ -29,6 +30,19 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // ACouchGameCharacter
+
+void ASfCharacter::OnDelegateStickCircleLate()
+{
+	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded)
+	{
+		// Réussite du stick toupie lol
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		IsRotationAnimLaunched = true;
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
+	CurrentDeltaMadeByStick = 0.f;
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+}
 
 FVector ASfCharacter::GetFollowTarget()
 {
@@ -100,20 +114,10 @@ void ASfCharacter::BeginPlay()
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 
 	SetupHealth(CharacterSettings->CharacterInputDatas[PlayerType].MaxHealth);
-	
-	// USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[PlayerType].Mesh.LoadSynchronous();
-	// ChangeSkeletalMesh(SkeletalMesh);
-	//Add Input Mapping Context
-	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	// {
-	// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	// 	{
-	// 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
-	// 	}
-	// }
 
-	//ENBIE DE TIE c pourri
-	
+	CurrentAngle = GetActorRotation().Yaw;
+	DestinationAngle = CurrentAngle;
+	InputRJ = FVector2d(1.f,0.f);
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -129,15 +133,9 @@ void ASfCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (StateMachine) StateMachine->Tick(DeltaSeconds);	
-	
-	//Clamping Z location between ZLocation of bone where we apply ragdoll and its own ZLocation
-	//float ClampedZLocation = FMath::Clamp(BoneTransformToMove.GetLocation().Z, BoneTransformToApplyRagdoll.GetLocation().Z, BoneTransformToMove.GetLocation().Z);
-	//Create new vector Location
-	//FVector NewClampedLocation = FVector(BoneTransformToMove.GetLocation().X, BoneTransformToMove.GetLocation().Y, ClampedZLocation);
-	//Set new Location
-	//BoneTransformToMove.SetLocation(NewClampedLocation);
-	//Set Bone transform with modifications
+	if (StateMachine) StateMachine->Tick(DeltaSeconds);
+
+	ManageCharacterRotation(DeltaSeconds);
 
 	if(DashCooldownTimer > 0.f && !CanDash)
 	{
@@ -156,6 +154,40 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("FALSE"), false);
 	}
+
+	#pragma region Anim
+
+	FVector2D ActorForwardVector = FVector2D(GetActorForwardVector().X, GetActorForwardVector().Y);
+	ActorForwardVector.Normalize();
+
+	FVector2D InputMoveSnap = InputMove;
+	InputMoveSnap.Normalize();
+
+	FVector ActorRightVector = GetActorForwardVector().RotateAngleAxis(90, FVector::UpVector);
+	FVector2D RightVector = FVector2D(ActorRightVector.X, ActorRightVector.Y);
+	float AngleSign = FMath::Sign(FVector2D::DotProduct(RightVector, InputMoveSnap));
+	float DotProduct = FVector2D::DotProduct(ActorForwardVector, InputMoveSnap);
+	float DotSign = FMath::Sign(DotProduct);
+	float AngleInRadians = FMath::Acos(DotProduct);
+	float AngleInDegrees = FMath::RadiansToDegrees(AngleInRadians) * -AngleSign;
+
+	FVector DirectionVector = FVector(1, 0, 0).RotateAngleAxis(AngleInDegrees, FVector::UpVector);
+	if (DotSign < 0)
+	{
+		//DirectionVector.Y = -DirectionVector.Y;
+	}
+	DirectionForAnimVector = DirectionVector;
+
+	// FVector Intermediate = GetActorForwardVector() * InputMoveSnap.Length();
+	// Intermediate.Normalize();
+	// // FVector2D AngleVector = FVector2D(ActorForwardVector.X, ActorForwardVector.Y) - InputMove;
+	// // double Angle = FMath::Atan2(AngleVector.Y, AngleVector.X);
+	// DirectionForAnimVector = FVector(1, 0, 0) .RotateAngleAxis(AngleInDegrees, FVector::UpVector);
+
+	GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Emerald, DirectionForAnimVector.ToString(), false);
+	GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Emerald, FString::SanitizeFloat(AngleInDegrees), false);
+
+	#pragma endregion
 
 	GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, FString::SanitizeFloat(DashCooldownTimer), false);
 
@@ -193,6 +225,58 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 		
 	
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
+}
+
+void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
+{
+	FVector2d TempInputRJValue = InputActionValue.Get<FVector2D>(); //Case of Stick Length >= Dead Zone
+	if(TempInputRJValue.SquaredLength() > InputRightJoystickDeadZone * InputRightJoystickDeadZone)
+	{
+		TempInputRJValue = InputRJ;
+		InputRJ = InputActionValue.Get<FVector2D>();
+		
+		//float DeltaAngle = FMath::Atan2(InputRJ.Y, InputRJ.X) - FMath::Atan2(TempInputRJValue.Y, TempInputRJValue.X);
+
+		float DeltaAngle = FMath::Atan2(InputRJ.Y*TempInputRJValue.X - InputRJ.X*TempInputRJValue.Y, InputRJ.X*TempInputRJValue.X + InputRJ.Y*TempInputRJValue.Y);
+
+		CurrentDeltaMadeByStick += DeltaAngle;
+		NumberOfRotationMadeByStick = int(CurrentDeltaMadeByStick / (2 * PI));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::FromInt(NumberOfRotationMadeByStick));
+		
+		DestinationAngle += DeltaAngle;
+	}
+}
+
+void ASfCharacter::OnDelegateStickCicleThrustEnd()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
+	if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForThrust);
+}
+
+void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
+{
+	CurrentDeltaMadeByStick = 0.f;
+	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
+	FTimerDelegate TimerDelegateForStickCircleCount;
+	FTimerDelegate TimerDelegateForStickCirlceThrust;
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
+	TimerDelegateForStickCircleCount.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleLate);
+	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCicleThrustEnd);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleForCircle, TimerDelegateForStickCircleCount, TimeNeededForRotation, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleForThrust, TimerDelegateForStickCirlceThrust, TimeNeedForThrust, false);
+}
+
+void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
+{
+	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && IsRotationAnimLaunched == false)
+	{
+		// Réussite du stick toupie lol
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
 
 void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
@@ -278,6 +362,38 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 	{
 		//Je slap tes grosses fessiers bien rondes et dodus et soyeuses et rambombés et galbées et rebondis
 	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Triggered,
+		this,
+		&ASfCharacter::RightJoystickInput);
+	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Started,
+		this,
+		&ASfCharacter::RightJoystickStarted);
+	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Completed,
+		this,
+		&ASfCharacter::RightJoystickEnded);
+	}
+
+	if(InputData->InputActionRightJoystick)
+	{
+		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
+		ETriggerEvent::Canceled,
+		this,
+		&ASfCharacter::RightJoystickEnded);
+	}
 }
 
 void ASfCharacter::StartDashCooldownTimer()
@@ -332,12 +448,31 @@ void ASfCharacter::SetUpArmsRagdoll()
 	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Turquoise, BoneTransformToMove.ToHumanReadableString());
 }
 
+bool ASfCharacter::CanBeDamagedCustom()
+{
+	// Actually I'm not sure we really use this CanBeDamaged() but well, it works
+	return CanBeDamaged() && !IsUnderInvincibilityTime;
+}
+
 void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
-	if(CanBeDamaged())
+	if(CanBeDamagedCustom())
 	{
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
+		IsUnderInvincibilityTime = true;
+
+		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
+		if (DmgDealer != nullptr)
+		{
+			FVector Direction = GetActorLocation() - DmgDealer->GetActorLocation();
+			Direction.Normalize();
+			Direction *= Amount * Settings->CharacterInputDatas[PlayerType].ForcePerDmg;
+			LaunchCharacter(Direction, false, false);
+		}
+
+		FTimerHandle NullHandle;
+		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->CharacterInputDatas[PlayerType].InvincibilityTime);
 	}
 	
 	if (Health <= 0 && !IsDead)
@@ -352,6 +487,11 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 	}
+}
+
+void ASfCharacter::RemoveInvincibility()
+{
+	IsUnderInvincibilityTime = false;
 }
 
 void ASfCharacter::AddHealth(float HealthToAdd)
@@ -372,9 +512,6 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 	DynMat2->SetVectorParameterValue("ColorParam", FColor::Purple);
 	if(PlayerTeam == ETeam::Team1) GetMesh()->SetMaterial(0, DynMat);
 	if(PlayerTeam == ETeam::Team2) GetMesh()->SetMaterial(0, DynMat2);
-	// GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this]()
-	// {
-	// }));
 }
 
 void ASfCharacter::SetupHealth(uint8 inMaxHealth)
@@ -476,12 +613,6 @@ void ASfCharacter::PickUpAndThrow(TArray<AActor*>& ArrayOfPickable)
 	}
 }
 
-// void ASfCharacter::OnPickableCollisionTimeout()
-// {
-// 	if(LastPickable != nullptr)	LastPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
-// 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-// }
-
 void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 {
 	if(Pickable != nullptr)	Pickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
@@ -516,10 +647,10 @@ APickable* ASfCharacter::Drop()
 	CurrentPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, true);
 
 	//Timer Delegate
-	FTimerDelegate TimerDelegate;
+	FTimerDelegate TimerDelegateForHandCollision;
 	APickable* DroppedPickable = CurrentPickable;
-	TimerDelegate.BindUObject<ASfCharacter>(this, &ASfCharacter::OnPickableCollisionTimeout, DroppedPickable);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerForObjectCollisionWithPlayer, false);
+	TimerDelegateForHandCollision.BindUObject<ASfCharacter>(this, &ASfCharacter::OnPickableCollisionTimeout, DroppedPickable);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegateForHandCollision, TimerForObjectCollisionWithPlayer, false);
 	// LastPickable = DroppedPickable;
 	CurrentPickable = nullptr;
 	return DroppedPickable;
@@ -574,6 +705,20 @@ void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 void ASfCharacter::StopFeedBackEffect()
 {
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
+}
+
+void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
+{
+	FRotator DestinationRotator = GetActorRotation();
+	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
+	//SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
+	
+	CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
+	float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
+	FRotator NewActorRotator = GetActorRotation();
+	NewActorRotator.Yaw = ActorConvertedAngle;
+	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
+	
 }
 
 //////////////////////////////////////////////////////////////////////////

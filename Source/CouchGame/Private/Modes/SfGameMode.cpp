@@ -82,7 +82,7 @@ void ASfGameMode::BeginPlay()
 
 void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 {
-	TeamScoreMap[Killer->PlayerTeam]++;
+	//TeamScoreMap[Killer->PlayerTeam]++;
 
 	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "respawn");
 	
@@ -92,7 +92,10 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 		return;
 	}
 
-	if (Killer->PlayerType == Knight && Dead->PlayerTeam != Killer->PlayerTeam && Dead->PlayerTeam == Knight) --TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
+	if (Killer != nullptr)
+	{
+		if (Killer->PlayerType == Knight && Dead->PlayerTeam != Killer->PlayerTeam && Dead->PlayerTeam == Knight) --TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
+	}
 	
 	const FRespawnData respawnData {
 		Dead->PlayerTeam,

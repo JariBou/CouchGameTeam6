@@ -33,8 +33,19 @@ void AWeapon::Tick(float DeltaTime)
 
 float AWeapon::GetDamage() const
 {
-	if (Holder != nullptr && Holder->PlayerType == Squire) return 0;
+	if (Holder == nullptr) return 0.0f;
+	if (Holder->PlayerType == Squire) return 0;
 	return CurrentDataRow.WeaponStats.Damage * m_speed * CurrentDataRow.WeaponStats.DMGMultiplier;
+}
+
+void AWeapon::DealtDamage()
+{
+	Durability--;
+	if (Durability <= 0)
+	{
+		Holder->Drop();
+		Destroy();
+	}
 }
 
 FWeaponInfo& AWeapon::GetDataWeaponRowInfo(FName NameOfRow)

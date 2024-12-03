@@ -30,6 +30,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetDamage() const;
 
+	UFUNCTION(BlueprintCallable)
+	void DealtDamage();
+
 private:
 	UPROPERTY()
 	FVector m_lastFramePos;

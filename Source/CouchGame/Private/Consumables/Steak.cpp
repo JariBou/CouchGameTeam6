@@ -34,6 +34,9 @@ void ASteak::EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveC
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("OE"));
 
 	ASfCharacter* Player = Cast<ASfCharacter>(Char);
+
+	if (Player == nullptr) return;
+	
 	Player->AddHealth(HealthToAdd);
 
 	this->Destroy();
