@@ -56,8 +56,10 @@ void UCameraWorldSubsystem::TickUpdateCameraRotation(float DeltaTime)
 
 	FVector DirDistance = AverageLocation - CameraMain->GetOwner()->GetActorLocation();
 
-	FVector LerpedOffsetDirDistance = FMath::Lerp(StartForwardVector * DirDistance.Size(), DirDistance, CameraPluginSettings->CameraRotationMaxOffsetAlpha);
-	
+	FVector LerpedOffsetDirDistance = DirDistance;
+	LerpedOffsetDirDistance.X = FMath::Lerp(StartForwardVector.X * DirDistance.Size(), DirDistance.X, CameraPluginSettings->CameraRotationMaxOffsetAlphaX);
+	LerpedOffsetDirDistance.Y = FMath::Lerp(StartForwardVector.Y * DirDistance.Size(), DirDistance.Y, CameraPluginSettings->CameraRotationMaxOffsetAlphaY);
+
 	FRotator NewRotation = LerpedOffsetDirDistance.Rotation();
 
 	FRotator NewCamRotation = FMath::Lerp(CameraMain->GetOwner()->GetActorRotation(), NewRotation, CameraPluginSettings->CameraRotationSpeedAlpha);
