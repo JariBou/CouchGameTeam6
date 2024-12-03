@@ -82,7 +82,7 @@ void ASfGameMode::BeginPlay()
 
 void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 {
-	TeamScoreMap[Killer->PlayerTeam]++;
+	//TeamScoreMap[Killer->PlayerTeam]++;
 
 	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "respawn");
 	

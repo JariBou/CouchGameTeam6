@@ -111,17 +111,16 @@ void AForge::BeginPlay()
 
 void AForge::ForgeLoop()
 {
-	while (!ForgeMap.Contains(ForgeLevel))
-	{
-		ForgeLevel = static_cast<EForgeLevel>(ForgeLevel - 1);
-	}
-	
 	FWeaponsRarityList WeaponsRarityList = ForgeMap[ForgeLevel];
 	SpawnWeaponsAtRandomLocation(WeaponsRarityList.NumberOfSpawnedWeapons, WeaponsRarityList.TimeBetweenSpawns);
 
 	if (ForgingsDoneThisLevel >= WeaponsRarityList.UpgradesAfterXForgings)
 	{
-		ForgeLevel = static_cast<EForgeLevel>(ForgeLevel + 1);
+		ForgeLevel = static_cast<EForgeLevel>(ForgeLevel << 1);
+		if (!ForgeMap.Contains(ForgeLevel))
+		{
+			ForgeLevel = static_cast<EForgeLevel>(ForgeLevel >> 1);
+		}
 		ForgingsDoneThisLevel = 0;
 	}
 	

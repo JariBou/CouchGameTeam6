@@ -12,11 +12,12 @@
 UENUM(BlueprintType)
 enum EForgeLevel : uint8
 {
-	Level1 = 0 ,
-	Level2 = 1 ,
-	Level3 = 2 ,
-	Level4 = 3 ,
-	Level5 = 4 ,
+	RequiredThingButCantBeNone = 0 UMETA(Hidden),
+	Level1 = 1 << 0 ,
+	Level2 = 1 << 1 ,
+	Level3 = 1 << 2 ,
+	Level4 = 1 << 3 ,
+	Level5 = 1 << 4 ,
 };
 
 USTRUCT()
