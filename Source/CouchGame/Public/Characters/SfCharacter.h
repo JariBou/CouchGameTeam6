@@ -85,6 +85,8 @@ private:
 	float CurrentAngle; //Current Yaw Rotation Of Actor
 	float DestinationAngle; //Destination Rotation Based On RightJoystick
 
+	
+
 public:
 	/** Constructeur */
 	ASfCharacter();
@@ -363,5 +365,13 @@ public:
 	TObjectPtr<USoundBase> SquireDeathSound;
 	
 #pragma endregion 
+
+#pragma region Animations
+
+	public:
+		UPROPERTY(BlueprintReadOnly)
+		FVector DirectionForAnimVector;
+
+	#pragma endregion
 };
 
