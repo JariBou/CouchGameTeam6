@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SpawnPointToolUser.h"
 #include "Components/ActorComponent.h"
 #include "EventHandler.generated.h"
 
@@ -11,9 +12,15 @@ class AEventActor;
  * 
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class COUCHGAME_API UEventHandler : public UActorComponent
+class COUCHGAME_API UEventHandler : public UActorComponent, public ISpawnPointToolUser
 {
 	GENERATED_BODY()
+
+	virtual TArray<AActor*> GetAllSpawnPoints_Implementation() override;
+
+	virtual void SetSpawnPoints_Implementation(const TArray<AActor*>& NewRespawnPoints) override;
+
+	virtual void AddSpawnPoint_Implementation(AActor* NewSpawnPoint) override;
 
 private:
 	UFUNCTION(CallInEditor)

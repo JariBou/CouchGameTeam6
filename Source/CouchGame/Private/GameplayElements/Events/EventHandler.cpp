@@ -9,6 +9,21 @@
 #include "Utils/ArrayUtils.h"
 #include "Utils/TransformUtils.h"
 
+TArray<AActor*> UEventHandler::GetAllSpawnPoints_Implementation()
+{
+	return SpawnPointActors;
+}
+
+void UEventHandler::SetSpawnPoints_Implementation(const TArray<AActor*>& NewRespawnPoints)
+{
+	SpawnPointActors = NewRespawnPoints;
+}
+
+void UEventHandler::AddSpawnPoint_Implementation(AActor* NewSpawnPoint)
+{
+	SpawnPointActors.Add(NewSpawnPoint);
+}
+
 void UEventHandler::InitializeSpawnPoints()
 {
 	while(SpawnPointActors.Num() > 0)
