@@ -61,5 +61,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentData(FWeaponInfo NewData);
+#pragma endregion
+
+
+
+#pragma region Sounds
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<USoundBase> WeaponHitSound;
+	
 #pragma endregion 
 };

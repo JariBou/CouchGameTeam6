@@ -313,6 +313,22 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FName ForceFeedBackEffectTag;
 	
+#pragma endregion
+
+#pragma region Sounds
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> KnightDropSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> SquireDropSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> KnightDeathSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> SquireDeathSound;
+	
 #pragma endregion 
 };
 

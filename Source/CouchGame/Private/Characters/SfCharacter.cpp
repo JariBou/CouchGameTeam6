@@ -343,6 +343,12 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	if (Health <= 0 && !IsDead)
 	{
 		IsDead = true;
+
+		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDeathSound,GetActorLocation());
+		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDeathSound,GetActorLocation());
+		
 		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 	}
@@ -484,6 +490,12 @@ void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 
 APickable* ASfCharacter::Drop()
 {
+	//Play Drop sound
+	if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDropSound, GetActorLocation());
+	else if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDropSound, GetActorLocation());
+	
 	//Detach Pickable
 	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
 	CurrentPickable->DetachFromActor(DeTransformRules);

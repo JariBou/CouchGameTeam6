@@ -46,6 +46,6 @@ void AWeapon::SetCurrentData(FWeaponInfo NewData)
 {
 	CurrentDataRow = NewData;
 	Durability = CurrentDataRow.WeaponStats.Durability;
-	StaticMeshComponent->SetStaticMesh(CurrentDataRow.WeaponMesh.LoadSynchronous());
+	//StaticMeshComponent->SetStaticMesh(CurrentDataRow.WeaponMesh.LoadSynchronous());
 }
 
