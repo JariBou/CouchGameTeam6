@@ -39,6 +39,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* Material;
 
+	UFUNCTION()
+	void OnDelegateStickCircleLate();
+
+	UFUNCTION()
+	void OnDelegateStickCicleThrustEnd();
+
+
 
 #pragma region CameraFollowTarget
 public:
@@ -80,7 +87,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	float InputRightJoystickDeadZone = 0.5f;
 	
-	FVector2D InputRJ;
+	FVector2D InputRJ = FVector2d(0.f,0.f);
 
 	float CurrentAngle; //Current Yaw Rotation Of Actor
 	float DestinationAngle; //Destination Rotation Based On RightJoystick
@@ -165,6 +172,10 @@ private:
 	void OnInputDash(const FInputActionValue& InputActionValue);
 
 	void RightJoystickInput(const FInputActionValue& InputActionValue);
+	
+	void RightJoystickStarted(const FInputActionValue& InputActionValue);
+
+	void RightJoystickEnded(const FInputActionValue& InputActionValue);
 	
 	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
 	
@@ -303,6 +314,8 @@ public:
 	// TArray<AActor*> ListOfActorFromCollision;
 	
 	FTimerHandle TimerHandle;
+	FTimerHandle TimerHandleForCircle;
+	FTimerHandle TimerHandleForThrust;
 
 	UPROPERTY(EditAnywhere, Category= "Pickable")
 	float TimerForObjectCollisionWithPlayer = 1.f;
@@ -344,9 +357,29 @@ protected:
 private:
 	void ManageCharacterRotation(float DeltaSeconds);
 
+	float CurrentDeltaMadeByStick = 0.f;
+	
+	UPROPERTY(VisibleAnywhere, Category="Rotation")
+	int NumberOfRotationMadeByStick = 0;
+
+	bool IsRotationAnimLaunched = false;
+
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Rotation")
 	int RotationSpeed = 1.f;
+
+	UPROPERTY(EditAnywhere, Category="Rotation")
+	int NumberOfRotationNeeded = 1;
+
+	UPROPERTY(EditAnywhere, Category="Rotation")
+	float TimeNeededForRotation = 1.f;
+
+	UPROPERTY(EditAnywhere, Category="Rotation")
+	float TimeNeedForThrust = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category="Rotation")
+	int MaxAngleForThrust = 10;
+	
 	
 #pragma endregion
 	
