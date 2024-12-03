@@ -62,7 +62,7 @@ void ASfGameMode::BeginPlay()
 		NewCharacter->PlayerTeam = NewPlayerTeam;
 		TeamMap[NewPlayerTeam].AddPlayer(NewCharacter);
 
-		TypeOfPlayer TypeOfPlayer = i/2 > 0 ? Knight : Squire;
+		TypeOfPlayer TypeOfPlayer = /*i/2 > 0 ? Knight :*/ Squire;
 		NewCharacter->PlayerType = TypeOfPlayer;
 
 		const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
