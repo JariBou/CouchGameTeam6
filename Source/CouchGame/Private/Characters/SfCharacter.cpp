@@ -477,20 +477,26 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	
 	if (Health <= 0 && !IsDead)
 	{
-		IsDead = true;
-
-		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDeathSound,GetActorLocation());
-		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDeathSound,GetActorLocation());
-		
-		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
+		Kill(DmgDealer);
 	}
+}
+
+void ASfCharacter::Kill(ASfCharacter* DmgDealer)
+{
+	IsDead = true;
+	
+	if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDeathSound,GetActorLocation());
+	if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDeathSound,GetActorLocation());
+	
+	ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 }
 
 void ASfCharacter::RemoveInvincibility()
 {
+	if (this == nullptr) return; // in case we have some sort of timer bug
 	IsUnderInvincibilityTime = false;
 }
 

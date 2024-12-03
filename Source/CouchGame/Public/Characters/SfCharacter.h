@@ -81,9 +81,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	UPROPERTY()
-	bool IsDead = false;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	float InputRightJoystickDeadZone = 0.5f;
 	
@@ -248,8 +245,11 @@ protected:
 
 	UPROPERTY()
 	bool IsUnderInvincibilityTime;
+
+	public:
+	UPROPERTY(BlueprintReadWrite)
+	bool IsDead = false;
 	
-public:
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthValueChange OnHealthValueChange;
 
@@ -258,6 +258,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void Kill(ASfCharacter* DmgDealer);
 
 	UFUNCTION()
 	void RemoveInvincibility();
