@@ -176,7 +176,7 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	{
 		//DirectionVector.Y = -DirectionVector.Y;
 	}
-	DirectionForAnimVector = DirectionVector;
+	DirectionForAnimVector = DirectionVector * InputMove.Length();
 
 	// FVector Intermediate = GetActorForwardVector() * InputMoveSnap.Length();
 	// Intermediate.Normalize();
