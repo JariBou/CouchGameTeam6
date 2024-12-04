@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* Material;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontage;
+
 	UFUNCTION()
 	void OnDelegateStickCircleLate();
 
@@ -385,7 +388,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int MaxAngleForThrust = 10;
-	
+
+	UFUNCTION(BlueprintCallable)
+	void FinishRotAnim();
 	
 #pragma endregion
 	

@@ -37,7 +37,8 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
-		//TODO play anim montage
+		// TODO: play anim montage
+		PlayAnimMontage(RotationAnimMontage);
 		IsRotationAnimLaunched = true;
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
@@ -723,6 +724,11 @@ void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
 	NewActorRotator.Yaw = ActorConvertedAngle;
 	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
 	
+}
+
+void ASfCharacter::FinishRotAnim()
+{
+	IsRotationAnimLaunched = false;
 }
 
 //////////////////////////////////////////////////////////////////////////
