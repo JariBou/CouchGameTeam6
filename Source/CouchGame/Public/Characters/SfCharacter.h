@@ -89,8 +89,6 @@ private:
 	float CurrentAngle; //Current Yaw Rotation Of Actor
 	float DestinationAngle; //Destination Rotation Based On RightJoystick
 
-	
-
 public:
 	/** Constructeur */
 	ASfCharacter();
@@ -137,6 +135,8 @@ public:
 
 protected:
 	//void SetupMappingContextIntoController() const;
+	UPROPERTY()
+	UEnhancedInputComponent* EnhancedInputComponent;
 
 private:
 	void SetInputData(USfCharacterInputData* NewInputData);
@@ -174,7 +174,7 @@ private:
 
 	void RightJoystickEnded(const FInputActionValue& InputActionValue);
 	
-	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
+	void BindInputMoveAndActions();
 	
 #pragma endregion 
 

@@ -279,9 +279,11 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
 
-void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
+void ASfCharacter::BindInputMoveAndActions()
 {
 	if (InputData == nullptr) return;
+	if (EnhancedInputComponent == nullptr) return;
+	EnhancedInputComponent->ClearActionBindings();
 
 	if(InputData->InputActionLeftJoystick) //Move
 	{
@@ -369,26 +371,17 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 		ETriggerEvent::Triggered,
 		this,
 		&ASfCharacter::RightJoystickInput);
-	}
 
-	if(InputData->InputActionRightJoystick)
-	{
 		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
 		ETriggerEvent::Started,
 		this,
 		&ASfCharacter::RightJoystickStarted);
-	}
 
-	if(InputData->InputActionRightJoystick)
-	{
 		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
 		ETriggerEvent::Completed,
 		this,
 		&ASfCharacter::RightJoystickEnded);
-	}
 
-	if(InputData->InputActionRightJoystick)
-	{
 		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
 		ETriggerEvent::Canceled,
 		this,
@@ -734,13 +727,13 @@ void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComponent == nullptr) return;
 
 	SetInputData(GetDefault<UCharacterSettings>()->GetInputDataFromPlayerType(PlayerType));
 	SetPossibleStates(InputData->CharacterStates);
 	
-	BindInputMoveAndActions(EnhancedInputComponent);
+	BindInputMoveAndActions();
 
 }
 
@@ -749,12 +742,14 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 {
 	if (PlayerType == TypeOfPlayer) return;
 	PlayerType = TypeOfPlayer;
+	const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 	if (TypeOfPlayer == Knight)
 	{
 		if (IsCarrying) Drop();
-		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 		ChangeSkeletalMesh(Settings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
 	}
+	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
+	BindInputMoveAndActions();
 }
 
 void ASfCharacter::Move(const FInputActionValue& Value)
