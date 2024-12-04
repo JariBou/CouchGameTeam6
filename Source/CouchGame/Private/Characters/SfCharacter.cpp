@@ -208,6 +208,8 @@ void ASfCharacter::OnInputMove(const FInputActionValue& InputActionValue)
 	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("AGUGUGAGA")));
 
 	InputMove = InputActionValue.Get<FVector2D>();
+
+	TriggerMoveSound.Broadcast();
 }
 
 void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
@@ -222,7 +224,7 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 		4.0f,
 		FColor::Yellow,
 		TEXT("OnInputDash"));*/
-		
+		TriggerDodgeSound.Broadcast();
 	
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
@@ -417,6 +419,8 @@ void ASfCharacter::TickStateMachine(float DeltaTime) const
 {
 	if (StateMachine == nullptr) return;
 	StateMachine->Tick(DeltaTime);
+
+	GEngine->AddOnScreenDebugMessage(-1,3.f,FColor::Red, "Bouuuh, éteint ton PC la prochaine fois Clément Kiss Kiss");
 }
 
 TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> ASfCharacter::GetPossibleStates()
@@ -458,6 +462,8 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
 	if(CanBeDamagedCustom())
 	{
+		TriggerTakeDamageSound.Broadcast();
+		
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
 		IsUnderInvincibilityTime = true;
@@ -479,10 +485,7 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	{
 		IsDead = true;
 
-		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDeathSound,GetActorLocation());
-		if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDeathSound,GetActorLocation());
+		TriggerDeathSound.Broadcast();
 		
 		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
@@ -522,6 +525,8 @@ void ASfCharacter::SetupHealth(uint8 inMaxHealth)
 
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {
+	TriggerPickupSound.Broadcast();
+	
 	//Btw si j'avais dit de créer un BP du puits c'est pas pour rien....
 	//C reel ca, mais va y c la faute de clément chef
 
@@ -622,10 +627,7 @@ void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 APickable* ASfCharacter::Drop()
 {
 	//Play Drop sound
-	if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDropSound, GetActorLocation());
-	else if(PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDropSound, GetActorLocation());
+	TriggerDropSound.Broadcast();
 	
 	//Detach Pickable
 	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);

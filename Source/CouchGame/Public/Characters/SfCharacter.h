@@ -385,7 +385,29 @@ public:
 	
 #pragma region Sounds
 
-	UPROPERTY(EditAnywhere)
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerSound);
+
+	UPROPERTY(BlueprintAssignable, Category="event")
+	FTriggerSound TriggerDropSound;
+	
+	UPROPERTY(BlueprintAssignable, Category="event")
+	FTriggerSound TriggerDeathSound;
+
+	UPROPERTY(BlueprintAssignable, Category="event")
+	FTriggerSound TriggerMoveSound;
+
+	UPROPERTY(BlueprintAssignable, Category="event")
+	FTriggerSound TriggerDodgeSound;
+
+	UPROPERTY(BlueprintAssignable, Category="event")
+	FTriggerSound TriggerPickupSound;
+
+	UPROPERTY(BlueprintAssignable, Category="event")
+	FTriggerSound TriggerTakeDamageSound;
+	
+	//Ce code est pas fou Clément, j'aurais pas fait comme ca à ta place, pas fifou, Change le ce serait mieux
+	
+	/*UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> KnightDropSound;
 
 	UPROPERTY(EditAnywhere)
@@ -395,7 +417,9 @@ public:
 	TObjectPtr<USoundBase> KnightDeathSound;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> SquireDeathSound;
+	TObjectPtr<USoundBase> SquireDeathSound;*/
+
+	
 	
 #pragma endregion 
 
