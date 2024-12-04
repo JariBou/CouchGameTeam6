@@ -118,6 +118,8 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 
 	TeamMap[Dead->PlayerTeam].AddPlayer(NewCharacter);
 
+	NewCharacter->TriggerRespawnSound.Broadcast();
+
 	if (CheckEndOfGame())
 	{
 		OnEndOfGame();
