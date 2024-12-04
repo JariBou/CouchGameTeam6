@@ -37,6 +37,7 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		//TODO play anim montage
 		IsRotationAnimLaunched = true;
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
@@ -114,6 +115,8 @@ void ASfCharacter::BeginPlay()
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 
 	SetupHealth(CharacterSettings->CharacterInputDatas[PlayerType].MaxHealth);
+	
+	SetActorScale3D(CharacterSettings->CharacterInputDatas[PlayerType].Scale);
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
@@ -748,6 +751,7 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 		if (IsCarrying) Drop();
 		ChangeSkeletalMesh(Settings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
 	}
+	SetActorScale3D(Settings->CharacterInputDatas[TypeOfPlayer].Scale);
 	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
 	BindInputMoveAndActions();
 }

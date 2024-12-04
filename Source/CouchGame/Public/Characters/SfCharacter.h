@@ -405,8 +405,11 @@ public:
 #pragma region Animations
 
 	public:
-		UPROPERTY(BlueprintReadOnly)
-		FVector DirectionForAnimVector;
+	UPROPERTY(BlueprintReadOnly)
+	FVector DirectionForAnimVector;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsRotating;
 
 	#pragma endregion
 };
