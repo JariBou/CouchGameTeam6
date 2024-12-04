@@ -24,6 +24,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	private:
+	UPROPERTY(VisibleAnywhere)
+	float Life = 10;
+	
+
 #pragma region DamageLogic
 
 public:
@@ -55,7 +60,7 @@ public:
 	int Speed;
 
 	UPROPERTY(BlueprintReadWrite)
-	uint8 Durability = 0;
+	uint8 Durability = 10;
 
 	#pragma endregion 
 
