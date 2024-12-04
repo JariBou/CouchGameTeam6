@@ -31,6 +31,9 @@ struct FCharacterSettingsData
 
 	UPROPERTY(EditAnywhere)
 	float ForcePerDmg;
+
+	UPROPERTY(EditAnywhere)
+	FVector Scale;
 	
 };
 
