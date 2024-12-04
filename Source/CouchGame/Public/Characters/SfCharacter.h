@@ -224,6 +224,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FPhysicalAnimationData PhysicalAnimationData;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ActivateRagdollArms();
 	
 #pragma endregion
 

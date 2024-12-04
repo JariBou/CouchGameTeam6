@@ -121,6 +121,8 @@ void ASfCharacter::BeginPlay()
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
 	InputRJ = FVector2d(1.f,0.f);
+
+	// ActivateRagdollArms();
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -750,6 +752,11 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 	{
 		if (IsCarrying) Drop();
 		ChangeSkeletalMesh(Settings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
+		ActivateRagdollArms();
+		// GetWorldTimerManager().SetTimerForNextTick([&]
+		// {
+		// 	ActivateRagdollArms();
+		// });
 	}
 	SetActorScale3D(Settings->CharacterInputDatas[TypeOfPlayer].Scale);
 	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
