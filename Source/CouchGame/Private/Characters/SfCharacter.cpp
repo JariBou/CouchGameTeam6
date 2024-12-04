@@ -648,6 +648,12 @@ APickable* ASfCharacter::Drop()
 		FVector ImpulseDirection = FVector(wow->GetForwardVector().X * 500.f, wow->GetForwardVector().Y * 500.f, 1.f * 200.f); //IMPULSE DIRECTION (NO GD FRIENDLY)
 		ImpulseDirection += this->GetVelocity();
 		CurrentPickable->StaticMeshComponent->AddImpulse(ImpulseDirection, FName(""), true); //IMPULSE
+
+		AWaterBucket* WaterBucket = Cast<AWaterBucket>(CurrentPickable);
+		if(WaterBucket != nullptr)
+		{
+			WaterBucket->TriggerThrowSound.Broadcast();
+		}
 	}
 	CurrentPickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	CurrentPickable->StaticMeshComponent->IgnoreActorWhenMoving(this, true);
@@ -679,6 +685,12 @@ void ASfCharacter::PickupObject(APickable* Pickable)
 				Pickable->AttachToComponent(this->GetMesh(),TransformRules,FName(RightHandBoneName));
 				IsCarrying = true;
 				CurrentPickable = Pickable;
+
+				AWaterBucket* WaterBucket = Cast<AWaterBucket>(Pickable);
+				if(WaterBucket != nullptr)
+				{
+					WaterBucket->TriggerPickupSound.Broadcast();
+				}
 			}
 		}
 	}

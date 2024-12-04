@@ -59,6 +59,7 @@ void AWaterBucket::ComponentHit(UPrimitiveComponent* HitComponent, AActor* Other
 
 		if(Hit.GetActor()->ActorHasTag("Ground"))
 		{
+			TriggerHitGroundSound.Broadcast();
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Water Bucket Hit Ground");
 			SpawnMuddyGround(Hit.ImpactPoint, FRotator(0,0,0), Hit.GetActor()->GetActorUpVector());
 		}
@@ -76,6 +77,7 @@ void AWaterBucket::UpdateMesh()
 {
 	if(IsFilled)
 	{
+		TriggerFillSound.Broadcast();
 		StaticMeshComponent->SetStaticMesh(FilledMesh);
 	}
 	else

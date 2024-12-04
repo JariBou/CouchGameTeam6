@@ -59,4 +59,25 @@ protected:
 private:
 
 #pragma endregion
+
+#pragma region Sounds
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerSound);
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "event")
+	FTriggerSound TriggerFillSound;
+
+	UPROPERTY(BlueprintAssignable, Category = "event")
+	FTriggerSound TriggerHitGroundSound;
+
+	UPROPERTY(BlueprintAssignable, Category = "event")
+	FTriggerSound TriggerPickupSound;
+
+	UPROPERTY(BlueprintAssignable, Category = "event")
+	FTriggerSound TriggerThrowSound;
+
+	
+	
+#pragma endregion
 };
