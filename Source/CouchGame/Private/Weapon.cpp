@@ -18,12 +18,28 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	StaticMeshComponent->SetSimulatePhysics(true);
+	FWeaponInfo* row = Weapon.DataTable->FindRow<FWeaponInfo>(Weapon.RowName, "");
+	if (row == nullptr)
+	{
+		Destroy();
+		return;
+	}
+	SetCurrentData(*row);
 }
 
 // Called every frame
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (Holder == nullptr)
+	{
+		Life -= DeltaTime;
+		if (Life < 0)
+		{
+			Life = 0;
+			Destroy();
+		}
+	}
 
 	m_speed = (GetActorLocation() - m_lastFramePos).Length();
 	m_lastFramePos = GetActorLocation();
@@ -40,6 +56,8 @@ float AWeapon::GetDamage() const
 
 void AWeapon::DealtDamage()
 {
+	if (Holder == nullptr) return;
+	
 	Durability--;
 	if (Durability <= 0)
 	{
@@ -57,6 +75,7 @@ void AWeapon::SetCurrentData(FWeaponInfo NewData)
 {
 	CurrentDataRow = NewData;
 	Durability = CurrentDataRow.WeaponStats.Durability;
+	Life = CurrentDataRow.WeaponStats.Lifetime;
 	//StaticMeshComponent->SetStaticMesh(CurrentDataRow.WeaponMesh.LoadSynchronous());
 }
 

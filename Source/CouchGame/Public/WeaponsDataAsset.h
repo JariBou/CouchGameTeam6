@@ -33,6 +33,9 @@ struct FWeaponStats
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 DMGMultiplier = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 Lifetime;
 };
 
 USTRUCT(BlueprintType)

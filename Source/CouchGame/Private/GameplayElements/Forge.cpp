@@ -21,6 +21,7 @@ AForge::AForge()
 void AForge::SpawnWeaponsAtRandomLocation(int NumberToSpawn, int SpawnDelayOfAttempts)
 {
 	ForgingsDoneThisLevel++;
+	if (NumberToSpawn <= 0) return;
 	SpawnRandomWeapon();
 	float SpawnDelay = SpawnDelayOfAttempts;
 	for (int i = 0; i < NumberToSpawn-1; i++)
@@ -171,8 +172,8 @@ void AForge::SpawnWeapon(FName WeaponName)
 	PredictParams.OverrideGravityZ = 0;
 	PredictParams.ActorsToIgnore = {GetOwner()};
 	//PredictParams.ObjectTypes = {EObjectTypeQuery::ObjectTypeQuery1};
-	PredictParams.DrawDebugType = EDrawDebugTrace::ForDuration;
-	PredictParams.DrawDebugTime = 3;
+	// PredictParams.DrawDebugType = EDrawDebugTrace::ForDuration;
+	// PredictParams.DrawDebugTime = 3;
 	PredictParams.MaxSimTime = 3;
 
 

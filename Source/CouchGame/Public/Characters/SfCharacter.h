@@ -81,9 +81,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	UPROPERTY()
-	bool IsDead = false;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	float InputRightJoystickDeadZone = 0.5f;
 	
@@ -91,8 +88,6 @@ private:
 
 	float CurrentAngle; //Current Yaw Rotation Of Actor
 	float DestinationAngle; //Destination Rotation Based On RightJoystick
-
-	
 
 public:
 	/** Constructeur */
@@ -140,6 +135,8 @@ public:
 
 protected:
 	//void SetupMappingContextIntoController() const;
+	UPROPERTY()
+	UEnhancedInputComponent* EnhancedInputComponent;
 
 private:
 	void SetInputData(USfCharacterInputData* NewInputData);
@@ -177,7 +174,7 @@ private:
 
 	void RightJoystickEnded(const FInputActionValue& InputActionValue);
 	
-	void BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent);
+	void BindInputMoveAndActions();
 	
 #pragma endregion 
 
@@ -227,6 +224,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FPhysicalAnimationData PhysicalAnimationData;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ActivateRagdollArms();
 	
 #pragma endregion
 
@@ -248,8 +248,11 @@ protected:
 
 	UPROPERTY()
 	bool IsUnderInvincibilityTime;
+
+	public:
+	UPROPERTY(BlueprintReadWrite)
+	bool IsDead = false;
 	
-public:
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthValueChange OnHealthValueChange;
 
@@ -258,6 +261,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void Kill(ASfCharacter* DmgDealer);
 
 	UFUNCTION()
 	void RemoveInvincibility();
@@ -426,8 +432,11 @@ public:
 #pragma region Animations
 
 	public:
-		UPROPERTY(BlueprintReadOnly)
-		FVector DirectionForAnimVector;
+	UPROPERTY(BlueprintReadOnly)
+	FVector DirectionForAnimVector;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsRotating;
 
 	#pragma endregion
 };

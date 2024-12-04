@@ -62,7 +62,7 @@ void ASfGameMode::BeginPlay()
 		NewCharacter->PlayerTeam = NewPlayerTeam;
 		TeamMap[NewPlayerTeam].AddPlayer(NewCharacter);
 
-		TypeOfPlayer TypeOfPlayer = i/2 > 0 ? Knight : Squire;
+		TypeOfPlayer TypeOfPlayer = /*i/2 > 0 ? Knight :*/ Squire;
 		NewCharacter->PlayerType = TypeOfPlayer;
 
 		const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
@@ -94,13 +94,18 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 
 	if (Killer != nullptr)
 	{
-		if (Killer->PlayerType == Knight && Dead->PlayerTeam != Killer->PlayerTeam && Dead->PlayerTeam == Knight) --TeamMap[Dead->PlayerTeam].Lives; // T'es content Jerem?
+		if ((Killer->PlayerType == Knight) && (Dead->PlayerTeam != Killer->PlayerTeam) && (Dead->PlayerType == Knight))
+		{
+			// T'es content Jerem?
+			--TeamMap[Dead->PlayerTeam].Lives;
+		} 
 	}
 	
 	const FRespawnData respawnData {
 		Dead->PlayerTeam,
 		Dead->GetController(),
 	};
+	
 	Dead->GetController()->UnPossess();
 	TeamMap[Dead->PlayerTeam].RemovePlayer(Dead);
 	Dead->Destroy();

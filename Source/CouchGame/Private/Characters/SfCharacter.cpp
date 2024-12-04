@@ -37,6 +37,7 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		//TODO play anim montage
 		IsRotationAnimLaunched = true;
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
@@ -114,10 +115,14 @@ void ASfCharacter::BeginPlay()
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 
 	SetupHealth(CharacterSettings->CharacterInputDatas[PlayerType].MaxHealth);
+	
+	SetActorScale3D(CharacterSettings->CharacterInputDatas[PlayerType].Scale);
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
 	InputRJ = FVector2d(1.f,0.f);
+
+	// ActivateRagdollArms();
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -176,7 +181,7 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	{
 		//DirectionVector.Y = -DirectionVector.Y;
 	}
-	DirectionForAnimVector = DirectionVector;
+	DirectionForAnimVector = DirectionVector * InputMove.Length();
 
 	// FVector Intermediate = GetActorForwardVector() * InputMoveSnap.Length();
 	// Intermediate.Normalize();
@@ -281,9 +286,11 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
 
-void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInputComponent)
+void ASfCharacter::BindInputMoveAndActions()
 {
 	if (InputData == nullptr) return;
+	if (EnhancedInputComponent == nullptr) return;
+	EnhancedInputComponent->ClearActionBindings();
 
 	if(InputData->InputActionLeftJoystick) //Move
 	{
@@ -371,26 +378,17 @@ void ASfCharacter::BindInputMoveAndActions(UEnhancedInputComponent* EnhancedInpu
 		ETriggerEvent::Triggered,
 		this,
 		&ASfCharacter::RightJoystickInput);
-	}
 
-	if(InputData->InputActionRightJoystick)
-	{
 		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
 		ETriggerEvent::Started,
 		this,
 		&ASfCharacter::RightJoystickStarted);
-	}
 
-	if(InputData->InputActionRightJoystick)
-	{
 		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
 		ETriggerEvent::Completed,
 		this,
 		&ASfCharacter::RightJoystickEnded);
-	}
 
-	if(InputData->InputActionRightJoystick)
-	{
 		EnhancedInputComponent->BindAction(InputData->InputActionRightJoystick,
 		ETriggerEvent::Canceled,
 		this,
@@ -483,17 +481,23 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	
 	if (Health <= 0 && !IsDead)
 	{
-		IsDead = true;
-
-		TriggerDeathSound.Broadcast();
-		
-		ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-		if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
+		Kill(DmgDealer);
 	}
+}
+
+void ASfCharacter::Kill(ASfCharacter* DmgDealer)
+{
+	IsDead = true;
+	
+	TriggerDeathSound.Broadcast();
+	
+	ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
 }
 
 void ASfCharacter::RemoveInvincibility()
 {
+	if (this == nullptr) return; // in case we have some sort of timer bug
 	IsUnderInvincibilityTime = false;
 }
 
@@ -730,13 +734,13 @@ void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComponent == nullptr) return;
 
 	SetInputData(GetDefault<UCharacterSettings>()->GetInputDataFromPlayerType(PlayerType));
 	SetPossibleStates(InputData->CharacterStates);
 	
-	BindInputMoveAndActions(EnhancedInputComponent);
+	BindInputMoveAndActions();
 
 }
 
@@ -745,12 +749,20 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 {
 	if (PlayerType == TypeOfPlayer) return;
 	PlayerType = TypeOfPlayer;
+	const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 	if (TypeOfPlayer == Knight)
 	{
 		if (IsCarrying) Drop();
-		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 		ChangeSkeletalMesh(Settings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
+		ActivateRagdollArms();
+		// GetWorldTimerManager().SetTimerForNextTick([&]
+		// {
+		// 	ActivateRagdollArms();
+		// });
 	}
+	SetActorScale3D(Settings->CharacterInputDatas[TypeOfPlayer].Scale);
+	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
+	BindInputMoveAndActions();
 }
 
 void ASfCharacter::Move(const FInputActionValue& Value)
