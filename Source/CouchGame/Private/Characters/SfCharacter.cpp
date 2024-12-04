@@ -282,6 +282,7 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		PlayAnimMontage(RotationAnimMontage);
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
