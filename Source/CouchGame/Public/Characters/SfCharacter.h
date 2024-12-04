@@ -398,6 +398,7 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerSound);
 
+public:
 	UPROPERTY(BlueprintAssignable, Category="event")
 	FTriggerSound TriggerDropSound;
 	
@@ -415,6 +416,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="event")
 	FTriggerSound TriggerTakeDamageSound;
+
+	UPROPERTY(BlueprintAssignable, Category="event")
+	FTriggerSound TriggerRespawnSound;
 	
 	//Ce code est pas fou Clément, j'aurais pas fait comme ca à ta place, pas fifou, Change le ce serait mieux
 	

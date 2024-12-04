@@ -107,5 +107,7 @@ private:
 public:
 	UFUNCTION(BlueprintCallable)
 	const TMap<TEnumAsByte<ETeam>, FTeamInfo>& GetTeamMap() const;
+
+	
 	
 };
