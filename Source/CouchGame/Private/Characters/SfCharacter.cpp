@@ -45,6 +45,8 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
 
+#pragma region AActor & Interfaces
+
 FVector ASfCharacter::GetFollowTarget()
 {
 	return GetActorLocation();
@@ -198,6 +200,24 @@ void ASfCharacter::Tick(float DeltaSeconds)
 
 }
 
+void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent == nullptr) return;
+
+	SetInputData(GetDefault<UCharacterSettings>()->GetInputDataFromPlayerType(PlayerType));
+	SetPossibleStates(InputData->CharacterStates);
+	
+	BindInputMoveAndActions();
+
+}
+
+#pragma endregion
+
+#pragma region Movement
+
 void ASfCharacter::SetInputData(USfCharacterInputData* NewInputData)
 {
 	InputData = NewInputData;
@@ -224,13 +244,7 @@ void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 
 void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
-	/*GEngine->AddOnScreenDebugMessage(
-		-1,
-		4.0f,
-		FColor::Yellow,
-		TEXT("OnInputDash"));*/
 	TriggerDodgeSound.Broadcast();
-	
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
 
@@ -402,6 +416,66 @@ void ASfCharacter::StartDashCooldownTimer()
 	DashCooldownTimer = DashCooldown;
 }
 
+void ASfCharacter::Move(const FInputActionValue& Value)
+{
+	// input is a Vector2D
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get forward vector
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	
+		// get right vector 
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		// add movement 
+		AddMovementInput(ForwardDirection, MovementVector.Y);
+		AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+
+void ASfCharacter::Look(const FInputActionValue& Value)
+{
+	// input is a Vector2D
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// add yaw and pitch input to controller
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
+{
+	FRotator DestinationRotator = GetActorRotation();
+	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
+	//SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
+	FRotator NewActorRotator;
+	if (PlayerType == Knight)
+	{
+		CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
+		float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
+		NewActorRotator = GetActorRotation();
+		NewActorRotator.Yaw = ActorConvertedAngle;
+	}else
+	{
+		NewActorRotator = FVector(InputMove.X, InputMove.Y, 0).Rotation();
+	}
+
+	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
+}
+
+#pragma endregion
+
+#pragma region StateMachine
+
 void ASfCharacter::CreateStateMachine()
 {
 	StateMachine = NewObject<USfCharacterStateMachine>(this);
@@ -431,6 +505,8 @@ void ASfCharacter::SetPossibleStates(TMap<ESfCharacterStateID, TSubclassOf<USfCh
 	PossibleStates = NewPossibleStates;
 }
 
+#pragma endregion
+
 void ASfCharacter::SetUpArmsRagdoll()
 {
 	if (PhysicalComponent!=nullptr) return;
@@ -449,6 +525,8 @@ void ASfCharacter::SetUpArmsRagdoll()
 	
 	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Turquoise, BoneTransformToMove.ToHumanReadableString());
 }
+
+#pragma region Health And stuff
 
 bool ASfCharacter::CanBeDamagedCustom()
 {
@@ -511,6 +589,19 @@ void ASfCharacter::AddHealth(float HealthToAdd)
 	++NumberOfTimeHealthIsUsed; //Hurm actually c'est plus opti
 }
 
+void ASfCharacter::SetupHealth(uint8 inMaxHealth)
+{
+	MaxHealth = inMaxHealth;
+	Health = MaxHealth;
+}
+
+void ASfCharacter::SetInvincibility(bool bCond)
+{
+	IsUnderInvincibilityTime = bCond;
+}
+
+#pragma endregion
+
 void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 {
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
@@ -525,17 +616,9 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 	if(PlayerTeam == ETeam::Team2) GetMesh()->SetMaterial(0, DynMat2);
 }
 
-void ASfCharacter::SetupHealth(uint8 inMaxHealth)
-{
-	MaxHealth = inMaxHealth;
-	Health = MaxHealth;
-}
+#pragma region Pickup & Give
 
-void ASfCharacter::SetInvincibility(bool bCond)
-{
-	IsUnderInvincibilityTime = bCond;
-}
-
+/// Binded to the input
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {
 	TriggerPickupSound.Broadcast();
@@ -546,7 +629,7 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	TArray<AActor*> ListOfActorFromCollision;
 	UEventHandler* FoundWell = nullptr;
 	//CHECK OBJ
-	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, AActor::StaticClass()); //La Faute de clem ptn
+	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, AActor::StaticClass()); // La Faute de clem ptn
 	ListOfActorFromCollision.RemoveAll([&](const AActor* Actor){return Actor == this;});
 	//Setup FriendlyKnight && Well PAS OPTI
 	for (AActor* ActorFromCollision : ListOfActorFromCollision)
@@ -721,6 +804,8 @@ void ASfCharacter::Interact()
 	//Interaction Event sur Puit a coder
 }
 
+#pragma endregion
+
 void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 {
 	FForceFeedbackParameters FeedbackParams;
@@ -735,44 +820,8 @@ void ASfCharacter::StopFeedBackEffect()
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
 }
 
-void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
-{
-	FRotator DestinationRotator = GetActorRotation();
-	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
-	//SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
-	FRotator NewActorRotator;
-	if (PlayerType == Knight)
-	{
-		CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
-		float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
-		NewActorRotator = GetActorRotation();
-		NewActorRotator.Yaw = ActorConvertedAngle;
-	}else
-	{
-		NewActorRotator = FVector(InputMove.X, InputMove.Y, 0).Rotation();
-	}
-
-	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
-}
-
 //////////////////////////////////////////////////////////////////////////
 // Input
-
-void ASfCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if (EnhancedInputComponent == nullptr) return;
-
-	SetInputData(GetDefault<UCharacterSettings>()->GetInputDataFromPlayerType(PlayerType));
-	SetPossibleStates(InputData->CharacterStates);
-	
-	BindInputMoveAndActions();
-
-}
-
-
 void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 {
 	if (PlayerType == TypeOfPlayer) return;
@@ -795,38 +844,4 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 	BindInputMoveAndActions();
 }
 
-void ASfCharacter::Move(const FInputActionValue& Value)
-{
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
-	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
-	}
-}
-
-void ASfCharacter::Look(const FInputActionValue& Value)
-{
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
-}
