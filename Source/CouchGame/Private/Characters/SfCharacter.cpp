@@ -174,25 +174,12 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	FVector2D RightVector = FVector2D(ActorRightVector.X, ActorRightVector.Y);
 	float AngleSign = FMath::Sign(FVector2D::DotProduct(RightVector, InputMoveSnap));
 	float DotProduct = FVector2D::DotProduct(ActorForwardVector, InputMoveSnap);
-	float DotSign = FMath::Sign(DotProduct);
 	float AngleInRadians = FMath::Acos(DotProduct);
 	float AngleInDegrees = FMath::RadiansToDegrees(AngleInRadians) * -AngleSign;
 
 	FVector DirectionVector = FVector(1, 0, 0).RotateAngleAxis(AngleInDegrees, FVector::UpVector);
-	if (DotSign < 0)
-	{
-		//DirectionVector.Y = -DirectionVector.Y;
-	}
+
 	DirectionForAnimVector = DirectionVector * InputMove.Length();
-
-	// FVector Intermediate = GetActorForwardVector() * InputMoveSnap.Length();
-	// Intermediate.Normalize();
-	// // FVector2D AngleVector = FVector2D(ActorForwardVector.X, ActorForwardVector.Y) - InputMove;
-	// // double Angle = FMath::Atan2(AngleVector.Y, AngleVector.X);
-	// DirectionForAnimVector = FVector(1, 0, 0) .RotateAngleAxis(AngleInDegrees, FVector::UpVector);
-
-	// GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Emerald, DirectionForAnimVector.ToString(), false);
-	// GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Emerald, FString::SanitizeFloat(AngleInDegrees), false);
 
 	#pragma endregion
 
