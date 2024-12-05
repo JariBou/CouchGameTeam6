@@ -260,7 +260,7 @@ protected:
 	bool CanBeDamagedCustom();
 	
 	UFUNCTION(BlueprintCallable)
-	void TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
+	bool TakeDamageCustom(ASfCharacter* DmgDealer, float Amount);
 
 	UFUNCTION(BlueprintCallable)
 	void Kill(ASfCharacter* DmgDealer);

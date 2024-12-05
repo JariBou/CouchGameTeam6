@@ -62,6 +62,8 @@ class COUCHGAME_API AForge : public AActor, public ISpawnPointToolUser
 {
 	GENERATED_BODY()
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerSound);
+
 public:
 	// Sets default values for this actor's properties
 	AForge();
@@ -103,6 +105,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<AActor*> SpawnPointActors;
+
+	UPROPERTY(BlueprintAssignable, Category="event")
+	FTriggerSound TriggerWeaponSpawnSound;
 	
 private:
 	UPROPERTY(EditAnywhere)

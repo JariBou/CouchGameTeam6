@@ -2,7 +2,11 @@
 
 
 #include "Pickable.h"
+
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Characters/SfCharacter.h"
+#include "NiagaraSystem.h"
 
 
 // Sets default values
@@ -27,13 +31,19 @@ void APickable::Tick(float DeltaTime)
 
 void APickable::Interact_Implementation(ASfCharacter* CouchGameCharacter)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Blue, TEXT("Interaction With Interface"));
+	// GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Purple, TEXT("Interaction With Interface"));
 	if (CouchGameCharacter != nullptr) Holder = CouchGameCharacter;
+	NiagaraDropSystem_Implementation();
 }
 
 bool APickable::CanPickUp_Implementation(ASfCharacter* CouchGameCharacter)
 {
 	TEnumAsByte<TypeOfPlayer> PlayerType = CouchGameCharacter->PlayerType;
 	return PlayerType & PickableType;
+}
+
+void APickable::NiagaraDropSystem_Implementation()
+{
+	NiagaraComponentForDrop = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraParticleDrop, StaticMeshComponent, NAME_None, FVector(0.f,0.f,0.f), FRotator(0.f), EAttachLocation::Type::SnapToTarget, true);
 }
 

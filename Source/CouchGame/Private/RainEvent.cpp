@@ -4,6 +4,7 @@
 #include "RainEvent.h"
 
 #include "GameplayElements/MuddyGround.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void ARainEvent::EndEvent()
@@ -25,7 +26,7 @@ void ARainEvent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "ARainEvent::BeginPlay");
+	// GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "ARainEvent::BeginPlay");
 	
 	SetActorLocation(GetActorLocation() + FVector(0, 0, 100));
 
@@ -37,7 +38,9 @@ void ARainEvent::BeginPlay()
 	if (GetWorld()->LineTraceMultiByChannel(OutHits, GetActorLocation(), GetActorLocation() - FVector(0, 0, 100),
 	                                        ECC_WorldStatic))
 	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), RainSound, GetActorLocation());
 		SpawnMuddyGround(OutHits[0].Location, FRotator(0,0,0), OutHits[0].Normal);
+
 	}
 }
 

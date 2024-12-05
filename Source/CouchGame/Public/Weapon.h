@@ -38,12 +38,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DealtDamage();
 
+	UFUNCTION(BlueprintCallable)
+	bool DealDamage(ASfCharacter* Target);
+	
 private:
 	UPROPERTY()
 	FVector m_lastFramePos;
 
 	UPROPERTY()
 	float m_speed;
+
+	UPROPERTY()
+	bool JustDealtDamage;
 	
 #pragma endregion
 

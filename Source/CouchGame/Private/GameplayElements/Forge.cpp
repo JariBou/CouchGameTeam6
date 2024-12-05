@@ -34,6 +34,8 @@ void AForge::SpawnWeaponsAtRandomLocation(int NumberToSpawn, int SpawnDelayOfAtt
 
 void AForge::SpawnRandomWeapon()
 {
+	TriggerWeaponSpawnSound.Broadcast();
+	
 	FWeaponsRarityList WeaponsRarityList = ForgeMap[ForgeLevel];
 	
 	WeaponsRarityList.WeaponListRarity.ValueSort([](const FWeaponsList &A, const FWeaponsList &B) { return A.PercentChance < B.PercentChance; });
@@ -149,7 +151,7 @@ void AForge::SpawnWeapon(FName WeaponName)
 
 	AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), WeaponInfo->WeaponBP, WeaponSpawnTransform));
 	NewWeapon->SetCurrentData(*WeaponInfo);
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
 	NewWeapon->FinishSpawning(WeaponSpawnTransform);
 
 	// FVector TrajectVector = SpawnPointLocation - GetActorTransform().GetLocation();
@@ -179,7 +181,7 @@ void AForge::SpawnWeapon(FName WeaponName)
 
 	FPredictProjectilePathResult PredictResult;
 	UGameplayStatics::PredictProjectilePath(GetWorld(), PredictParams, PredictResult);
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TossVelocity.ToString());
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TossVelocity.ToString());
 
 	Cast<UPrimitiveComponent>(NewWeapon->GetRootComponent())->AddImpulse(TossVelocity, NAME_None, true);
 }

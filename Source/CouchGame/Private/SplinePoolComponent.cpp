@@ -19,7 +19,7 @@ USplinePoolComponent::USplinePoolComponent()
 
 TBitsToSizeType<32>::Type USplinePoolComponent::CreateNewSpline(const FVector& StartLocation, const FVector& EndLocation)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "Spline Created");
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "Spline Created");
 	FTransform RelativeTransform = FTransform();
 	USplineComponent* NewSplineComponent = Cast<USplineComponent>(GetOwner()->AddComponentByClass(USplineComponent::StaticClass(), false, RelativeTransform, true));
 	
@@ -91,7 +91,7 @@ void USplinePoolComponent::StartSplineForWeapon(AWeapon* ForWeapon, const FVecto
 
 	FPredictProjectilePathResult PredictResult;
 	UGameplayStatics::PredictProjectilePath(GetWorld(), PredictParams, PredictResult);
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TossVelocity.ToString());
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TossVelocity.ToString());
 
 	Cast<UPrimitiveComponent>(ForWeapon->GetRootComponent())->AddImpulse(TossVelocity, NAME_None, true);
 	

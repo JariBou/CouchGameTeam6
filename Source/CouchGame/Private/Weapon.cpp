@@ -56,14 +56,46 @@ float AWeapon::GetDamage() const
 
 void AWeapon::DealtDamage()
 {
-	if (Holder == nullptr) return;
-	
+	if (Holder == nullptr || JustDealtDamage) return;
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Weapon Takes DAMAAAAAAAAGE");
 	Durability--;
+	JustDealtDamage = true;
+	GetGameInstance()->GetTimerManager().SetTimerForNextTick([&]
+	{
+		JustDealtDamage = false;
+	});
+	
 	if (Durability <= 0)
 	{
 		Holder->Drop();
 		Destroy();
 	}
+}
+
+bool AWeapon::DealDamage(ASfCharacter* Target)
+{
+	if (Holder == nullptr || JustDealtDamage) return false;
+
+	if (!Target->CanBeDamagedCustom()) return false;
+	
+	JustDealtDamage = true;
+	GetGameInstance()->GetTimerManager().SetTimerForNextTick([&]
+	{
+		JustDealtDamage = false;
+	});
+
+	Target->TakeDamageCustom(Holder, GetDamage());
+	Durability--;
+	
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Weapon Takes DAMAAAAAAAAGE");
+
+	if (Durability <= 0)
+	{
+		Holder->Drop();
+		Destroy();
+	}
+	return true;
 }
 
 FWeaponInfo& AWeapon::GetDataWeaponRowInfo(FName NameOfRow)

@@ -30,7 +30,7 @@ struct FCharacterSettingsData
 	float InvincibilityTime;
 
 	UPROPERTY(EditAnywhere)
-	float ForcePerDmg;
+	float KnockbackForce;
 
 	UPROPERTY(EditAnywhere)
 	FVector Scale;
