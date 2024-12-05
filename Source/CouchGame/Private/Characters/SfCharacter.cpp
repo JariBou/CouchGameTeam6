@@ -108,7 +108,7 @@ void ASfCharacter::BeginPlay()
 	//SetUpArmsRagdoll();
 	
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 	
 	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->AddFollowTarget(this);
 	
@@ -153,11 +153,11 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	}
 	if(CanDash)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("TRUE"), false);
+		// GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("TRUE"), false);
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("FALSE"), false);
+		// GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, TEXT("FALSE"), false);
 	}
 
 	#pragma region Anim
@@ -229,7 +229,7 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 		4.0f,
 		FColor::Yellow,
 		TEXT("OnInputDash"));*/
-		TriggerDodgeSound.Broadcast();
+	TriggerDodgeSound.Broadcast();
 	
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
@@ -256,9 +256,9 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 
 void ASfCharacter::OnDelegateStickCicleThrustEnd()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
-	if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
+	// if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
+	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForThrust);
 }
 
@@ -268,7 +268,7 @@ void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValu
 	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
+	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
 	TimerDelegateForStickCircleCount.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleLate);
 	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCicleThrustEnd);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleForCircle, TimerDelegateForStickCircleCount, TimeNeededForRotation, false);
@@ -280,9 +280,9 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && IsRotationAnimLaunched == false)
 	{
 		// Réussite du stick toupie lol
-		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
 
@@ -418,7 +418,7 @@ void ASfCharacter::TickStateMachine(float DeltaTime) const
 	if (StateMachine == nullptr) return;
 	StateMachine->Tick(DeltaTime);
 
-	GEngine->AddOnScreenDebugMessage(-1,3.f,FColor::Red, "Bouuuh, éteint ton PC la prochaine fois Clément Kiss Kiss");
+	// GEngine->AddOnScreenDebugMessage(-1,3.f,FColor::Red, "Bouuuh, éteint ton PC la prochaine fois Clément Kiss Kiss");
 }
 
 TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> ASfCharacter::GetPossibleStates()
@@ -463,7 +463,7 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		IsUnderInvincibilityTime = true;
 		TriggerTakeDamageSound.Broadcast();
 
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Player Takes Damage");
 		
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
@@ -619,7 +619,7 @@ AActor* ASfCharacter::GetClosestActorToCharacterInArray(TArray<AActor*>& ArrayOf
 
 void ASfCharacter::PickUpAndThrow(TArray<AActor*>& ArrayOfPickable)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 6.f, FColor::Emerald, TEXT("PICK UP DE FOU CA MARCHE STP"));
+	// GEngine->AddOnScreenDebugMessage(-1, 6.f, FColor::Emerald, TEXT("PICK UP DE FOU CA MARCHE STP"));
 
 	if(IsCarrying) //Si il porte un objet
 	{
@@ -740,13 +740,19 @@ void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
 	FRotator DestinationRotator = GetActorRotation();
 	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
 	//SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
-	
-	CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
-	float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
-	FRotator NewActorRotator = GetActorRotation();
-	NewActorRotator.Yaw = ActorConvertedAngle;
+	FRotator NewActorRotator;
+	if (PlayerType == Knight)
+	{
+		CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
+		float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
+		NewActorRotator = GetActorRotation();
+		NewActorRotator.Yaw = ActorConvertedAngle;
+	}else
+	{
+		NewActorRotator = FVector(InputMove.X, InputMove.Y, 0).Rotation();
+	}
+
 	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
-	
 }
 
 //////////////////////////////////////////////////////////////////////////

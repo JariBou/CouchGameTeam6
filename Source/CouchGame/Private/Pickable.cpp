@@ -31,7 +31,7 @@ void APickable::Tick(float DeltaTime)
 
 void APickable::Interact_Implementation(ASfCharacter* CouchGameCharacter)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Purple, TEXT("Interaction With Interface"));
+	// GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Purple, TEXT("Interaction With Interface"));
 	if (CouchGameCharacter != nullptr) Holder = CouchGameCharacter;
 	NiagaraDropSystem_Implementation();
 }

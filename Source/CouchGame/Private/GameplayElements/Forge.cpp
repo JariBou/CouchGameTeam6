@@ -181,7 +181,7 @@ void AForge::SpawnWeapon(FName WeaponName)
 
 	FPredictProjectilePathResult PredictResult;
 	UGameplayStatics::PredictProjectilePath(GetWorld(), PredictParams, PredictResult);
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TossVelocity.ToString());
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TossVelocity.ToString());
 
 	Cast<UPrimitiveComponent>(NewWeapon->GetRootComponent())->AddImpulse(TossVelocity, NAME_None, true);
 }

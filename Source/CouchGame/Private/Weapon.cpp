@@ -58,7 +58,7 @@ void AWeapon::DealtDamage()
 {
 	if (Holder == nullptr || JustDealtDamage) return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "Weapon Takes DAMAAAAAAAAGE");
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Weapon Takes DAMAAAAAAAAGE");
 	Durability--;
 	JustDealtDamage = true;
 	GetGameInstance()->GetTimerManager().SetTimerForNextTick([&]
@@ -88,7 +88,7 @@ bool AWeapon::DealDamage(ASfCharacter* Target)
 	Target->TakeDamageCustom(Holder, GetDamage());
 	Durability--;
 	
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Green, "Weapon Takes DAMAAAAAAAAGE");
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Weapon Takes DAMAAAAAAAAGE");
 
 	if (Durability <= 0)
 	{

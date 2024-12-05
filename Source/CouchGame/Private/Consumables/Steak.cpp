@@ -31,7 +31,7 @@ void ASteak::EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveC
 	bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::EffectOnPlayer(Comp, Char, Comp2, OtherBodyIndex, bFromSweep, SweepResult);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("OE"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("OE"));
 
 	ASfCharacter* Player = Cast<ASfCharacter>(Char);
 
