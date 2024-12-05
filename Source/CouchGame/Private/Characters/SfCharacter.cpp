@@ -460,20 +460,20 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
 	if(CanBeDamagedCustom())
 	{
+		IsUnderInvincibilityTime = true;
 		TriggerTakeDamageSound.Broadcast();
 
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
-		IsUnderInvincibilityTime = true;
 
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 		if (DmgDealer != nullptr)
 		{
 			FVector Direction = GetActorLocation() - DmgDealer->GetActorLocation();
 			Direction.Normalize();
-			Direction *= Amount * Settings->CharacterInputDatas[PlayerType].ForcePerDmg;
+			Direction *= Settings->CharacterInputDatas[PlayerType].KnockbackForce;
 			LaunchCharacter(Direction, false, false);
 		}
 

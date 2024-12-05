@@ -25,7 +25,7 @@ ASfCharacter* URespawner::StartDeferredRespawn(FRespawnData RespawnData)
 	// RespawnMap.Add(RespawnData, Character);
 	Character->PlayerTeam = RespawnData.Team;
 	Character->PlayerType = RespawnData.TypeOfPlayer;
-	Character->SetInvincibility(true);
+	// Character->SetInvincibility(true);
 
 	return Character;
 }
