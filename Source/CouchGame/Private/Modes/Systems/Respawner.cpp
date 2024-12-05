@@ -25,6 +25,7 @@ ASfCharacter* URespawner::StartDeferredRespawn(FRespawnData RespawnData)
 	// RespawnMap.Add(RespawnData, Character);
 	Character->PlayerTeam = RespawnData.Team;
 	Character->PlayerType = RespawnData.TypeOfPlayer;
+	Character->SetInvincibility(true);
 
 	return Character;
 }
@@ -38,7 +39,6 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	Character->ChangeSkeletalMesh(SkeletalMesh);
 	
 	FTimerHandle NullHandle;
-	Character->SetInvincibility(true);
 	Character->GetGameInstance()->GetTimerManager().SetTimer(NullHandle, Character, &ASfCharacter::RemoveInvincibility, CharacterSettings->RespawnInvincibilityTime);
 	
 	//

@@ -25,7 +25,7 @@ void ARainEvent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "ARainEvent::BeginPlay");
+	// GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "ARainEvent::BeginPlay");
 	
 	SetActorLocation(GetActorLocation() + FVector(0, 0, 100));
 

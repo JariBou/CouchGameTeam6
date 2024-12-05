@@ -57,7 +57,8 @@ float AWeapon::GetDamage() const
 void AWeapon::DealtDamage()
 {
 	if (Holder == nullptr) return;
-	
+
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "Weapon Takes DAMAAAAAAAAGE");
 	Durability--;
 	if (Durability <= 0)
 	{

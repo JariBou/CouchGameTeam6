@@ -36,11 +36,11 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded)
 	{
 		// Réussite du stick toupie lol
-		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		//TODO play anim montage
 		IsRotationAnimLaunched = true;
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
+	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
 	CurrentDeltaMadeByStick = 0.f;
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
@@ -189,12 +189,12 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	// // double Angle = FMath::Atan2(AngleVector.Y, AngleVector.X);
 	// DirectionForAnimVector = FVector(1, 0, 0) .RotateAngleAxis(AngleInDegrees, FVector::UpVector);
 
-	GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Emerald, DirectionForAnimVector.ToString(), false);
-	GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Emerald, FString::SanitizeFloat(AngleInDegrees), false);
+	// GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Emerald, DirectionForAnimVector.ToString(), false);
+	// GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Emerald, FString::SanitizeFloat(AngleInDegrees), false);
 
 	#pragma endregion
 
-	GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, FString::SanitizeFloat(DashCooldownTimer), false);
+	// GEngine->AddOnScreenDebugMessage(-1, DeltaSeconds, FColor::Yellow, FString::SanitizeFloat(DashCooldownTimer), false);
 
 }
 
@@ -456,11 +456,13 @@ bool ASfCharacter::CanBeDamagedCustom()
 	return CanBeDamaged() && !IsUnderInvincibilityTime;
 }
 
-void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
+bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
 	if(CanBeDamagedCustom())
 	{
 		TriggerTakeDamageSound.Broadcast();
+
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
@@ -477,12 +479,14 @@ void ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 
 		FTimerHandle NullHandle;
 		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->CharacterInputDatas[PlayerType].InvincibilityTime);
+		if (Health <= 0 && !IsDead)
+		{
+			Kill(DmgDealer);
+		}
+		return true;
 	}
 	
-	if (Health <= 0 && !IsDead)
-	{
-		Kill(DmgDealer);
-	}
+	return false;
 }
 
 void ASfCharacter::Kill(ASfCharacter* DmgDealer)

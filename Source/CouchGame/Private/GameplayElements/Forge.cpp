@@ -149,7 +149,7 @@ void AForge::SpawnWeapon(FName WeaponName)
 
 	AWeapon* NewWeapon = Cast<AWeapon>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetGameInstance()->GetWorld(), WeaponInfo->WeaponBP, WeaponSpawnTransform));
 	NewWeapon->SetCurrentData(*WeaponInfo);
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("New Weapon Created"));
 	NewWeapon->FinishSpawning(WeaponSpawnTransform);
 
 	// FVector TrajectVector = SpawnPointLocation - GetActorTransform().GetLocation();
