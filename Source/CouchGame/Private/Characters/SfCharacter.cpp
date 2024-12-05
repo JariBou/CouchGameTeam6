@@ -457,14 +457,14 @@ void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
 	FRotator DestinationRotator = GetActorRotation();
 	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
 	//SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
-	FRotator NewActorRotator;
+	FRotator NewActorRotator = GetActorRotation();
 	if (PlayerType == Knight)
 	{
 		CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
 		float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
 		NewActorRotator = GetActorRotation();
 		NewActorRotator.Yaw = ActorConvertedAngle;
-	}else
+	}else if (InputMove.Length() > .1f)
 	{
 		NewActorRotator = FVector(InputMove.X, InputMove.Y, 0).Rotation();
 	}
@@ -620,7 +620,7 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 
 /// Binded to the input
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
-{
+{	
 	TriggerPickupSound.Broadcast();
 	
 	//Btw si j'avais dit de créer un BP du puits c'est pas pour rien....
@@ -630,12 +630,16 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	UEventHandler* FoundWell = nullptr;
 	//CHECK OBJ
 	CollisionForObject->GetOverlappingActors(ListOfActorFromCollision, AActor::StaticClass()); // La Faute de clem ptn
-	ListOfActorFromCollision.RemoveAll([&](const AActor* Actor){return Actor == this;});
+	ListOfActorFromCollision.RemoveAll([&](const AActor* Actor)
+	{
+		return Actor == this || (CurrentPickable != nullptr && Actor == CurrentPickable);
+	});
 	//Setup FriendlyKnight && Well PAS OPTI
 	for (AActor* ActorFromCollision : ListOfActorFromCollision)
 	{
 		// Warning: does not take into account if it's a friendly character or self
-		if(ASfCharacter* Character = Cast<ASfCharacter>(ActorFromCollision); Character != nullptr)
+		if(ASfCharacter* Character = Cast<ASfCharacter>(ActorFromCollision);
+			Character != nullptr && Character->PlayerTeam == PlayerTeam && Character->PlayerType == Knight)
 		{
 			FriendlyKnight = Character;
 		}
@@ -645,14 +649,13 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 		}
 		//else if(Cast<AWell>(ActorFromCollision) != nullptr) WellInRange = Cast<AWell>(ActorFromCollision);
 	}
-
 	
 	AActor* ClosestActor = GetClosestActorToCharacterInArray(ListOfActorFromCollision);
 	
 	AWaterBucket* MyWaterBucket = Cast<AWaterBucket>(CurrentPickable);
 	if(MyWaterBucket == nullptr && CurrentPickable != nullptr) //OUI JE LE SAIS TOMÉ JE LE FAIS DEJA APRES M'EN VEUX PAS STP
 	{
-		if(FriendlyKnight != nullptr)
+		if(PlayerType == Squire && FriendlyKnight != nullptr)
 		{
 			GiveToKnight();
 		}
@@ -663,6 +666,10 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 			// Drop() then Give()??
 			Drop();
 			PickupObject(obj);
+		}
+		else
+		{
+			Drop();
 		}
 	}
 	else if(MyWaterBucket != nullptr)

@@ -51,7 +51,7 @@ float AWeapon::GetDamage() const
 {
 	if (Holder == nullptr) return 0.0f;
 	if (Holder->PlayerType == Squire) return 0;
-	return CurrentDataRow.WeaponStats.Damage * m_speed * CurrentDataRow.WeaponStats.DMGMultiplier;
+	return CurrentDataRow.WeaponStats.Damage /* * m_speed * CurrentDataRow.WeaponStats.DMGMultiplier*/;
 }
 
 void AWeapon::DealtDamage()
@@ -76,7 +76,7 @@ void AWeapon::DealtDamage()
 bool AWeapon::DealDamage(ASfCharacter* Target)
 {
 	if (Holder == nullptr || JustDealtDamage) return false;
-
+	if (Holder->PlayerType == Squire) return false;
 	if (!Target->CanBeDamagedCustom()) return false;
 	
 	JustDealtDamage = true;
