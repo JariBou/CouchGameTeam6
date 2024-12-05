@@ -11,6 +11,8 @@ class AMuddyGround;
 UCLASS(Blueprintable, BlueprintType)
 class COUCHGAME_API ARainEvent : public AEventActor
 {
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerSound);
+	
 public:
 	virtual void EndEvent() override;
 
@@ -27,6 +29,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AMuddyGround> MuddyClass;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> RainSound;
 
 public:
 	// Called every frame
