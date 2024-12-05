@@ -27,7 +27,7 @@ struct FCharacterSettingsData
 	uint8 MaxHealth;
 	
 	UPROPERTY(EditAnywhere)
-	float InvincibilityTime;
+	float InvincibilityTimeAfterHit;
 
 	UPROPERTY(EditAnywhere)
 	float KnockbackForce;
@@ -53,4 +53,7 @@ public:
 
 	UPROPERTY(Config, EditAnywhere, Category="Settings")
 	float RespawnInvincibilityTime;
+
+	UPROPERTY(EditAnywhere)
+	float InvincibilityTimeAfterGive = 1;
 };

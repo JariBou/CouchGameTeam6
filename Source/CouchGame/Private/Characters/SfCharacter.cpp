@@ -556,7 +556,7 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		}
 
 		FTimerHandle NullHandle;
-		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->CharacterInputDatas[PlayerType].InvincibilityTime);
+		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->CharacterInputDatas[PlayerType].InvincibilityTimeAfterHit);
 		if (Health <= 0 && !IsDead)
 		{
 			Kill(DmgDealer);
@@ -802,8 +802,15 @@ void ASfCharacter::GiveToKnight()
 	{
 		APickable* DroppedPickable = Drop(); //Lache Son Arme
 		SetActorTickEnabled(true);
+		if (FriendlyKnight->CurrentPickable != nullptr) FriendlyKnight->Drop()->Destroy();
+		
 		FriendlyKnight->PickupObject(DroppedPickable, true); //Met l'arme dans sa main
-		GetGameInstance()->GetTimerManager().SetTimerForNextTick([&]{RemoveInvincibility();});
+		
+		// GetGameInstance()->GetTimerManager().SetTimerForNextTick([&]{RemoveInvincibility();});
+
+		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
+		FTimerHandle NullHandle;
+		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->InvincibilityTimeAfterGive);
 	}
 }
 
