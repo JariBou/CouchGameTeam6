@@ -34,6 +34,8 @@ void AForge::SpawnWeaponsAtRandomLocation(int NumberToSpawn, int SpawnDelayOfAtt
 
 void AForge::SpawnRandomWeapon()
 {
+	TriggerWeaponSpawnSound.Broadcast();
+	
 	FWeaponsRarityList WeaponsRarityList = ForgeMap[ForgeLevel];
 	
 	WeaponsRarityList.WeaponListRarity.ValueSort([](const FWeaponsList &A, const FWeaponsList &B) { return A.PercentChance < B.PercentChance; });
