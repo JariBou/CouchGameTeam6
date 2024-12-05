@@ -36,6 +36,11 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].Mesh.LoadSynchronous();
 	Character->ChangeSkeletalMesh(SkeletalMesh);
+	
+	FTimerHandle NullHandle;
+	Character->SetInvincibility(true);
+	Character->GetGameInstance()->GetTimerManager().SetTimer(NullHandle, Character, &ASfCharacter::RemoveInvincibility, CharacterSettings->RespawnInvincibilityTime);
+	
 	//
 	// Character->SetupHealth(CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].MaxHealth);
 

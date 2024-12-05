@@ -527,6 +527,11 @@ void ASfCharacter::SetupHealth(uint8 inMaxHealth)
 	Health = MaxHealth;
 }
 
+void ASfCharacter::SetInvincibility(bool bCond)
+{
+	IsUnderInvincibilityTime = bCond;
+}
+
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {
 	TriggerPickupSound.Broadcast();
@@ -762,17 +767,19 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 	if (PlayerType == TypeOfPlayer) return;
 	PlayerType = TypeOfPlayer;
 	const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
+	FCharacterSettingsData CharacterSettingsData = Settings->CharacterInputDatas[TypeOfPlayer];
 	if (TypeOfPlayer == Knight)
 	{
 		if (IsCarrying) Drop();
-		ChangeSkeletalMesh(Settings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
+		ChangeSkeletalMesh(CharacterSettingsData.Mesh.LoadSynchronous());
 		ActivateRagdollArms();
 		// GetWorldTimerManager().SetTimerForNextTick([&]
 		// {
 		// 	ActivateRagdollArms();
 		// });
 	}
-	SetActorScale3D(Settings->CharacterInputDatas[TypeOfPlayer].Scale);
+	SetupHealth(CharacterSettingsData.MaxHealth);
+	SetActorScale3D(CharacterSettingsData.Scale);
 	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
 	BindInputMoveAndActions();
 }

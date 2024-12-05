@@ -50,4 +50,7 @@ public:
 
 	UPROPERTY(Config, EditAnywhere, Category="Settings")
 	TMap<TEnumAsByte<TypeOfPlayer>, FCharacterSettingsData> CharacterInputDatas;
+
+	UPROPERTY(Config, EditAnywhere, Category="Settings")
+	float RespawnInvincibilityTime;
 };

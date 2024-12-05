@@ -53,7 +53,7 @@ public:
 	
 	virtual bool IsFollowable() override;
 
-#pragma endregion
+	#pragma endregion
 
 private:
 
@@ -276,6 +276,8 @@ protected:
 
 	UFUNCTION()
 	void SetupHealth(uint8 inMaxHealth);
+
+	void SetInvincibility(bool bCond);
 	
 #pragma endregion
 
