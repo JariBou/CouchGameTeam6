@@ -688,6 +688,7 @@ void ASfCharacter::PickupObject(APickable* Pickable)
 			if(Pickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
 			{
 				Pickable->Holder = this;
+				Pickable->NiagaraDropSystem_Implementation();
 				Pickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 				Pickable->StaticMeshComponent->SetSimulatePhysics(false);
 				const FAttachmentTransformRules TransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget,EAttachmentRule::KeepRelative, true);
