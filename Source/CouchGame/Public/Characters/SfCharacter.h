@@ -299,7 +299,7 @@ protected:
 	APickable* Drop(); //Drop Object
 	
 	protected:
-	void PickupObject(APickable* Pickable); //Give Object TO Player = THIS
+	void PickupObject(APickable* Pickable, bool Force = false); //Give Object TO Player = THIS
 
 	void GiveToKnight();
 

@@ -767,7 +767,7 @@ APickable* ASfCharacter::Drop()
 	return DroppedPickable;
 }
 
-void ASfCharacter::PickupObject(APickable* Pickable)
+void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 {
 	if(Pickable != nullptr)
 	{
@@ -775,7 +775,7 @@ void ASfCharacter::PickupObject(APickable* Pickable)
 		// Leaving it for now since it is 1:34am and I have no clue how to test that
 		if(Pickable->Implements<UInteractions>()) //Si il contient l'interface
 		{
-			if(Pickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
+			if(Force || Pickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
 			{
 				Pickable->Holder = this;
 				Pickable->NiagaraDropSystem_Implementation();
@@ -801,7 +801,9 @@ void ASfCharacter::GiveToKnight()
 	if(FriendlyKnight != nullptr)
 	{
 		APickable* DroppedPickable = Drop(); //Lache Son Arme
-		FriendlyKnight->PickupObject(DroppedPickable); //Met l'arme dans sa main
+		SetActorTickEnabled(true);
+		FriendlyKnight->PickupObject(DroppedPickable, true); //Met l'arme dans sa main
+		GetGameInstance()->GetTimerManager().SetTimerForNextTick([&]{RemoveInvincibility();});
 	}
 }
 
