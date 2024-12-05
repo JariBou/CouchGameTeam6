@@ -85,6 +85,23 @@ FVector UCameraWorldSubsystem::CalculateAveragePositionBetweenTargets()
 
 float UCameraWorldSubsystem::CalculateGreatestYDistanceBetweenTargets()
 {
+	float GreatestDistanceSqrd = 0.f;
+	
+	for (int i = 0; i < FollowTargets.Num(); ++i)
+	{
+		TScriptInterface<ICameraFollowTarget> iCameraFollowTargetInterface = FollowTargets[i];
+		if (iCameraFollowTargetInterface == nullptr) continue;
+		
+		for (int j = i+1; j < FollowTargets.Num(); ++j)
+		{
+			TScriptInterface<ICameraFollowTarget> jCameraFollowTargetInterface = FollowTargets[j];
+			if (jCameraFollowTargetInterface == nullptr) continue;
+
+			float SizeSquared = (iCameraFollowTargetInterface->GetFollowTarget() - jCameraFollowTargetInterface->GetFollowTarget()).SizeSquared();
+			if (SizeSquared > GreatestDistanceSqrd) GreatestDistanceSqrd = SizeSquared;
+		}
+	}
+	return FMath::Sqrt(GreatestDistanceSqrd);
 	float GreatestDistance = 0.f;
 	
 	for (int i = 0; i < FollowTargets.Num(); ++i)
@@ -97,7 +114,9 @@ float UCameraWorldSubsystem::CalculateGreatestYDistanceBetweenTargets()
 			TScriptInterface<ICameraFollowTarget> jCameraFollowTargetInterface = FollowTargets[j];
 			if (jCameraFollowTargetInterface == nullptr) continue;
 			
-			float Distance = FMath::Abs(iCameraFollowTargetInterface->GetFollowTarget().Y - jCameraFollowTargetInterface->GetFollowTarget().Y);
+			// float Distance = FMath::Abs(iCameraFollowTargetInterface->GetFollowTarget().Y - jCameraFollowTargetInterface->GetFollowTarget().Y);
+			float Distance = (iCameraFollowTargetInterface->GetFollowTarget() - jCameraFollowTargetInterface->GetFollowTarget()).Length();
+			// if (Distance > GreatestDistance) GreatestDistance = Distance;
 			if (Distance > GreatestDistance) GreatestDistance = Distance;
 		}
 	}
