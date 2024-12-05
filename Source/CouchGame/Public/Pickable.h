@@ -9,6 +9,9 @@
 #include "Pickable.generated.h"
 
 
+class UNiagaraSystem;
+class UNiagaraComponent;
+
 UCLASS()
 class COUCHGAME_API APickable : public AActor, public IInteractions
 {
@@ -30,6 +33,8 @@ public:
 
 	virtual bool CanPickUp_Implementation(ASfCharacter* CouchGameCharacter) override;
 
+	virtual void NiagaraDropSystem_Implementation() override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Bitmask, BitmaskEnum = ETypeOfPickable))
 	int32 PickableType = 0;
 
@@ -38,4 +43,11 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<ASfCharacter> Holder;
+
+	UPROPERTY(EditAnywhere, Category="ParticlePart")
+	TObjectPtr<UNiagaraSystem> NiagaraParticleDrop;
+
+	UPROPERTY(VisibleAnywhere, Category="ParticlePart")
+	TObjectPtr<UNiagaraComponent> NiagaraComponentForDrop;
+	
 };

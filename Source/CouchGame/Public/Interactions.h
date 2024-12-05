@@ -29,5 +29,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Pickup")
 	bool CanPickUp(ASfCharacter* CouchGameCharacter);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Drop")
+	void NiagaraDropSystem();
 };
 
