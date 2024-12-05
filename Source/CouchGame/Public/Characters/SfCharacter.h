@@ -175,6 +175,8 @@ private:
 	
 	void RightJoystickStarted(const FInputActionValue& InputActionValue);
 
+
+
 	void RightJoystickEnded(const FInputActionValue& InputActionValue);
 	
 	void BindInputMoveAndActions();
@@ -446,6 +448,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRotating;
+	
+	UFUNCTION()
+	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 
 	#pragma endregion
 };

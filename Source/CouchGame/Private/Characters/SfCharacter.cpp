@@ -37,9 +37,8 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
-		// TODO: play anim montage
-		PlayAnimMontage(RotationAnimMontage);
 		IsRotationAnimLaunched = true;
+		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * FMath::Sign(NumberOfRotationMadeByStick));
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
 	CurrentDeltaMadeByStick = 0.f;
@@ -107,7 +106,6 @@ void ASfCharacter::BeginPlay()
 	CreateStateMachine();
 	InitStateMachine();
 	//SetUpArmsRagdoll();
-	
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 	
@@ -123,6 +121,7 @@ void ASfCharacter::BeginPlay()
 	DestinationAngle = CurrentAngle;
 	InputRJ = FVector2d(1.f,0.f);
 
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 	// ActivateRagdollArms();
 }
 
@@ -266,7 +265,7 @@ void ASfCharacter::OnDelegateStickCicleThrustEnd()
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
 {
 	CurrentDeltaMadeByStick = 0.f;
-	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
+	//IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
@@ -281,8 +280,11 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && IsRotationAnimLaunched == false)
 	{
 		// Réussite du stick toupie lol
+		IsRotationAnimLaunched = true;
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
-		PlayAnimMontage(RotationAnimMontage);
+		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		if (Sign == 0) Sign = 1;
+		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * Sign);
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
@@ -720,18 +722,32 @@ void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
 	FRotator DestinationRotator = GetActorRotation();
 	DestinationRotator.Yaw = FMath::RadiansToDegrees(DestinationAngle);
 	//SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), DestinationRotator, DeltaSeconds * RotationSpeed, true), ETeleportType::TeleportPhysics);
-	
-	CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
-	float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
-	FRotator NewActorRotator = GetActorRotation();
-	NewActorRotator.Yaw = ActorConvertedAngle;
-	SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
+
+	if (!IsRotationAnimLaunched)
+	{
+		CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
+		float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
+		FRotator NewActorRotator = GetActorRotation();
+		NewActorRotator.Yaw = ActorConvertedAngle;
+		SetActorRotation(NewActorRotator, ETeleportType::TeleportPhysics);
+	}
 	
 }
 
 void ASfCharacter::FinishRotAnim()
 {
 	IsRotationAnimLaunched = false;
+}
+
+void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+	if (NotifyName == "EndTourbilol")
+	{
+		FinishRotAnim();
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, NotifyName.ToString());
 }
 
 //////////////////////////////////////////////////////////////////////////
