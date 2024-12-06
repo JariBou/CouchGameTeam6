@@ -52,6 +52,6 @@ void APickable::NiagaraDropSystem_Implementation()
 		FRotator(0.f),
 		EAttachLocation::Type::SnapToTarget,
 		true);
-	NiagaraComponentForDrop->SetUsingAbsoluteRotation(true);
+	if(IsValid(NiagaraComponentForDrop))	NiagaraComponentForDrop->SetUsingAbsoluteRotation(true);
 }
 

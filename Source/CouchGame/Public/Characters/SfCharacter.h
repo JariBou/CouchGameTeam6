@@ -37,7 +37,10 @@ class ASfCharacter : public ACharacter, public ICameraFollowTarget
 
 public:
 	UPROPERTY(EditAnywhere)
-	UMaterialInterface* Material;
+	UMaterialInterface* MaterialTeam1;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* MaterialTeam2;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> RotationAnimMontage;

@@ -631,12 +631,13 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 	GetMesh()->SetSkeletalMesh(SkeletalMesh);
 	GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
-	UMaterialInstanceDynamic* DynMat = UMaterialInstanceDynamic::Create(Material, nullptr);
-	UMaterialInstanceDynamic* DynMat2 = UMaterialInstanceDynamic::Create(Material, nullptr);
-	DynMat->SetVectorParameterValue("ColorParam", FColor::Green);
-	DynMat2->SetVectorParameterValue("ColorParam", FColor::Purple);
-	if(PlayerTeam == ETeam::Team1) GetMesh()->SetMaterial(0, DynMat);
-	if(PlayerTeam == ETeam::Team2) GetMesh()->SetMaterial(0, DynMat2);
+	UMaterialInstanceDynamic* DynMatTeam1 = UMaterialInstanceDynamic::Create(MaterialTeam1, nullptr);
+	UMaterialInstanceDynamic* DynMatTeam2 = UMaterialInstanceDynamic::Create(MaterialTeam2, nullptr);
+	// For the moment
+	//DynMat->SetVectorParameterValue("ColorParam", FColor::Green);
+	//DynMat2->SetVectorParameterValue("ColorParam", FColor::Purple);
+	if(PlayerTeam == ETeam::Team1) GetMesh()->SetMaterial(0, DynMatTeam1);
+	if(PlayerTeam == ETeam::Team2) GetMesh()->SetMaterial(0, DynMatTeam2);
 }
 
 #pragma region Pickup & Give
