@@ -3,6 +3,7 @@
 
 #include "Pickable.h"
 
+#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Characters/SfCharacter.h"
 
@@ -44,6 +45,13 @@ bool APickable::CanPickUp_Implementation(ASfCharacter* CouchGameCharacter)
 
 void APickable::NiagaraDropSystem_Implementation()
 {
-	NiagaraComponentForDrop = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraParticleDrop, StaticMeshComponent, NAME_None, FVector(0.f,0.f,0.f), FRotator(0.f), EAttachLocation::Type::SnapToTarget, true);
+	NiagaraComponentForDrop = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraParticleDrop,
+		StaticMeshComponent,
+		NAME_None,
+		FVector(0.f,0.f,0.f),
+		FRotator(0.f),
+		EAttachLocation::Type::SnapToTarget,
+		true);
+	NiagaraComponentForDrop->SetUsingAbsoluteRotation(true);
 }
 

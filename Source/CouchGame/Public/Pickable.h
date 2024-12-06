@@ -9,6 +9,7 @@
 #include "Pickable.generated.h"
 
 
+class ANiagaraActor;
 class UNiagaraSystem;
 class UNiagaraComponent;
 
@@ -54,6 +55,5 @@ public:
 	TObjectPtr<UNiagaraSystem> NiagaraParticleDrop;
 
 	UPROPERTY(VisibleAnywhere, Category="ParticlePart")
-	TObjectPtr<UNiagaraComponent> NiagaraComponentForDrop;
-	
+	TObjectPtr<UNiagaraComponent> NiagaraComponentForDrop;	
 };
