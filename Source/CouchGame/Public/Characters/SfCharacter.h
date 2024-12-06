@@ -301,7 +301,7 @@ protected:
 	protected:
 	void PickupObject(APickable* Pickable, bool Force = false); //Give Object TO Player = THIS
 
-	void GiveToKnight();
+	void GiveToKnight(ASfCharacter* FriendlyKnight);
 
 	void Interact();
 
@@ -335,9 +335,6 @@ public:
 	UPROPERTY()
 	TObjectPtr<AWell> WellInRange;
 	*/
-
-	UPROPERTY()
-	TObjectPtr<ASfCharacter> FriendlyKnight;
 			
 
 #pragma endregion 

@@ -620,6 +620,8 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 		return Actor == this || (CurrentPickable != nullptr && Actor == CurrentPickable);
 	});
 	//Setup FriendlyKnight && Well PAS OPTI
+	ASfCharacter* FriendlyKnight = nullptr;
+	
 	for (AActor* ActorFromCollision : ListOfActorFromCollision)
 	{
 		// Warning: does not take into account if it's a friendly character or self
@@ -642,7 +644,7 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	{
 		if(PlayerType == Squire && FriendlyKnight != nullptr)
 		{
-			GiveToKnight();
+			GiveToKnight(FriendlyKnight);
 		}
 		else if(APickable* obj = Cast<APickable>(ClosestActor); obj != nullptr) //Switch
 		{
@@ -782,7 +784,7 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 	}
 }
 
-void ASfCharacter::GiveToKnight()
+void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 {
 	if(FriendlyKnight != nullptr)
 	{
