@@ -2,6 +2,7 @@
 	"BuildId": "27405482",
 	"Modules": 
 	{
-		"CouchGame": "UnrealEditor-CouchGame.dll"
+		"CouchGame": "UnrealEditor-CouchGame.dll",
+		"ToolModule": "UnrealEditor-ToolModule.dll"
 	}
 }

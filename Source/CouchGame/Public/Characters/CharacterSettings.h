@@ -37,6 +37,16 @@ struct FCharacterSettingsData
 	
 };
 
+UENUM()
+enum EDefaultSpawnInfo
+{
+	NoDefaultSpawnInfo = 0,
+	Team1_K = 1,
+	Team1_S = 2,
+	Team2_K = 3,
+	Team2_S = 4,
+};
+
 /**
  * 
  */
@@ -59,4 +69,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float RespawnTime = 2;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<uint8, TEnumAsByte<EDefaultSpawnInfo>> DefaultSpawnInfo;
+
+	UPROPERTY(VisibleAnywhere)
+	bool UseDefaultSpawnInfo;
 };

@@ -64,23 +64,53 @@ void ASfGameMode::BeginPlay()
 		// Remove autoposses
 		// RemoveSetting player type in here, handled by DesignRandomKnight()
 		*/
-		
 
-		ETeam NewPlayerTeam = i%2 > 0 ? Team2 : Team1;
-		NewCharacter->PlayerTeam = NewPlayerTeam;
-		TeamMap[NewPlayerTeam].AddPlayer(NewCharacter);
+		if (CharacterSettings->UseDefaultSpawnInfo)
+		{
+			if (!CharacterSettings->DefaultSpawnInfo.Contains(i)) throw;
+			switch (CharacterSettings->DefaultSpawnInfo[i])
+			{
+				case Team1_K:
+					NewCharacter->PlayerTeam = Team1;
+					NewCharacter->PlayerType = Knight;
+					break;
+				case Team1_S:
+					NewCharacter->PlayerTeam = Team1;
+					NewCharacter->PlayerType = Squire;
+					break;
+				case Team2_K:
+					NewCharacter->PlayerTeam = Team2;
+					NewCharacter->PlayerType = Knight;
+					break;
+				case Team2_S:
+					NewCharacter->PlayerTeam = Team2;
+					NewCharacter->PlayerType = Squire;
+					break;
+				default:
+				case NoDefaultSpawnInfo:
+					throw;
+			}
+		} else
+		{
+			ETeam NewPlayerTeam = i%2 > 0 ? Team2 : Team1;
+			NewCharacter->PlayerTeam = NewPlayerTeam;
 
-		TypeOfPlayer TypeOfPlayer = /*i/2 > 0 ? Knight :*/ Squire;
-		NewCharacter->PlayerType = TypeOfPlayer;
+			TypeOfPlayer TypeOfPlayer = /*i/2 > 0 ? Knight :*/ Squire;
+			NewCharacter->PlayerType = TypeOfPlayer;
+		}		
 
-		NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
+		TeamMap[NewCharacter->PlayerTeam].AddPlayer(NewCharacter);
+		NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[NewCharacter->PlayerType].Mesh.LoadSynchronous());
 
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 		i++;
 	}
 
-	TeamMap[Team1].SelectRandomKnight();
-	TeamMap[Team2].SelectRandomKnight();
+	if (!CharacterSettings->UseDefaultSpawnInfo)
+	{
+		TeamMap[Team1].SelectRandomKnight();
+		TeamMap[Team2].SelectRandomKnight();
+	}
 
 
 	Respawner = NewObject<URespawner>(this, URespawner::StaticClass());
