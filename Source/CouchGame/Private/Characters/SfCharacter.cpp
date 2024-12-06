@@ -123,7 +123,12 @@ void ASfCharacter::BeginPlay()
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
-	InputRJ = FVector2d(1.f,0.f);
+	// G pas les môts
+	// FVector Forward = GetActorForwardVector().RotateAngleAxis(CurrentAngle, FVector::UpVector);
+	// FVector Forward = FVector(1, 0, 0).RotateAngleAxis(CurrentAngle, FVector::UpVector);
+	// InputRJ = FVector2d(Forward.X, Forward.Y);
+	// InputRJ = FVector2d(GetActorForwardVector().X, GetActorForwardVector().Y);
+	InputRJ = FVector2d(1, 0);
 
 	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 	// ActivateRagdollArms();
@@ -134,6 +139,8 @@ void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	if (IsCarrying) Drop();
+	
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.RemoveDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 
 	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->RemoveFollowTarget(this);
 }

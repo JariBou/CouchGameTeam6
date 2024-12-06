@@ -57,6 +57,8 @@ void ASfGameMode::BeginPlay()
 		//Assign teams after selection
 		const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromArray(i);
 		SelectionInfo.PlayerTeam;
+
+		// Possess after finishing spawn IMO
 		SelectionInfo.PlayerController->Possess(NewCharacter);
 
 		// Remove autoposses
