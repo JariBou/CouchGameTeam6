@@ -140,6 +140,17 @@ void ASfCharacter::Tick(float DeltaSeconds)
 
 	if (StateMachine) StateMachine->Tick(DeltaSeconds);
 
+	//Dmg Visual Effect
+	if(IsMatDmgRed)
+	{
+		DmgRedAdvancement += DeltaSeconds / TimeForDmgVisual;
+		GetMesh()->SetScalarParameterValueOnMaterials("HitValue", FMath::Clamp(FMath::Sin(DmgRedAdvancement * PI),0.f , 1.f));
+		if(DmgRedAdvancement >= 1.f)
+		{
+			IsMatDmgRed = false;
+		}
+	}
+
 	ManageCharacterRotation(DeltaSeconds);
 
 	if(DashCooldownTimer > 0.f && !CanDash)
@@ -527,6 +538,9 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		TriggerTakeDamageSound.Broadcast();
 
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Player Takes Damage");
+
+		IsMatDmgRed = true;
+		DmgRedAdvancement = 0.f;
 		
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
