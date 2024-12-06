@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* Material;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontage;
+
 	UFUNCTION()
 	void OnDelegateStickCircleLate();
 
@@ -171,6 +174,8 @@ private:
 	void RightJoystickInput(const FInputActionValue& InputActionValue);
 	
 	void RightJoystickStarted(const FInputActionValue& InputActionValue);
+
+
 
 	void RightJoystickEnded(const FInputActionValue& InputActionValue);
 	
@@ -389,7 +394,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int MaxAngleForThrust = 10;
-	
+
+	UFUNCTION(BlueprintCallable)
+	void FinishRotAnim();
 	
 #pragma endregion
 	
@@ -445,6 +452,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRotating;
+	
+	UFUNCTION()
+	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 
 	#pragma endregion
 };
