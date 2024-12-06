@@ -34,9 +34,19 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded)
 	{
 		// Réussite du stick toupie lol
-		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
-		//TODO play anim montage
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		// TODO play anim montage
 		IsRotationAnimLaunched = true;
+		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		if (Sign == 0) Sign = 1;
+		if(Sign >= 0)
+		{
+			PlayAnimMontage(RotationAnimMontageRevert, RotationAnimMontageRevert->RateScale);
+
+		} else
+		{
+			PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale);
+		}
 	}
 	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
 	CurrentDeltaMadeByStick = 0.f;
@@ -290,8 +300,21 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && IsRotationAnimLaunched == false)
 	{
 		// Réussite du stick toupie lol
-		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		// TODO play anim montage
+		IsRotationAnimLaunched = true;
+		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		if (Sign == 0) Sign = 1;
+		if(Sign >= 0)
+		{
+			PlayAnimMontage(RotationAnimMontageRevert, RotationAnimMontageRevert->RateScale);
+
+		} else
+		{
+			PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale);
+		}
 	}
+	CurrentDeltaMadeByStick = 0.f;
 	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
@@ -601,6 +624,7 @@ void ASfCharacter::SetInvincibility(bool bCond)
 
 #pragma endregion
 
+// Change some skeletal mesh
 void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 {
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
@@ -840,6 +864,22 @@ void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 void ASfCharacter::StopFeedBackEffect()
 {
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
+}
+
+void ASfCharacter::FinishRotAnim()
+{
+	IsRotationAnimLaunched = false;
+}
+
+void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+	if (NotifyName == "EndTourbilol")
+	{
+		FinishRotAnim();
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, NotifyName.ToString());
 }
 
 //////////////////////////////////////////////////////////////////////////

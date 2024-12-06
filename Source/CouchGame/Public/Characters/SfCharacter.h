@@ -42,6 +42,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> RotationAnimMontage;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
+
 	UFUNCTION()
 	void OnDelegateStickCircleLate();
 
