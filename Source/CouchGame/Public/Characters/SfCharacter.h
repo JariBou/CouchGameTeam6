@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* Material;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontage;
+
 	UFUNCTION()
 	void OnDelegateStickCircleLate();
 
@@ -172,6 +175,8 @@ private:
 	
 	void RightJoystickStarted(const FInputActionValue& InputActionValue);
 
+
+
 	void RightJoystickEnded(const FInputActionValue& InputActionValue);
 	
 	void BindInputMoveAndActions();
@@ -249,9 +254,14 @@ protected:
 	UPROPERTY()
 	bool IsUnderInvincibilityTime;
 
-	public:
+public:
 	UPROPERTY(BlueprintReadWrite)
 	bool IsDead = false;
+
+	UPROPERTY(EditAnywhere, Category= "DmgIndicator")
+	float TimeForDmgVisual = 1.0f;
+	bool IsMatDmgRed = false;
+	float DmgRedAdvancement = 0.f;
 	
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthValueChange OnHealthValueChange;
@@ -384,7 +394,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int MaxAngleForThrust = 10;
-	
+
+	UFUNCTION(BlueprintCallable)
+	void FinishRotAnim();
 	
 #pragma endregion
 	
@@ -440,6 +452,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRotating;
+	
+	UFUNCTION()
+	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 
 	#pragma endregion
 };
