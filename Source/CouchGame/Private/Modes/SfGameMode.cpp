@@ -81,6 +81,21 @@ void ASfGameMode::BeginPlay()
 
 	Respawner = NewObject<URespawner>(this, URespawner::StaticClass());
 	Respawner->Initialize(this);
+
+	Timer = MaxTime;
+}
+
+void ASfGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (isGameOver) return;
+	
+	Timer -= DeltaSeconds;
+
+	if (Timer <= 0){
+		isGameOver = true;
+		OnEndOfGame();
+	}
 }
 
 void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
@@ -127,6 +142,11 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	}
 }
 
+float ASfGameMode::GetTimer()
+{
+	return Timer;
+}
+
 bool ASfGameMode::CheckEndOfGame()
 {
 	isGameOver = false;
@@ -141,7 +161,7 @@ bool ASfGameMode::CheckEndOfGame()
 
 void ASfGameMode::OnEndOfGame()
 {
-	//TODO Clément
+	// TODO: Clément
 }
 
 void ASfGameMode::CreateAndInitPlayers() const
