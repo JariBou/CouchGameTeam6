@@ -5,7 +5,6 @@
 #include <Consumables/Consumable.h>
 
 #include "Engine/LocalPlayer.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -19,13 +18,9 @@
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "Components/BoxComponent.h"
-#include "Components/PoseableMeshComponent.h"
-#include "Components/SphereComponent.h"
 #include "GameplayElements/WaterBucket.h"
 #include "GameplayElements/Events/VisualEventHandler.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetStringLibrary.h"
 #include "Modes/SfGameMode.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 
@@ -767,8 +762,9 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 		{
 			if(Force || Pickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
 			{
-				Pickable->Holder = this;
-				Pickable->NiagaraDropSystem_Implementation();
+				// Pickable->Holder = this;
+				Pickable->Interact_Implementation(this);
+				// Pickable->NiagaraDropSystem_Implementation();
 				Pickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 				Pickable->StaticMeshComponent->SetSimulatePhysics(false);
 				const FAttachmentTransformRules TransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget,EAttachmentRule::KeepRelative, true);

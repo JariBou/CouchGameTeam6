@@ -3,10 +3,8 @@
 
 #include "Pickable.h"
 
-#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Characters/SfCharacter.h"
-#include "NiagaraSystem.h"
 
 
 // Sets default values
@@ -33,6 +31,8 @@ void APickable::Interact_Implementation(ASfCharacter* CouchGameCharacter)
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Purple, TEXT("Interaction With Interface"));
 	if (CouchGameCharacter != nullptr) Holder = CouchGameCharacter;
+	OnPickedUp.Broadcast();
+	
 	NiagaraDropSystem_Implementation();
 }
 
