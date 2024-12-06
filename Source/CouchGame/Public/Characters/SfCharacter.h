@@ -13,7 +13,7 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
-	class UBoxComponent;
+class UBoxComponent;
 class APickable;
 struct FInputActionInstance;
 //struct FPhysicalAnimationData;
@@ -36,11 +36,24 @@ class ASfCharacter : public ACharacter, public ICameraFollowTarget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	UMaterialInterface* Material;
+	
+	UPROPERTY(EditAnywhere, Category="Materials For Characters")
+	UMaterialInterface* MaterialKTeam1;
+
+	UPROPERTY(EditAnywhere, Category="Materials For Characters")
+	UMaterialInterface* MaterialKTeam2;
+
+	UPROPERTY(EditAnywhere, Category="Materials For Characters")
+	UMaterialInterface* MaterialSTeam1;
+
+	UPROPERTY(EditAnywhere, Category="Materials For Characters")
+	UMaterialInterface* MaterialSTeam2;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> RotationAnimMontage;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
 
 	UFUNCTION()
 	void OnDelegateStickCircleLate();
@@ -265,7 +278,7 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthValueChange OnHealthValueChange;
-
+	
 	UFUNCTION(BlueprintCallable)
 	bool CanBeDamagedCustom();
 	
@@ -279,8 +292,11 @@ public:
 	void RemoveInvincibility();
 
 	UFUNCTION()
-	void AddHealth(float HealthToAdd);
+	void AddHealth(float HealthDelta);
 
+	UFUNCTION()
+	void UsedHealingSource();
+	
 	UFUNCTION()
 	void ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const;
 

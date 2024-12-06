@@ -38,6 +38,7 @@ void ASteak::EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveC
 	if (Player == nullptr) return;
 	
 	Player->AddHealth(HealthToAdd);
+	Player->UsedHealingSource();
 
 	this->Destroy();
 }

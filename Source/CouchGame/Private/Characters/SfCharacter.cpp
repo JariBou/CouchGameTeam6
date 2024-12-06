@@ -35,11 +35,20 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
-		//TODO play anim montage
+		// TODO play anim montage
 		IsRotationAnimLaunched = true;
-		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * FMath::Sign(NumberOfRotationMadeByStick));
+		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		if (Sign == 0) Sign = 1;
+		if(Sign >= 0)
+		{
+			PlayAnimMontage(RotationAnimMontageRevert, RotationAnimMontageRevert->RateScale);
+
+		} else
+		{
+			PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale);
+		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
+	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
 	CurrentDeltaMadeByStick = 0.f;
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
@@ -107,6 +116,7 @@ void ASfCharacter::BeginPlay()
 	CreateStateMachine();
 	InitStateMachine();
 	//SetUpArmsRagdoll();
+	
 
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 	
@@ -120,9 +130,13 @@ void ASfCharacter::BeginPlay()
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
-	InputRJ = FVector2d(1.f,0.f);
+	// G pas les môts
+	// FVector Forward = GetActorForwardVector().RotateAngleAxis(CurrentAngle, FVector::UpVector);
+	// FVector Forward = FVector(1, 0, 0).RotateAngleAxis(CurrentAngle, FVector::UpVector);
+	// InputRJ = FVector2d(Forward.X, Forward.Y);
+	// InputRJ = FVector2d(GetActorForwardVector().X, GetActorForwardVector().Y);
+	InputRJ = FVector2d(1, 0);
 
-	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 	// ActivateRagdollArms();
 }
 
@@ -131,6 +145,8 @@ void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	if (IsCarrying) Drop();
+	
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.RemoveDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 
 	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->RemoveFollowTarget(this);
 }
@@ -276,7 +292,7 @@ void ASfCharacter::OnDelegateStickCicleThrustEnd()
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
 {
 	CurrentDeltaMadeByStick = 0.f;
-	//IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
+	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
@@ -293,11 +309,18 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 		// Réussite du stick toupie lol
 		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		IsRotationAnimLaunched = true;
-		//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
 		if (Sign == 0) Sign = 1;
-		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * Sign);
+		if(Sign >= 0)
+		{
+			PlayAnimMontage(RotationAnimMontageRevert, RotationAnimMontageRevert->RateScale);
+
+		} else
+		{
+			PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale);
+		}
 	}
+	CurrentDeltaMadeByStick = 0.f;
 	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
@@ -548,7 +571,8 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		IsMatDmgRed = true;
 		DmgRedAdvancement = 0.f;
 		
-		Health -= Amount;
+		//Health -= Amount;
+		AddHealth(-Amount);
 		OnHealthValueChange.Broadcast(this);
 
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
@@ -588,10 +612,16 @@ void ASfCharacter::RemoveInvincibility()
 	IsUnderInvincibilityTime = false;
 }
 
-void ASfCharacter::AddHealth(float HealthToAdd)
+void ASfCharacter::AddHealth(float HealthDelta)
 {
-	Health += HealthToAdd;
-	++NumberOfTimeHealthIsUsed; //Hurm actually c'est plus opti
+	Health += HealthDelta;
+	Health = FMath::Clamp(Health, -1.f, MaxHealth);
+	OnHealthValueChange.Broadcast(this);
+}
+
+void ASfCharacter::UsedHealingSource()
+{
+	++NumberOfTimeHealthIsUsed;
 }
 
 void ASfCharacter::SetupHealth(uint8 inMaxHealth)
@@ -607,18 +637,31 @@ void ASfCharacter::SetInvincibility(bool bCond)
 
 #pragma endregion
 
+// Change some skeletal mesh
 void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 {
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
 	GetMesh()->SetSkeletalMesh(SkeletalMesh);
 	GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
-	UMaterialInstanceDynamic* DynMat = UMaterialInstanceDynamic::Create(Material, nullptr);
-	UMaterialInstanceDynamic* DynMat2 = UMaterialInstanceDynamic::Create(Material, nullptr);
-	DynMat->SetVectorParameterValue("ColorParam", FColor::Green);
-	DynMat2->SetVectorParameterValue("ColorParam", FColor::Purple);
-	if(PlayerTeam == ETeam::Team1) GetMesh()->SetMaterial(0, DynMat);
-	if(PlayerTeam == ETeam::Team2) GetMesh()->SetMaterial(0, DynMat2);
+
+	UMaterialInstanceDynamic* DynMatTeam1;
+	UMaterialInstanceDynamic* DynMatTeam2;
+	
+	if(PlayerType == TypeOfPlayer::Knight)
+	{
+		DynMatTeam1 = UMaterialInstanceDynamic::Create(MaterialKTeam1, nullptr);
+		DynMatTeam2 = UMaterialInstanceDynamic::Create(MaterialKTeam2, nullptr);
+	} else
+	{
+		DynMatTeam1 = UMaterialInstanceDynamic::Create(MaterialSTeam1, nullptr);
+		DynMatTeam2 = UMaterialInstanceDynamic::Create(MaterialSTeam2, nullptr);
+	}
+	// For the moment
+	//DynMat->SetVectorParameterValue("ColorParam", FColor::Green);
+	//DynMat2->SetVectorParameterValue("ColorParam", FColor::Purple);
+	if(PlayerTeam == ETeam::Team1 && IsValid(DynMatTeam1)) GetMesh()->SetMaterial(0, DynMatTeam1);
+	if(PlayerTeam == ETeam::Team2 && IsValid(DynMatTeam2)) GetMesh()->SetMaterial(0, DynMatTeam2);
 }
 
 #pragma region Pickup & Give

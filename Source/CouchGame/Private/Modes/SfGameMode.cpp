@@ -53,13 +53,17 @@ void ASfGameMode::BeginPlay()
 
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
 
+		/*
 		//Assign teams after selection
 		const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromArray(i);
 		SelectionInfo.PlayerTeam;
+
+		// Possess after finishing spawn IMO
 		SelectionInfo.PlayerController->Possess(NewCharacter);
 
 		// Remove autoposses
 		// RemoveSetting player type in here, handled by DesignRandomKnight()
+		*/
 		
 
 		ETeam NewPlayerTeam = i%2 > 0 ? Team2 : Team1;
