@@ -38,7 +38,10 @@ void ASfCharacter::OnDelegateStickCircleLate()
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		IsRotationAnimLaunched = true;
-		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * FMath::Sign(NumberOfRotationMadeByStick));
+		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		if (Sign == 0) Sign = 1;
+		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * Sign * -1); // Je crois qu'il aime pas le rate negatif bonne chance
+		
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
 	CurrentDeltaMadeByStick = 0.f;
@@ -284,7 +287,7 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
 		if (Sign == 0) Sign = 1;
-		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * Sign);
+		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * Sign * -1);
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
