@@ -2,7 +2,7 @@
 	"BuildId": "27405482",
 	"Modules": 
 	{
-		"CouchGame": "UnrealEditor-CouchGame.dll",
+		"RoyalRiot": "UnrealEditor-RoyalRiot.dll",
 		"ToolModule": "UnrealEditor-ToolModule.dll"
 	}
 }

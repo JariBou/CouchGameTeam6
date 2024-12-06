@@ -10,7 +10,7 @@ public class ToolModule : ModuleRules
             new string[]
             {
                 "Core",
-                "CouchGame",
+                "RoyalRiot",
             }
         );
 
