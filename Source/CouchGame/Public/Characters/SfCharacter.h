@@ -249,9 +249,14 @@ protected:
 	UPROPERTY()
 	bool IsUnderInvincibilityTime;
 
-	public:
+public:
 	UPROPERTY(BlueprintReadWrite)
 	bool IsDead = false;
+
+	UPROPERTY(EditAnywhere, Category= "DmgIndicator")
+	float TimeForDmgVisual = 1.0f;
+	bool IsMatDmgRed = false;
+	float DmgRedAdvancement = 0.f;
 	
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthValueChange OnHealthValueChange;
