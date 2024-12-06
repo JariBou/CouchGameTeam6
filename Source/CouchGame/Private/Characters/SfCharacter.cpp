@@ -130,7 +130,12 @@ void ASfCharacter::BeginPlay()
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
-	InputRJ = FVector2d(1.f,0.f);
+	// G pas les môts
+	// FVector Forward = GetActorForwardVector().RotateAngleAxis(CurrentAngle, FVector::UpVector);
+	// FVector Forward = FVector(1, 0, 0).RotateAngleAxis(CurrentAngle, FVector::UpVector);
+	// InputRJ = FVector2d(Forward.X, Forward.Y);
+	// InputRJ = FVector2d(GetActorForwardVector().X, GetActorForwardVector().Y);
+	InputRJ = FVector2d(1, 0);
 
 	// ActivateRagdollArms();
 }
@@ -140,6 +145,8 @@ void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	if (IsCarrying) Drop();
+	
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.RemoveDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 
 	GetWorld()->GetSubsystem<UCameraWorldSubsystem>()->RemoveFollowTarget(this);
 }
@@ -300,8 +307,7 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && IsRotationAnimLaunched == false)
 	{
 		// Réussite du stick toupie lol
-		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
-		// TODO play anim montage
+		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		IsRotationAnimLaunched = true;
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
 		if (Sign == 0) Sign = 1;
@@ -565,7 +571,8 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		IsMatDmgRed = true;
 		DmgRedAdvancement = 0.f;
 		
-		Health -= Amount;
+		//Health -= Amount;
+		AddHealth(-Amount);
 		OnHealthValueChange.Broadcast(this);
 
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
@@ -605,10 +612,16 @@ void ASfCharacter::RemoveInvincibility()
 	IsUnderInvincibilityTime = false;
 }
 
-void ASfCharacter::AddHealth(float HealthToAdd)
+void ASfCharacter::AddHealth(float HealthDelta)
 {
-	Health += HealthToAdd;
-	++NumberOfTimeHealthIsUsed; //Hurm actually c'est plus opti
+	Health += HealthDelta;
+	Health = FMath::Clamp(Health, -1.f, MaxHealth);
+	OnHealthValueChange.Broadcast(this);
+}
+
+void ASfCharacter::UsedHealingSource()
+{
+	++NumberOfTimeHealthIsUsed;
 }
 
 void ASfCharacter::SetupHealth(uint8 inMaxHealth)
