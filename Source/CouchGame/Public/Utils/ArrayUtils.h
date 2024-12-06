@@ -21,7 +21,11 @@ public:
 
 	template<typename T>
 	UFUNCTION(BlueprintCallable, Category = "ArrayUtils")
-	static T& GetRandomElement(const TArray<T>& Array);
+	static T* GetRandomElement(const TArray<T>& Array);
+
+	template<typename T>
+	UFUNCTION(BlueprintCallable, Category = "ArrayUtils")
+	static T* GetRandomElement(TArray<T>& Array);
 };
 
 

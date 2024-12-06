@@ -72,6 +72,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	URespawner* Respawner;
 
+	UPROPERTY()
+	float RespawnTime;
+
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)

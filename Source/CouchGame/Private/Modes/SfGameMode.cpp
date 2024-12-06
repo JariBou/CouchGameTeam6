@@ -22,6 +22,9 @@ void ASfGameMode::BeginPlay()
 	TeamScoreMap.Add(Team1);
 	TeamScoreMap.Add(Team2);
 
+	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
+	RespawnTime = CharacterSettings->RespawnTime;
+
 	for (ETeam Team : {Team1, Team2})
 	{
 		FTeamInfo NewInfo {
@@ -65,7 +68,6 @@ void ASfGameMode::BeginPlay()
 		TypeOfPlayer TypeOfPlayer = /*i/2 > 0 ? Knight :*/ Squire;
 		NewCharacter->PlayerType = TypeOfPlayer;
 
-		const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 		NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[TypeOfPlayer].Mesh.LoadSynchronous());
 
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
@@ -106,19 +108,17 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 		Dead->GetController(),
 	};
 	
-	Dead->GetController()->UnPossess();
+	respawnData.PlayerController->UnPossess();
 	TeamMap[Dead->PlayerTeam].RemovePlayer(Dead);
 	Dead->Destroy();
-
+	
 	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight);
 	
-	ASfCharacter* NewCharacter = Respawner->StartDeferredRespawn(respawnData);
+	ASfCharacter* NewCharacter = Respawner->QueueRespawn(respawnData, RespawnTime);
 	
-	Respawner->EndDeferredRespawn(respawnData, NewCharacter);
+	//Respawner->EndDeferredRespawn(respawnData, NewCharacter);
 
 	TeamMap[Dead->PlayerTeam].AddPlayer(NewCharacter);
-
-	NewCharacter->TriggerRespawnSound.Broadcast();
 
 	if (CheckEndOfGame())
 	{

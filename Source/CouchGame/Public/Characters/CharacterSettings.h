@@ -56,4 +56,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float InvincibilityTimeAfterGive = 1;
+
+	UPROPERTY(EditAnywhere)
+	float RespawnTime = 2;
 };

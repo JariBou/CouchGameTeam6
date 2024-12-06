@@ -9,9 +9,17 @@ void UArrayUtils::GetRandomElement(const TArray<T>& Array, T& outElement)
 }
 
 template <typename T>
-T& UArrayUtils::GetRandomElement(const TArray<T>& Array)
+T* UArrayUtils::GetRandomElement(const TArray<T>& Array)
 {
 	if (Array.IsEmpty()) return nullptr;
 	uint16 RandRange = FMath::RandRange(0, Array.Num() - 1);
-	return Array[RandRange];
+	return &Array[RandRange];
+}
+
+template <typename T>
+T* UArrayUtils::GetRandomElement(TArray<T>& Array)
+{
+	if (Array.IsEmpty()) return nullptr;
+	uint16 RandRange = FMath::RandRange(0, Array.Num() - 1);
+	return &Array[RandRange];
 }

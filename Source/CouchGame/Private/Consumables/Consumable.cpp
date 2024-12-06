@@ -15,11 +15,15 @@ AConsumable::AConsumable()
 void AConsumable::BeginPlay()
 {
 	Super::BeginPlay();
-	StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AConsumable::EffectOnPlayer);
+	//StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AConsumable::EffectOnPlayer);
 }
 
 void AConsumable::EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveComponent* Comp2,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+}
+
+void AConsumable::GetConsumedBy(ASfCharacter* Consumer)
 {
 }
 

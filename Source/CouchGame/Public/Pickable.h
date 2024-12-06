@@ -21,15 +21,21 @@ public:
 	// Sets default values for this actor's properties
 	APickable();
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickedUp);
+
+	UPROPERTY()
+	FOnPickedUp OnPickedUp;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Interact_Implementation(ASfCharacter* CouchGameCharacter) override;
+	virtual void Interact_Implementation(ASfCharacter* CouchGameCharacter) override;
 
 	virtual bool CanPickUp_Implementation(ASfCharacter* CouchGameCharacter) override;
 

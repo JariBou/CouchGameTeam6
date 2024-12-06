@@ -1,8 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "CouchGame/Public/Characters/SfCharacter.h"
+
+#include <Consumables/Consumable.h>
+
 #include "Engine/LocalPlayer.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -16,13 +18,9 @@
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
 #include "Components/BoxComponent.h"
-#include "Components/PoseableMeshComponent.h"
-#include "Components/SphereComponent.h"
 #include "GameplayElements/WaterBucket.h"
 #include "GameplayElements/Events/VisualEventHandler.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetStringLibrary.h"
 #include "Modes/SfGameMode.h"
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 
@@ -764,8 +762,9 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 		{
 			if(Force || Pickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
 			{
-				Pickable->Holder = this;
-				Pickable->NiagaraDropSystem_Implementation();
+				// Pickable->Holder = this;
+				Pickable->Interact_Implementation(this);
+				// Pickable->NiagaraDropSystem_Implementation();
 				Pickable->StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 				Pickable->StaticMeshComponent->SetSimulatePhysics(false);
 				const FAttachmentTransformRules TransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget,EAttachmentRule::KeepRelative, true);
@@ -788,13 +787,19 @@ void ASfCharacter::GiveToKnight()
 	if(FriendlyKnight != nullptr)
 	{
 		APickable* DroppedPickable = Drop(); //Lache Son Arme
-		SetActorTickEnabled(true);
+
+		if (AConsumable* Consumable = Cast<AConsumable>(DroppedPickable); Consumable != nullptr)
+		{
+			Consumable->GetConsumedBy(FriendlyKnight);
+			return;
+		}
+		
+		SetInvincibility(true);
+		
 		if (FriendlyKnight->CurrentPickable != nullptr) FriendlyKnight->Drop()->Destroy();
 		
 		FriendlyKnight->PickupObject(DroppedPickable, true); //Met l'arme dans sa main
 		
-		// GetGameInstance()->GetTimerManager().SetTimerForNextTick([&]{RemoveInvincibility();});
-
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 		FTimerHandle NullHandle;
 		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->InvincibilityTimeAfterGive);
