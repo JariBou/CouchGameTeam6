@@ -71,7 +71,7 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	RespawnData.PlayerController->Possess(Character);
 
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
-	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].Mesh.LoadSynchronous();
+	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Character->PlayerType].Mesh.LoadSynchronous();
 	Character->ChangeSkeletalMesh(SkeletalMesh);
 	
 	FTimerHandle NullHandle;
