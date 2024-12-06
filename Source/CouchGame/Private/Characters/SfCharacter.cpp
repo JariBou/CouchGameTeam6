@@ -551,7 +551,8 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		IsMatDmgRed = true;
 		DmgRedAdvancement = 0.f;
 		
-		Health -= Amount;
+		//Health -= Amount;
+		AddHealth(-Amount);
 		OnHealthValueChange.Broadcast(this);
 
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
@@ -591,10 +592,16 @@ void ASfCharacter::RemoveInvincibility()
 	IsUnderInvincibilityTime = false;
 }
 
-void ASfCharacter::AddHealth(float HealthToAdd)
+void ASfCharacter::AddHealth(float HealthDelta)
 {
-	Health += HealthToAdd;
-	++NumberOfTimeHealthIsUsed; //Hurm actually c'est plus opti
+	Health += HealthDelta;
+	Health = FMath::Clamp(Health, -1.f, MaxHealth);
+	OnHealthValueChange.Broadcast(this);
+}
+
+void ASfCharacter::UsedHealingSource()
+{
+	++NumberOfTimeHealthIsUsed;
 }
 
 void ASfCharacter::SetupHealth(uint8 inMaxHealth)

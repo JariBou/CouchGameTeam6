@@ -13,7 +13,7 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
-	class UBoxComponent;
+class UBoxComponent;
 class APickable;
 struct FInputActionInstance;
 //struct FPhysicalAnimationData;
@@ -265,7 +265,7 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthValueChange OnHealthValueChange;
-
+	
 	UFUNCTION(BlueprintCallable)
 	bool CanBeDamagedCustom();
 	
@@ -279,8 +279,11 @@ public:
 	void RemoveInvincibility();
 
 	UFUNCTION()
-	void AddHealth(float HealthToAdd);
+	void AddHealth(float HealthDelta);
 
+	UFUNCTION()
+	void UsedHealingSource();
+	
 	UFUNCTION()
 	void ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const;
 
