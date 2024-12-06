@@ -36,11 +36,18 @@ class ASfCharacter : public ACharacter, public ICameraFollowTarget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	UMaterialInterface* MaterialTeam1;
+	
+	UPROPERTY(EditAnywhere, Category="Materials For Characters")
+	UMaterialInterface* MaterialKTeam1;
 
-	UPROPERTY(EditAnywhere)
-	UMaterialInterface* MaterialTeam2;
+	UPROPERTY(EditAnywhere, Category="Materials For Characters")
+	UMaterialInterface* MaterialKTeam2;
+
+	UPROPERTY(EditAnywhere, Category="Materials For Characters")
+	UMaterialInterface* MaterialSTeam1;
+
+	UPROPERTY(EditAnywhere, Category="Materials For Characters")
+	UMaterialInterface* MaterialSTeam2;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> RotationAnimMontage;
