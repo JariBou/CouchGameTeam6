@@ -241,7 +241,7 @@ void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 
 void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
-	TriggerDodgeSound.Broadcast();
+	//TriggerDodgeSound.Broadcast();
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
 

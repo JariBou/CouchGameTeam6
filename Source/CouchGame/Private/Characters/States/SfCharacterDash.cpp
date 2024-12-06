@@ -25,6 +25,7 @@ void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 
 	if(Character->CanDash)
 	{
+		Character->TriggerDodgeSound.Broadcast();
 		FVector MovementDirection;
 
 		if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
