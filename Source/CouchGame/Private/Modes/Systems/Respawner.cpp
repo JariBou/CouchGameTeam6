@@ -36,6 +36,7 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 {
 	if (TeamRespawnDelegateMap.Contains(RespawnData.Team))
 	{
+		// If someone else needs to respawn while someone on the same team is respawning make the other one respawn instantly
 		FQueuedRespawnData QueuedRespawnData = TeamRespawnDelegateMap[RespawnData.Team];
 		GameMode->GetWorldTimerManager().ClearTimer(QueuedRespawnData.TimerHandle);
 		EndDeferredRespawn(QueuedRespawnData.RespawnData, QueuedRespawnData.Character);

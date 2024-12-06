@@ -14,7 +14,7 @@ enum class ETypeOfChangingStat : uint8
 	HEALTH = 2 UMETA(DisplayName = "Health")
 };
 
-UCLASS()
+UCLASS(Abstract, Blueprintable)
 class COUCHGAME_API AConsumable : public APickable
 {
 	GENERATED_BODY()
