@@ -35,11 +35,20 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
-		//TODO play anim montage
+		// TODO play anim montage
 		IsRotationAnimLaunched = true;
-		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * FMath::Sign(NumberOfRotationMadeByStick));
+		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		if (Sign == 0) Sign = 1;
+		if(Sign >= 0)
+		{
+			PlayAnimMontage(RotationAnimMontageRevert, RotationAnimMontageRevert->RateScale);
+
+		} else
+		{
+			PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale);
+		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
+	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
 	CurrentDeltaMadeByStick = 0.f;
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
@@ -107,6 +116,7 @@ void ASfCharacter::BeginPlay()
 	CreateStateMachine();
 	InitStateMachine();
 	//SetUpArmsRagdoll();
+	
 
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 	
@@ -122,7 +132,6 @@ void ASfCharacter::BeginPlay()
 	DestinationAngle = CurrentAngle;
 	InputRJ = FVector2d(1.f,0.f);
 
-	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 	// ActivateRagdollArms();
 }
 
@@ -276,7 +285,7 @@ void ASfCharacter::OnDelegateStickCicleThrustEnd()
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
 {
 	CurrentDeltaMadeByStick = 0.f;
-	//IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
+	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
@@ -291,13 +300,21 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && IsRotationAnimLaunched == false)
 	{
 		// Réussite du stick toupie lol
-		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		// TODO play anim montage
 		IsRotationAnimLaunched = true;
-		//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
 		if (Sign == 0) Sign = 1;
-		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * Sign);
+		if(Sign >= 0)
+		{
+			PlayAnimMontage(RotationAnimMontageRevert, RotationAnimMontageRevert->RateScale);
+
+		} else
+		{
+			PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale);
+		}
 	}
+	CurrentDeltaMadeByStick = 0.f;
 	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
 }
@@ -607,6 +624,7 @@ void ASfCharacter::SetInvincibility(bool bCond)
 
 #pragma endregion
 
+// Change some skeletal mesh
 void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 {
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
