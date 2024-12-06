@@ -3,6 +3,8 @@
 
 #include "Modes/Systems/Respawner.h"
 
+#include <Utils/TransformUtils.h>
+
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,6 +32,39 @@ ASfCharacter* URespawner::StartDeferredRespawn(FRespawnData RespawnData)
 	return Character;
 }
 
+ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
+{
+	if (TeamRespawnDelegateMap.Contains(RespawnData.Team))
+	{
+		FQueuedRespawnData QueuedRespawnData = TeamRespawnDelegateMap[RespawnData.Team];
+		GameMode->GetWorldTimerManager().ClearTimer(QueuedRespawnData.TimerHandle);
+		EndDeferredRespawn(QueuedRespawnData.RespawnData, QueuedRespawnData.Character);
+	}
+	
+	ASfCharacter* Character = GetWorld()->SpawnActorDeferred<ASfCharacter>(GameMode->GetSfCharacterBpClass(), RespawnPoint + UTransformUtils::MakeTransformFromLocation(FVector(0, 0, 10000)), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+
+	Character->PlayerTeam = RespawnData.Team;
+	Character->PlayerType = RespawnData.TypeOfPlayer;
+	Character->SetInvincibility(true);
+
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDelegate;
+
+	FQueuedRespawnData QueuedRespawnData{
+		TimerHandle,
+		RespawnData,
+		Character
+	};
+	
+	TeamRespawnDelegateMap.Add(RespawnData.Team, QueuedRespawnData);
+	
+	TimerDelegate.BindUObject(this, &URespawner::EndDeferredRespawn, RespawnData, Character);
+	GameMode->GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, Delay, false);
+
+
+	return Character;
+}
+
 void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Character)
 {
 	RespawnData.PlayerController->Possess(Character);
@@ -45,5 +80,10 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	// Character->SetupHealth(CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].MaxHealth);
 
 	Character->FinishSpawning(RespawnPoint);
+	
+	Character->TriggerRespawnSound.Broadcast();
+
+	if (TeamRespawnDelegateMap.Contains(RespawnData.Team)) TeamRespawnDelegateMap.Remove(RespawnData.Team);
+
 	// RespawnMap.Remove(RespawnData);
 }

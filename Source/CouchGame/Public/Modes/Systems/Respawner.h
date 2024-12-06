@@ -27,6 +27,22 @@ struct FRespawnData
 	TEnumAsByte<TypeOfPlayer> TypeOfPlayer = Squire;
 };
 
+USTRUCT(BlueprintType)
+struct FQueuedRespawnData
+{
+	GENERATED_BODY()
+
+	public:
+	UPROPERTY()
+	FTimerHandle TimerHandle;
+	
+	UPROPERTY()
+	FRespawnData RespawnData;
+
+	UPROPERTY()
+	ASfCharacter* Character;
+};
+
 /**
  * 
  */
@@ -43,6 +59,9 @@ public:
 	ASfCharacter* StartDeferredRespawn(FRespawnData RespawnData);
 
 	UFUNCTION(BlueprintCallable, Category = "Respawner")
+	ASfCharacter* QueueRespawn(FRespawnData RespawnData, float Delay);
+
+	UFUNCTION(BlueprintCallable, Category = "Respawner")
 	void EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Character);
 
 	UPROPERTY()
@@ -50,4 +69,7 @@ public:
 
 	UPROPERTY()
 	ASfGameMode* GameMode;
+
+	UPROPERTY()
+	TMap<TEnumAsByte<ETeam>, FQueuedRespawnData> TeamRespawnDelegateMap;
 };
