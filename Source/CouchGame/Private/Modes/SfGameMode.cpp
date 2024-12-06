@@ -52,14 +52,15 @@ void ASfGameMode::BeginPlay()
 		
 
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
-		/*
+
+		//Assign teams after selection
 		const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromArray(i);
 		SelectionInfo.PlayerTeam;
 		SelectionInfo.PlayerController->Possess(NewCharacter);
 
 		// Remove autoposses
 		// RemoveSetting player type in here, handled by DesignRandomKnight()
-		*/
+		
 
 		ETeam NewPlayerTeam = i%2 > 0 ? Team2 : Team1;
 		NewCharacter->PlayerTeam = NewPlayerTeam;
@@ -80,6 +81,21 @@ void ASfGameMode::BeginPlay()
 
 	Respawner = NewObject<URespawner>(this, URespawner::StaticClass());
 	Respawner->Initialize(this);
+
+	Timer = MaxTime;
+}
+
+void ASfGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (isGameOver) return;
+	
+	Timer -= DeltaSeconds;
+
+	if (Timer <= 0){
+		isGameOver = true;
+		OnEndOfGame();
+	}
 }
 
 void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
@@ -126,6 +142,11 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	}
 }
 
+float ASfGameMode::GetTimer()
+{
+	return Timer;
+}
+
 bool ASfGameMode::CheckEndOfGame()
 {
 	isGameOver = false;
@@ -140,7 +161,7 @@ bool ASfGameMode::CheckEndOfGame()
 
 void ASfGameMode::OnEndOfGame()
 {
-	//TODO Clément
+	// TODO: Clément
 }
 
 void ASfGameMode::CreateAndInitPlayers() const

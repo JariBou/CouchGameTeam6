@@ -34,11 +34,12 @@ void ASfCharacter::OnDelegateStickCircleLate()
 	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded)
 	{
 		// Réussite du stick toupie lol
-		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		//TODO play anim montage
 		IsRotationAnimLaunched = true;
+		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * FMath::Sign(NumberOfRotationMadeByStick));
 	}
-	// GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Fin de Stick Delay"));
 	CurrentDeltaMadeByStick = 0.f;
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
@@ -106,7 +107,6 @@ void ASfCharacter::BeginPlay()
 	CreateStateMachine();
 	InitStateMachine();
 	//SetUpArmsRagdoll();
-	
 
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("AfterSuper"));
 	
@@ -122,6 +122,7 @@ void ASfCharacter::BeginPlay()
 	DestinationAngle = CurrentAngle;
 	InputRJ = FVector2d(1.f,0.f);
 
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 	// ActivateRagdollArms();
 }
 
@@ -139,6 +140,17 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	if (StateMachine) StateMachine->Tick(DeltaSeconds);
+
+	//Dmg Visual Effect
+	if(IsMatDmgRed)
+	{
+		DmgRedAdvancement += DeltaSeconds / TimeForDmgVisual;
+		GetMesh()->SetScalarParameterValueOnMaterials("HitValue", FMath::Clamp(FMath::Sin(DmgRedAdvancement * PI),0.f , 1.f));
+		if(DmgRedAdvancement >= 1.f)
+		{
+			IsMatDmgRed = false;
+		}
+	}
 
 	ManageCharacterRotation(DeltaSeconds);
 
@@ -264,7 +276,7 @@ void ASfCharacter::OnDelegateStickCicleThrustEnd()
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
 {
 	CurrentDeltaMadeByStick = 0.f;
-	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
+	//IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
@@ -280,6 +292,11 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 	{
 		// Réussite du stick toupie lol
 		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		IsRotationAnimLaunched = true;
+		//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
+		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		if (Sign == 0) Sign = 1;
+		PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale * Sign);
 	}
 	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Ended"));
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForCircle);
@@ -527,6 +544,9 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		TriggerTakeDamageSound.Broadcast();
 
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Player Takes Damage");
+
+		IsMatDmgRed = true;
+		DmgRedAdvancement = 0.f;
 		
 		Health -= Amount;
 		OnHealthValueChange.Broadcast(this);
@@ -620,6 +640,8 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 		return Actor == this || (CurrentPickable != nullptr && Actor == CurrentPickable);
 	});
 	//Setup FriendlyKnight && Well PAS OPTI
+	ASfCharacter* FriendlyKnight = nullptr;
+	
 	for (AActor* ActorFromCollision : ListOfActorFromCollision)
 	{
 		// Warning: does not take into account if it's a friendly character or self
@@ -642,7 +664,7 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	{
 		if(PlayerType == Squire && FriendlyKnight != nullptr)
 		{
-			GiveToKnight();
+			GiveToKnight(FriendlyKnight);
 		}
 		else if(APickable* obj = Cast<APickable>(ClosestActor); obj != nullptr) //Switch
 		{
@@ -782,7 +804,7 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 	}
 }
 
-void ASfCharacter::GiveToKnight()
+void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 {
 	if(FriendlyKnight != nullptr)
 	{
@@ -826,6 +848,22 @@ void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 void ASfCharacter::StopFeedBackEffect()
 {
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
+}
+
+void ASfCharacter::FinishRotAnim()
+{
+	IsRotationAnimLaunched = false;
+}
+
+void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+	if (NotifyName == "EndTourbilol")
+	{
+		FinishRotAnim();
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, NotifyName.ToString());
 }
 
 //////////////////////////////////////////////////////////////////////////

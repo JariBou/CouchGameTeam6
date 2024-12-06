@@ -65,6 +65,9 @@ public:
 	ASfGameMode();
 	UFUNCTION(BlueprintCallable)
 	void NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead);
+
+	UFUNCTION(BlueprintCallable)
+	float GetTimer();
 	
 private:
 	GENERATED_BODY()
@@ -77,6 +80,8 @@ private:
 
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	UFUNCTION(BlueprintCallable)
 	bool CheckEndOfGame();
 	
@@ -88,6 +93,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASfCharacter> SfCharacterBpClass;
+
+	UPROPERTY(EditAnywhere)
+	float MaxTime;
+
+	UPROPERTY()
+	float Timer;
 
 public:
 	const TSubclassOf<ASfCharacter>& GetSfCharacterBpClass() const;
