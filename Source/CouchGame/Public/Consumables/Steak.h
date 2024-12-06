@@ -24,7 +24,11 @@ public:
 	UFUNCTION()
 	virtual void EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveComponent* Comp2,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-	
+
+	UFUNCTION()
+	virtual void GetConsumedBy(ASfCharacter* Consumer) override;
+
+public:
 	UPROPERTY(EditAnywhere, meta=(UIMin = "0.0", UIMax = "100.0" ))
 	uint8 HealthToAdd = 0;
 };

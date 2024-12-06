@@ -32,7 +32,10 @@ protected:
 	virtual void BeginPlay() override;
 	
 	virtual void EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveComponent* Comp2, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	
+	public:
+	virtual void GetConsumedBy(ASfCharacter* Consumer);
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -42,7 +42,14 @@ void ASteak::EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveC
 	this->Destroy();
 }
 
-
+void ASteak::GetConsumedBy(ASfCharacter* Consumer)
+{
+	Super::GetConsumedBy(Consumer);
+GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Consumed");
+	if (Consumer == nullptr) return;
+	Consumer->AddHealth(HealthToAdd);
+	this->Destroy();
+}
 
 
 //ENORME CHIBRE DE LA PART DE CLEMENT https://yt3.googleusercontent.com/UrDr6Rp55gv3wpuyUimesOLOhrNqEgSV5h9rXU0n423n1fSjcyNDJ41yCg0ypL9GT7JKdRlck_w=s900-c-k-c0x00ffffff-no-rj
