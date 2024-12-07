@@ -62,7 +62,14 @@ UCLASS()
 class ROYALRIOT_API ASfGameMode : public AGameModeBase
 {
 public:
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTeamScoreChange, ETeam, TeamChanged, int, NewLives); 
+
+	UPROPERTY(BlueprintAssignable, Category="Event")
+	FOnTeamScoreChange OnTeamScoreChange;
+	
 	ASfGameMode();
+	
 	UFUNCTION(BlueprintCallable)
 	void NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead);
 

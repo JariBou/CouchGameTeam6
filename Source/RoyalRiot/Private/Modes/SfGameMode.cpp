@@ -33,6 +33,7 @@ void ASfGameMode::BeginPlay()
 		.Lives = TeamLives
 		};
 		TeamMap.Add(Team, NewInfo);
+		OnTeamScoreChange.Broadcast(Team, TeamLives);
 	}
 
 	UCharacterSelectionSubsystem* CharacterSelectionSubsystem = GetGameInstance()->GetSubsystem<UCharacterSelectionSubsystem>();
@@ -150,6 +151,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 		{
 			// T'es content Jerem?
 			--TeamMap[Dead->PlayerTeam].Lives;
+			OnTeamScoreChange.Broadcast(Dead->PlayerTeam, TeamMap[Dead->PlayerTeam].Lives);
 		} 
 	}
 	
