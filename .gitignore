@@ -54,6 +54,8 @@ Binaries/Win64/*
 !Binaries/Win64/UnrealEditor.modules
 !Binaries/Win64/UnrealEditor-RoyalRiot.dll
 
+!Binaries/Win64/UnrealEditor-ToolModule.dll
+
 Plugins/*/Binaries/*
 !Plugins/*/Binaries/Win64
 Plugins/*/Binaries/Win64/*
