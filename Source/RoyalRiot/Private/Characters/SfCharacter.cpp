@@ -88,14 +88,22 @@ ASfCharacter::ASfCharacter()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	// CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	// CameraBoom->SetupAttachment(RootComponent);
+	// CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	// CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	//Create Sphere Coll For Object Detection
 	CollisionForObject = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
 	CollisionForObject->SetupAttachment(RootComponent);
+	
+	CollisionForPlayer = CreateDefaultSubobject<UBoxComponent>(TEXT("Hurtbox"));
+	CollisionForPlayer->SetupAttachment(RootComponent);
+
+	PlumComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PlumComponent"));
+	PlumComponent->SetupAttachment(GetMesh(), "Head");
+
+	PhysicalAnimationComponent = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("PhysicalAnimationComponent"));
 
 	// Create a follow camera
 /*
@@ -642,6 +650,11 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
 	GetMesh()->SetSkeletalMesh(SkeletalMesh);
 	GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
+	// GetWorldTimerManager().SetTimerForNextTick([&]
+	// {
+	// 	ActivateRagdollArms();
+	// });
+	
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
 
 	UMaterialInstanceDynamic* DynMatTeam1;
@@ -910,9 +923,9 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 
 //////////////////////////////////////////////////////////////////////////
 // Input
-void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
+void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate)
 {
-	if (PlayerType == TypeOfPlayer) return;
+	// if (!ForceUpdate && PlayerType == TypeOfPlayer) return;
 	PlayerType = TypeOfPlayer;
 	const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 	FCharacterSettingsData CharacterSettingsData = Settings->CharacterInputDatas[TypeOfPlayer];

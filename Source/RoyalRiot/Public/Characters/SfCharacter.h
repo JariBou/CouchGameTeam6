@@ -72,15 +72,6 @@ public:
 	#pragma endregion
 
 private:
-
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
-
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FollowCamera;
-	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -118,7 +109,7 @@ public:
 	
 	/**Change Player Type */
 	UFUNCTION(BlueprintCallable, meta=(TypeOfPlayer))
-	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer);
+	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate = false);
 protected:
 
 	/** Called for movement input */
@@ -138,10 +129,6 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 #pragma region Input Data / Mapping Context
 
@@ -223,6 +210,9 @@ private:
 
 public:
 	void SetUpArmsRagdoll() ;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPhysicalAnimationComponent* PhysicalAnimationComponent;
 	
 protected:
 	UPROPERTY(EditAnywhere)
@@ -243,13 +233,15 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FPhysicalAnimationData PhysicalAnimationData;
 
+public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ActivateRagdollArms();
+
 	
 #pragma endregion
 
 #pragma region Health
-
+protected:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthValueChange, class ASfCharacter*, CallingCharacter);
 
 protected:
@@ -343,6 +335,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Pickable")
 	TObjectPtr<UBoxComponent> CollisionForObject;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Hurtbox")
+	TObjectPtr<UBoxComponent> CollisionForPlayer;
 
 	// UPROPERTY()
 	// TArray<AActor*> ListOfActorFromCollision;
@@ -468,6 +463,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRotating;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* PlumComponent;
 	
 	UFUNCTION()
 	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);

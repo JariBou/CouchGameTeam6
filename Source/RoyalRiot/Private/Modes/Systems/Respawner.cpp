@@ -69,23 +69,28 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 
 void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Character)
 {
-	RespawnData.PlayerController->Possess(Character);
+	if (TeamRespawnDelegateMap.Contains(RespawnData.Team)) TeamRespawnDelegateMap.Remove(RespawnData.Team);
 
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Character->PlayerType].Mesh.LoadSynchronous();
 	Character->ChangeSkeletalMesh(SkeletalMesh);
-	
+
+	if (Character->PlayerType == Knight) Character->ActivateRagdollArms();
+
+	// Here we "apply" the change
+
 	FTimerHandle NullHandle;
 	Character->GetGameInstance()->GetTimerManager().SetTimer(NullHandle, Character, &ASfCharacter::RemoveInvincibility, CharacterSettings->RespawnInvincibilityTime);
-	
+
 	//
 	// Character->SetupHealth(CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].MaxHealth);
 
 	Character->FinishSpawning(RespawnPoint);
-	
+	// Character->ChangePlayerType(Character->PlayerType, true);
+	RespawnData.PlayerController->Possess(Character);
+
 	Character->TriggerRespawnSound.Broadcast();
 
-	if (TeamRespawnDelegateMap.Contains(RespawnData.Team)) TeamRespawnDelegateMap.Remove(RespawnData.Team);
 
 	// RespawnMap.Remove(RespawnData);
 }

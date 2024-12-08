@@ -164,7 +164,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	TeamMap[Dead->PlayerTeam].RemovePlayer(Dead);
 	Dead->Destroy();
 	
-	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight);
+	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight, true);
 	
 	ASfCharacter* NewCharacter = Respawner->QueueRespawn(respawnData, RespawnTime);
 	
