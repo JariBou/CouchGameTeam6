@@ -51,7 +51,6 @@ void ASfGameMode::BeginPlay()
 		ASfCharacter* NewCharacter = GetWorld()->SpawnActorDeferred<ASfCharacter>(SfCharacterBpClass,SpawnPoint->GetTransform());
 		if (NewCharacter == nullptr) continue;
 		
-
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
 
 		/*
@@ -101,7 +100,8 @@ void ASfGameMode::BeginPlay()
 		}		
 
 		TeamMap[NewCharacter->PlayerTeam].AddPlayer(NewCharacter);
-		NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[NewCharacter->PlayerType].Mesh.LoadSynchronous());
+		NewCharacter->ChangePlayerType(NewCharacter->PlayerType);
+		// NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[NewCharacter->PlayerType].Mesh.LoadSynchronous());
 
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 		i++;
@@ -165,6 +165,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	Dead->Destroy();
 	
 	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight, true);
+	// TeamMap[Dead->PlayerTeam].Players[0]->PlayerType = Knight;
 	
 	ASfCharacter* NewCharacter = Respawner->QueueRespawn(respawnData, RespawnTime);
 	

@@ -70,7 +70,8 @@ public:
 	virtual bool IsFollowable() override;
 
 	#pragma endregion
-
+	
+#pragma region Misc
 private:
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -127,7 +128,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void Tick(float DeltaSeconds) override;
-
+#pragma endregion
 public:
 
 #pragma region Input Data / Mapping Context
@@ -290,7 +291,7 @@ public:
 	void UsedHealingSource();
 	
 	UFUNCTION()
-	void ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const;
+	void ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh);
 
 	UFUNCTION()
 	void SetupHealth(uint8 inMaxHealth);

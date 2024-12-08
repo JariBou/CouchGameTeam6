@@ -43,7 +43,7 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 		EndDeferredRespawn(QueuedRespawnData.RespawnData, QueuedRespawnData.Character);
 	}
 	
-	ASfCharacter* Character = GetWorld()->SpawnActorDeferred<ASfCharacter>(GameMode->GetSfCharacterBpClass(), RespawnPoint + UTransformUtils::MakeTransformFromLocation(FVector(0, 0, 10000)), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+	ASfCharacter* Character = GetWorld()->SpawnActorDeferred<ASfCharacter>(GameMode->GetSfCharacterBpClass(), /*RespawnPoint + */UTransformUtils::MakeTransformFromLocation(RespawnPoint.GetLocation() + FVector(0, 0, 10000)), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 
 	Character->PlayerTeam = RespawnData.Team;
 	Character->PlayerType = RespawnData.TypeOfPlayer;
@@ -72,12 +72,11 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	if (TeamRespawnDelegateMap.Contains(RespawnData.Team)) TeamRespawnDelegateMap.Remove(RespawnData.Team);
 
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
-	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Character->PlayerType].Mesh.LoadSynchronous();
-	Character->ChangeSkeletalMesh(SkeletalMesh);
+	// USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Character->PlayerType].Mesh.LoadSynchronous();
+	// Character->ChangeSkeletalMesh(SkeletalMesh);
+	//
+	// if (Character->PlayerType == Knight) Character->ActivateRagdollArms();
 
-	if (Character->PlayerType == Knight) Character->ActivateRagdollArms();
-
-	// Here we "apply" the change
 
 	FTimerHandle NullHandle;
 	Character->GetGameInstance()->GetTimerManager().SetTimer(NullHandle, Character, &ASfCharacter::RemoveInvincibility, CharacterSettings->RespawnInvincibilityTime);
@@ -86,7 +85,8 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	// Character->SetupHealth(CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].MaxHealth);
 
 	Character->FinishSpawning(RespawnPoint);
-	// Character->ChangePlayerType(Character->PlayerType, true);
+	// Here we "apply" the change
+	Character->ChangePlayerType(Character->PlayerType, true);
 	RespawnData.PlayerController->Possess(Character);
 
 	Character->TriggerRespawnSound.Broadcast();

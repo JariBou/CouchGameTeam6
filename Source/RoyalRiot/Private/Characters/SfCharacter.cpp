@@ -131,9 +131,10 @@ void ASfCharacter::BeginPlay()
 	
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 
+	// MAKES NO FUCKING SENSE BUT WE NEED THSI HERE
 	SetupHealth(CharacterSettings->CharacterInputDatas[PlayerType].MaxHealth);
-	
 	SetActorScale3D(CharacterSettings->CharacterInputDatas[PlayerType].Scale);
+
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
@@ -645,15 +646,19 @@ void ASfCharacter::SetInvincibility(bool bCond)
 #pragma endregion
 
 // Change some skeletal mesh
-void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
+void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh)
 {
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
+	// GetMesh()->SetAnimClass(nullptr);
 	GetMesh()->SetSkeletalMesh(SkeletalMesh);
-	GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
-	// GetWorldTimerManager().SetTimerForNextTick([&]
-	// {
-	// 	ActivateRagdollArms();
-	// });
+	if (PlayerType == Knight)
+	{
+		GetWorldTimerManager().SetTimerForNextTick([&]
+		{
+			ActivateRagdollArms();
+			GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
+		});
+	}
 	
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
 
@@ -929,21 +934,23 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool
 	PlayerType = TypeOfPlayer;
 	const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 	FCharacterSettingsData CharacterSettingsData = Settings->CharacterInputDatas[TypeOfPlayer];
+
+	SetActorScale3D(CharacterSettingsData.Scale);
+	SetupHealth(CharacterSettingsData.MaxHealth);
+
+	ChangeSkeletalMesh(CharacterSettingsData.Mesh.LoadSynchronous());
+	
 	if (TypeOfPlayer == Knight)
 	{
 		if (IsCarrying) Drop();
-		ChangeSkeletalMesh(CharacterSettingsData.Mesh.LoadSynchronous());
-
-		// TODO: sooo, we need to pass the physical thing component to a c++ component because they
-		// TODO: don't seem to be initialized before beginplay if they are only declared in BP
-		ActivateRagdollArms();
+		
+		// ActivateRagdollArms();
 		// GetWorldTimerManager().SetTimerForNextTick([&]
 		// {
 		// 	ActivateRagdollArms();
 		// });
 	}
-	SetupHealth(CharacterSettingsData.MaxHealth);
-	SetActorScale3D(CharacterSettingsData.Scale);
+	
 	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
 	BindInputMoveAndActions();
 }
