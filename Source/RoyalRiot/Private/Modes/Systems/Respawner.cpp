@@ -39,6 +39,7 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 		// If someone else needs to respawn while someone on the same team is respawning make the other one respawn instantly
 		FQueuedRespawnData QueuedRespawnData = TeamRespawnDelegateMap[RespawnData.Team];
 		GameMode->GetWorldTimerManager().ClearTimer(QueuedRespawnData.TimerHandle);
+		// if (IsValid(QueuedRespawnData.Character)) throw std::invalid_argument("Queued respawn data is invalid");
 		EndDeferredRespawn(QueuedRespawnData.RespawnData, QueuedRespawnData.Character);
 	}
 	
@@ -60,7 +61,7 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 	TeamRespawnDelegateMap.Add(RespawnData.Team, QueuedRespawnData);
 	
 	TimerDelegate.BindUObject(this, &URespawner::EndDeferredRespawn, RespawnData, Character);
-	GameMode->GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, Delay, false);
+	GameMode->GetWorldTimerManager().SetTimer(TeamRespawnDelegateMap[RespawnData.Team].TimerHandle, TimerDelegate, Delay, false);
 
 
 	return Character;

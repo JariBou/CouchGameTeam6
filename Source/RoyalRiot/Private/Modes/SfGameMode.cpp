@@ -68,7 +68,7 @@ void ASfGameMode::BeginPlay()
 
 		if (CharacterSettings->UseDefaultSpawnInfo)
 		{
-			if (!CharacterSettings->DefaultSpawnInfo.Contains(i)) throw;
+			if (!CharacterSettings->DefaultSpawnInfo.Contains(i)) continue;
 			switch (CharacterSettings->DefaultSpawnInfo[i])
 			{
 				case Team1_K:
@@ -89,7 +89,7 @@ void ASfGameMode::BeginPlay()
 					break;
 				default:
 				case NoDefaultSpawnInfo:
-					throw;
+					break;
 			}
 		} else
 		{

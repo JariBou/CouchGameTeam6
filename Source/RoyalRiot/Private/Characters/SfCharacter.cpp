@@ -42,7 +42,6 @@ void ASfCharacter::OnDelegateStickCircleLate()
 		if(Sign >= 0)
 		{
 			PlayAnimMontage(RotationAnimMontageRevert, RotationAnimMontageRevert->RateScale);
-
 		} else
 		{
 			PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale);
@@ -921,6 +920,9 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
 	{
 		if (IsCarrying) Drop();
 		ChangeSkeletalMesh(CharacterSettingsData.Mesh.LoadSynchronous());
+
+		// TODO: sooo, we need to pass the physical thing component to a c++ component because they
+		// TODO: don't seem to be initialized before beginplay if they are only declared in BP
 		ActivateRagdollArms();
 		// GetWorldTimerManager().SetTimerForNextTick([&]
 		// {
