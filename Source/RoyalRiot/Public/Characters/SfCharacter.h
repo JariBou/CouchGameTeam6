@@ -260,6 +260,9 @@ protected:
 	UPROPERTY()
 	bool IsUnderInvincibilityTime;
 
+	float InvisibilityAdvancement = 0.f;
+	
+
 public:
 	UPROPERTY(BlueprintReadWrite)
 	bool IsDead = false;

@@ -176,6 +176,15 @@ void ASfCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
+	if(IsUnderInvincibilityTime)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 0.f);
+		InvisibilityAdvancement += DeltaSeconds;
+		GetMesh()->SetScalarParameterValueOnMaterials("Invisibility", FMath::Clamp(FMath::Sin(InvisibilityAdvancement * PI),0.f , 1.f));
+	}
+
+	
+
 	ManageCharacterRotation(DeltaSeconds);
 
 	if(DashCooldownTimer > 0.f && !CanDash)
@@ -618,6 +627,8 @@ void ASfCharacter::RemoveInvincibility()
 {
 	if (this == nullptr) return; // in case we have some sort of timer bug
 	IsUnderInvincibilityTime = false;
+	//Reset Dissolve Mask
+	GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 10.f);
 }
 
 void ASfCharacter::AddHealth(float HealthDelta)
