@@ -275,6 +275,8 @@ void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
 	//TriggerDodgeSound.Broadcast();
+	if (!CanDash) return;
+	// Pas ouf de changer de state dans tout les cas
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
 
@@ -697,7 +699,6 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh)
 /// Binded to the input
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {	
-	TriggerPickupSound.Broadcast();
 	
 	//Btw si j'avais dit de créer un BP du puits c'est pas pour rien....
 	//C reel ca, mais va y c la faute de clément chef
@@ -807,9 +808,12 @@ void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 
 APickable* ASfCharacter::Drop()
 {
+	if (CurrentPickable == nullptr) return nullptr;
+	
 	//Play Drop sound
 	TriggerDropSound.Broadcast();
-	
+	AWaterBucket* WaterBucket = Cast<AWaterBucket>(CurrentPickable);
+
 	//Detach Pickable
 	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
 	CurrentPickable->DetachFromActor(DeTransformRules);
@@ -826,7 +830,6 @@ APickable* ASfCharacter::Drop()
 		ImpulseDirection += this->GetVelocity();
 		CurrentPickable->StaticMeshComponent->AddImpulse(ImpulseDirection, FName(""), true); //IMPULSE
 
-		AWaterBucket* WaterBucket = Cast<AWaterBucket>(CurrentPickable);
 		if(WaterBucket != nullptr)
 		{
 			WaterBucket->TriggerThrowSound.Broadcast();
@@ -855,6 +858,7 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 		{
 			if(Force || Pickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
 			{
+				TriggerPickupSound.Broadcast();
 				// Pickable->Holder = this;
 				Pickable->Interact_Implementation(this);
 				// Pickable->NiagaraDropSystem_Implementation();
@@ -890,7 +894,8 @@ void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 		SetInvincibility(true);
 		
 		if (FriendlyKnight->CurrentPickable != nullptr) FriendlyKnight->Drop()->Destroy();
-		
+
+		TriggerDropSound.Broadcast();
 		FriendlyKnight->PickupObject(DroppedPickable, true); //Met l'arme dans sa main
 		
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();

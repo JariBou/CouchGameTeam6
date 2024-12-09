@@ -176,8 +176,6 @@ private:
 	
 	void RightJoystickStarted(const FInputActionValue& InputActionValue);
 
-
-
 	void RightJoystickEnded(const FInputActionValue& InputActionValue);
 	
 	void BindInputMoveAndActions();
