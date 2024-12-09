@@ -70,17 +70,9 @@ public:
 	virtual bool IsFollowable() override;
 
 	#pragma endregion
-
-private:
-
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
-
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FollowCamera;
 	
+#pragma region Misc
+private:
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -118,7 +110,7 @@ public:
 	
 	/**Change Player Type */
 	UFUNCTION(BlueprintCallable, meta=(TypeOfPlayer))
-	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer);
+	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate = false);
 protected:
 
 	/** Called for movement input */
@@ -136,12 +128,8 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void Tick(float DeltaSeconds) override;
-
+#pragma endregion
 public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 #pragma region Input Data / Mapping Context
 
@@ -188,8 +176,6 @@ private:
 	
 	void RightJoystickStarted(const FInputActionValue& InputActionValue);
 
-
-
 	void RightJoystickEnded(const FInputActionValue& InputActionValue);
 	
 	void BindInputMoveAndActions();
@@ -223,6 +209,9 @@ private:
 
 public:
 	void SetUpArmsRagdoll() ;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPhysicalAnimationComponent* PhysicalAnimationComponent;
 	
 protected:
 	UPROPERTY(EditAnywhere)
@@ -243,13 +232,15 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FPhysicalAnimationData PhysicalAnimationData;
 
+public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ActivateRagdollArms();
+
 	
 #pragma endregion
 
 #pragma region Health
-
+protected:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthValueChange, class ASfCharacter*, CallingCharacter);
 
 protected:
@@ -301,7 +292,7 @@ public:
 	void UsedHealingSource();
 	
 	UFUNCTION()
-	void ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const;
+	void ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh);
 
 	UFUNCTION()
 	void SetupHealth(uint8 inMaxHealth);
@@ -347,6 +338,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Pickable")
 	TObjectPtr<UBoxComponent> CollisionForObject;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Hurtbox")
+	TObjectPtr<UBoxComponent> CollisionForPlayer;
 
 	// UPROPERTY()
 	// TArray<AActor*> ListOfActorFromCollision;
@@ -472,6 +466,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRotating;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* PlumComponent;
 	
 	UFUNCTION()
 	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);

@@ -33,6 +33,7 @@ void ASfGameMode::BeginPlay()
 		.Lives = TeamLives
 		};
 		TeamMap.Add(Team, NewInfo);
+		OnTeamScoreChange.Broadcast(Team, TeamLives);
 	}
 
 	UCharacterSelectionSubsystem* CharacterSelectionSubsystem = GetGameInstance()->GetSubsystem<UCharacterSelectionSubsystem>();
@@ -50,7 +51,6 @@ void ASfGameMode::BeginPlay()
 		ASfCharacter* NewCharacter = GetWorld()->SpawnActorDeferred<ASfCharacter>(SfCharacterBpClass,SpawnPoint->GetTransform());
 		if (NewCharacter == nullptr) continue;
 		
-
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
 
 		/*
@@ -67,7 +67,7 @@ void ASfGameMode::BeginPlay()
 
 		if (CharacterSettings->UseDefaultSpawnInfo)
 		{
-			if (!CharacterSettings->DefaultSpawnInfo.Contains(i)) throw;
+			if (!CharacterSettings->DefaultSpawnInfo.Contains(i)) continue;
 			switch (CharacterSettings->DefaultSpawnInfo[i])
 			{
 				case Team1_K:
@@ -88,7 +88,7 @@ void ASfGameMode::BeginPlay()
 					break;
 				default:
 				case NoDefaultSpawnInfo:
-					throw;
+					break;
 			}
 		} else
 		{
@@ -100,7 +100,8 @@ void ASfGameMode::BeginPlay()
 		}		
 
 		TeamMap[NewCharacter->PlayerTeam].AddPlayer(NewCharacter);
-		NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[NewCharacter->PlayerType].Mesh.LoadSynchronous());
+		NewCharacter->ChangePlayerType(NewCharacter->PlayerType);
+		// NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[NewCharacter->PlayerType].Mesh.LoadSynchronous());
 
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
 		i++;
@@ -150,6 +151,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 		{
 			// T'es content Jerem?
 			--TeamMap[Dead->PlayerTeam].Lives;
+			OnTeamScoreChange.Broadcast(Dead->PlayerTeam, TeamMap[Dead->PlayerTeam].Lives);
 		} 
 	}
 	
@@ -162,7 +164,8 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	TeamMap[Dead->PlayerTeam].RemovePlayer(Dead);
 	Dead->Destroy();
 	
-	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight);
+	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight, true);
+	// TeamMap[Dead->PlayerTeam].Players[0]->PlayerType = Knight;
 	
 	ASfCharacter* NewCharacter = Respawner->QueueRespawn(respawnData, RespawnTime);
 	

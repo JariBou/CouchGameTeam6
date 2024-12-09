@@ -29,5 +29,8 @@ public:
 
 	UPROPERTY(Config, EditAnywhere, category = "Camera")
 	float CameraRotationSpeedAlpha = .3f;
+
+	UPROPERTY(Config, EditAnywhere, category = "Camera")
+	float CameraXOffsetZoomStrength = 1.f;
 	
 };

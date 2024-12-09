@@ -61,7 +61,8 @@ void AMuddyGround::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	ASfCharacter* Character = Cast<ASfCharacter>(OtherActor);
 
 	if(Character == nullptr) return;
-
+	if (OverlappingActorsAndSpeedOnEnter.Contains(Character)) return;
+		
 	Character->StartFeedBackEffect(true);
 
 	//Add character in list of overlapping characters, character as key and speed as value
@@ -69,16 +70,22 @@ void AMuddyGround::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
 	//Add character in list of overlapping characters, character as key and dash distance as value
 	OverlappingActorsAndDashDistancedOnEnter.Add(Character, Character->DashDistance);
+	
+	// //Change speed to speed * slow value
+	// if(SlowPercent > 0.0f) Character->GetCharacterMovement()->MaxWalkSpeed = Character->GetCharacterMovement()->MaxWalkSpeed * (SlowPercent / 100.0f);
+	//
+	// //Change dash distance value to dash distance * dash percentage
+	// if(DashDistancePercent > 0.0f) Character->DashDistance = OverlappingActorsAndDashDistancedOnEnter.FindRef(Character) * (DashDistancePercent / 100.0f);
 }
 
-void AMuddyGround::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+bool AMuddyGround::RemoveActorDebuff(AActor* OtherActor)
 {
 	ASfCharacter* Character = Cast<ASfCharacter>(OtherActor);
 
-	if(Character == nullptr) return;
+	if(Character == nullptr) return true;
 
 	Character->StopFeedBackEffect();
+	if (!OverlappingActorsAndSpeedOnEnter.Contains(Character)) return true;
 
 	//Set character speed to its value before entering and remove it from overlapping characters list
 	Character->GetCharacterMovement()->MaxWalkSpeed = OverlappingActorsAndSpeedOnEnter.FindRef(Character);
@@ -87,6 +94,22 @@ void AMuddyGround::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	//Set character dash distance to its value before entering and remove it from overlapping characters list
 	Character->DashDistance = OverlappingActorsAndDashDistancedOnEnter.FindRef(Character);
 	OverlappingActorsAndDashDistancedOnEnter.Remove(Character);
+	return false;
+}
+
+void AMuddyGround::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                              UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	RemoveActorDebuff(OtherActor);
+}
+
+void AMuddyGround::BeginDestroy()
+{
+	Super::BeginDestroy();
+	// for (auto& [Actor, _] : OverlappingActorsAndSpeedOnEnter)
+	// {
+	// 	RemoveActorDebuff(Actor);
+	// }
 }
 
 void AMuddyGround::SetDuration(float inDuration)

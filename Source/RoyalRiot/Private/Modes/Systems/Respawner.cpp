@@ -39,10 +39,11 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 		// If someone else needs to respawn while someone on the same team is respawning make the other one respawn instantly
 		FQueuedRespawnData QueuedRespawnData = TeamRespawnDelegateMap[RespawnData.Team];
 		GameMode->GetWorldTimerManager().ClearTimer(QueuedRespawnData.TimerHandle);
+		// if (IsValid(QueuedRespawnData.Character)) throw std::invalid_argument("Queued respawn data is invalid");
 		EndDeferredRespawn(QueuedRespawnData.RespawnData, QueuedRespawnData.Character);
 	}
 	
-	ASfCharacter* Character = GetWorld()->SpawnActorDeferred<ASfCharacter>(GameMode->GetSfCharacterBpClass(), RespawnPoint + UTransformUtils::MakeTransformFromLocation(FVector(0, 0, 10000)), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+	ASfCharacter* Character = GetWorld()->SpawnActorDeferred<ASfCharacter>(GameMode->GetSfCharacterBpClass(), /*RespawnPoint + */UTransformUtils::MakeTransformFromLocation(RespawnPoint.GetLocation() + FVector(0, 0, 10000)), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 
 	Character->PlayerTeam = RespawnData.Team;
 	Character->PlayerType = RespawnData.TypeOfPlayer;
@@ -60,7 +61,7 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 	TeamRespawnDelegateMap.Add(RespawnData.Team, QueuedRespawnData);
 	
 	TimerDelegate.BindUObject(this, &URespawner::EndDeferredRespawn, RespawnData, Character);
-	GameMode->GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, Delay, false);
+	GameMode->GetWorldTimerManager().SetTimer(TeamRespawnDelegateMap[RespawnData.Team].TimerHandle, TimerDelegate, Delay, false);
 
 
 	return Character;
@@ -68,23 +69,28 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 
 void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Character)
 {
-	RespawnData.PlayerController->Possess(Character);
+	if (TeamRespawnDelegateMap.Contains(RespawnData.Team)) TeamRespawnDelegateMap.Remove(RespawnData.Team);
 
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
-	USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Character->PlayerType].Mesh.LoadSynchronous();
-	Character->ChangeSkeletalMesh(SkeletalMesh);
-	
+	// USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Character->PlayerType].Mesh.LoadSynchronous();
+	// Character->ChangeSkeletalMesh(SkeletalMesh);
+	//
+	// if (Character->PlayerType == Knight) Character->ActivateRagdollArms();
+
+
 	FTimerHandle NullHandle;
 	Character->GetGameInstance()->GetTimerManager().SetTimer(NullHandle, Character, &ASfCharacter::RemoveInvincibility, CharacterSettings->RespawnInvincibilityTime);
-	
+
 	//
 	// Character->SetupHealth(CharacterSettings->CharacterInputDatas[RespawnData.TypeOfPlayer].MaxHealth);
 
 	Character->FinishSpawning(RespawnPoint);
-	
+	// Here we "apply" the change
+	Character->ChangePlayerType(Character->PlayerType, true);
+	RespawnData.PlayerController->Possess(Character);
+
 	Character->TriggerRespawnSound.Broadcast();
 
-	if (TeamRespawnDelegateMap.Contains(RespawnData.Team)) TeamRespawnDelegateMap.Remove(RespawnData.Team);
 
 	// RespawnMap.Remove(RespawnData);
 }

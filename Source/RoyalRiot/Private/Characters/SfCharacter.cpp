@@ -42,7 +42,6 @@ void ASfCharacter::OnDelegateStickCircleLate()
 		if(Sign >= 0)
 		{
 			PlayAnimMontage(RotationAnimMontageRevert, RotationAnimMontageRevert->RateScale);
-
 		} else
 		{
 			PlayAnimMontage(RotationAnimMontage, RotationAnimMontage->RateScale);
@@ -89,14 +88,22 @@ ASfCharacter::ASfCharacter()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	// CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	// CameraBoom->SetupAttachment(RootComponent);
+	// CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	// CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	//Create Sphere Coll For Object Detection
 	CollisionForObject = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
 	CollisionForObject->SetupAttachment(RootComponent);
+	
+	CollisionForPlayer = CreateDefaultSubobject<UBoxComponent>(TEXT("Hurtbox"));
+	CollisionForPlayer->SetupAttachment(RootComponent);
+
+	PlumComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PlumComponent"));
+	PlumComponent->SetupAttachment(GetMesh(), "Head");
+
+	PhysicalAnimationComponent = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("PhysicalAnimationComponent"));
 
 	// Create a follow camera
 /*
@@ -124,9 +131,10 @@ void ASfCharacter::BeginPlay()
 	
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 
+	// MAKES NO FUCKING SENSE BUT WE NEED THSI HERE
 	SetupHealth(CharacterSettings->CharacterInputDatas[PlayerType].MaxHealth);
-	
 	SetActorScale3D(CharacterSettings->CharacterInputDatas[PlayerType].Scale);
+
 
 	CurrentAngle = GetActorRotation().Yaw;
 	DestinationAngle = CurrentAngle;
@@ -267,6 +275,8 @@ void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
 	//TriggerDodgeSound.Broadcast();
+	if (!CanDash) return;
+	// Pas ouf de changer de state dans tout les cas
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
 
@@ -649,11 +659,20 @@ void ASfCharacter::SetInvincibility(bool bCond)
 #pragma endregion
 
 // Change some skeletal mesh
-void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
+void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh)
 {
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
+	// GetMesh()->SetAnimClass(nullptr);
 	GetMesh()->SetSkeletalMesh(SkeletalMesh);
-	GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
+	if (PlayerType == Knight)
+	{
+		GetWorldTimerManager().SetTimerForNextTick([&]
+		{
+			ActivateRagdollArms();
+			GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
+		});
+	}
+	
 	// GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
 
 	UMaterialInstanceDynamic* DynMatTeam1;
@@ -680,7 +699,6 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh) const
 /// Binded to the input
 void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 {	
-	TriggerPickupSound.Broadcast();
 	
 	//Btw si j'avais dit de créer un BP du puits c'est pas pour rien....
 	//C reel ca, mais va y c la faute de clément chef
@@ -790,9 +808,12 @@ void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 
 APickable* ASfCharacter::Drop()
 {
+	if (CurrentPickable == nullptr) return nullptr;
+	
 	//Play Drop sound
 	TriggerDropSound.Broadcast();
-	
+	AWaterBucket* WaterBucket = Cast<AWaterBucket>(CurrentPickable);
+
 	//Detach Pickable
 	const FDetachmentTransformRules DeTransformRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, true);
 	CurrentPickable->DetachFromActor(DeTransformRules);
@@ -809,7 +830,6 @@ APickable* ASfCharacter::Drop()
 		ImpulseDirection += this->GetVelocity();
 		CurrentPickable->StaticMeshComponent->AddImpulse(ImpulseDirection, FName(""), true); //IMPULSE
 
-		AWaterBucket* WaterBucket = Cast<AWaterBucket>(CurrentPickable);
 		if(WaterBucket != nullptr)
 		{
 			WaterBucket->TriggerThrowSound.Broadcast();
@@ -838,6 +858,7 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 		{
 			if(Force || Pickable->CanPickUp_Implementation(this)) //Peut prendre selon son role
 			{
+				TriggerPickupSound.Broadcast();
 				// Pickable->Holder = this;
 				Pickable->Interact_Implementation(this);
 				// Pickable->NiagaraDropSystem_Implementation();
@@ -873,7 +894,8 @@ void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 		SetInvincibility(true);
 		
 		if (FriendlyKnight->CurrentPickable != nullptr) FriendlyKnight->Drop()->Destroy();
-		
+
+		TriggerDropSound.Broadcast();
 		FriendlyKnight->PickupObject(DroppedPickable, true); //Met l'arme dans sa main
 		
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
@@ -922,24 +944,29 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 
 //////////////////////////////////////////////////////////////////////////
 // Input
-void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer)
+void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate)
 {
-	if (PlayerType == TypeOfPlayer) return;
+	// if (!ForceUpdate && PlayerType == TypeOfPlayer) return;
 	PlayerType = TypeOfPlayer;
 	const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 	FCharacterSettingsData CharacterSettingsData = Settings->CharacterInputDatas[TypeOfPlayer];
+
+	SetActorScale3D(CharacterSettingsData.Scale);
+	SetupHealth(CharacterSettingsData.MaxHealth);
+
+	ChangeSkeletalMesh(CharacterSettingsData.Mesh.LoadSynchronous());
+	
 	if (TypeOfPlayer == Knight)
 	{
 		if (IsCarrying) Drop();
-		ChangeSkeletalMesh(CharacterSettingsData.Mesh.LoadSynchronous());
-		ActivateRagdollArms();
+		
+		// ActivateRagdollArms();
 		// GetWorldTimerManager().SetTimerForNextTick([&]
 		// {
 		// 	ActivateRagdollArms();
 		// });
 	}
-	SetupHealth(CharacterSettingsData.MaxHealth);
-	SetActorScale3D(CharacterSettingsData.Scale);
+	
 	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
 	BindInputMoveAndActions();
 }
