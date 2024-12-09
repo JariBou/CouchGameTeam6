@@ -201,7 +201,8 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 0.f);
 		InvisibilityAdvancement += DeltaSeconds;
-		GetMesh()->SetScalarParameterValueOnMaterials("Invisibility", FMath::Clamp(FMath::Sin(InvisibilityAdvancement * PI),0.f , 1.f));
+		float InvisibilityVfxValue = FMath::Clamp(1.f - FMath::Abs(FMath::Sin(InvisibilityAdvancement * PI * 2)),0.5f , 1.f);
+		GetMesh()->SetScalarParameterValueOnMaterials("Fader", InvisibilityVfxValue);
 	}
 
 	
@@ -608,6 +609,7 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	if(CanBeDamagedCustom())
 	{
 		IsUnderInvincibilityTime = true;
+		InvisibilityAdvancement = 0.f;
 		TriggerTakeDamageSound.Broadcast();
 
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Player Takes Damage");
@@ -656,6 +658,7 @@ void ASfCharacter::RemoveInvincibility()
 	IsUnderInvincibilityTime = false;
 	//Reset Dissolve Mask
 	GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 10.f);
+	GetMesh()->SetScalarParameterValueOnMaterials("Fader", 1.f);
 }
 
 void ASfCharacter::AddHealth(float HealthDelta, bool IsVisual)

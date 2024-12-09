@@ -92,7 +92,7 @@ bool AWeapon::DealDamage(ASfCharacter* Target)
 
 	if (Durability <= 0)
 	{
-		Holder->Drop();
+		if(IsValid(Holder)) Holder->Drop();
 		Destroy();
 	}
 	return true;
