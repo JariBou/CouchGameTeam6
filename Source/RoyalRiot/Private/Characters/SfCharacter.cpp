@@ -859,6 +859,7 @@ APickable* ASfCharacter::Drop()
 	TimerDelegateForHandCollision.BindUObject<ASfCharacter>(this, &ASfCharacter::OnPickableCollisionTimeout, DroppedPickable);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegateForHandCollision, TimerForObjectCollisionWithPlayer, false);
 	// LastPickable = DroppedPickable;
+	CurrentPickable->Holder = nullptr;
 	CurrentPickable = nullptr;
 	return DroppedPickable;
 }

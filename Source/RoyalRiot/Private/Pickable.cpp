@@ -26,6 +26,12 @@ void APickable::BeginPlay()
 void APickable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(Holder == nullptr && !IsNiagaraOn)
+	{
+		NiagaraDropSystem_Implementation();
+		IsNiagaraOn = true;
+	}
 }
 
 void APickable::Interact_Implementation(ASfCharacter* CouchGameCharacter)
@@ -33,8 +39,8 @@ void APickable::Interact_Implementation(ASfCharacter* CouchGameCharacter)
 	// GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Purple, TEXT("Interaction With Interface"));
 	if (CouchGameCharacter != nullptr) Holder = CouchGameCharacter;
 	OnPickedUp.Broadcast();
-	
-	NiagaraDropSystem_Implementation();
+	if(IsValid(NiagaraComponentForDrop)) NiagaraComponentForDrop->DeactivateImmediate();
+	IsNiagaraOn = false;	
 }
 
 bool APickable::CanPickUp_Implementation(ASfCharacter* CouchGameCharacter)
@@ -52,6 +58,10 @@ void APickable::NiagaraDropSystem_Implementation()
 		FRotator(0.f),
 		EAttachLocation::Type::SnapToTarget,
 		true);
-	if(IsValid(NiagaraComponentForDrop))	NiagaraComponentForDrop->SetUsingAbsoluteRotation(true);
+	NiagaraComponentForDrop->Activate();
+	if(IsValid(NiagaraComponentForDrop))
+	{
+		NiagaraComponentForDrop->SetUsingAbsoluteRotation(true);
+	}
 }
 
