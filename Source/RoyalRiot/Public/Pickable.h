@@ -56,6 +56,6 @@ public:
 	UPROPERTY(VisibleAnywhere, Category="ParticlePart")
 	TObjectPtr<UNiagaraComponent> NiagaraComponentForDrop;
 
-	UPROPERTY(EditAnywhere,Category="Niagara")
+	UPROPERTY(EditAnywhere,Category="ParticlePart")
 	bool IsNiagaraOn = true;
 };
