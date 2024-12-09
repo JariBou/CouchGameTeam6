@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
+#include "NiagaraComponent.h"
 #include "SfCharacterStateID.h"
 #include "Teams.h"
 #include "GameFramework/Character.h"
@@ -13,6 +14,7 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+	class UNiagaraSystem;
 class UBoxComponent;
 class APickable;
 struct FInputActionInstance;
@@ -54,6 +56,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
+
+	//Only Niagara Component, used only when niagara decide to exist (je te hais niagara)
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> NiagaraComponentOfPlayer;
+	UPROPERTY(EditAnywhere, Category="VFX")
+	TObjectPtr<UNiagaraSystem> NSHealth;
 
 	UFUNCTION()
 	void OnDelegateStickCircleLate();
@@ -97,6 +105,9 @@ private:
 	float CurrentAngle; //Current Yaw Rotation Of Actor
 	float DestinationAngle; //Destination Rotation Based On RightJoystick
 
+	UFUNCTION()
+	void NiagaraSpawn(UNiagaraSystem* NSToUse);
+
 public:
 	/** Constructeur */
 	ASfCharacter();
@@ -129,7 +140,6 @@ protected:
 
 	virtual void Tick(float DeltaSeconds) override;
 #pragma endregion
-public:
 
 #pragma region Input Data / Mapping Context
 
@@ -286,7 +296,7 @@ public:
 	void RemoveInvincibility();
 
 	UFUNCTION()
-	void AddHealth(float HealthDelta);
+	void AddHealth(float HealthDelta, bool IsVisual);
 
 	UFUNCTION()
 	void UsedHealingSource();

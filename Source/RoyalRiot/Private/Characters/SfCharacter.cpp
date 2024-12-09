@@ -12,6 +12,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Pickable.h"
 #include "Camera/CameraWorldSubsystem.h"
 #include "Characters/CharacterSettings.h"
@@ -62,6 +63,19 @@ FVector ASfCharacter::GetFollowTarget()
 bool ASfCharacter::IsFollowable()
 {
 	return Health > 0;
+}
+
+void ASfCharacter::NiagaraSpawn(UNiagaraSystem* NSToUse)
+{
+	NiagaraComponentOfPlayer = UNiagaraFunctionLibrary::SpawnSystemAttached(
+	NSToUse,
+	GetMesh(),
+	NAME_None,
+	FVector(0.f,0.f,0.f),
+	FRotator(0.f),
+	EAttachLocation::Type::SnapToTarget,
+	true);
+	if(IsValid(NiagaraComponentOfPlayer))	NiagaraComponentOfPlayer->SetUsingAbsoluteRotation(true);
 }
 
 ASfCharacter::ASfCharacter()
@@ -591,7 +605,7 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		DmgRedAdvancement = 0.f;
 		
 		//Health -= Amount;
-		AddHealth(-Amount);
+		AddHealth(-Amount, false);
 		OnHealthValueChange.Broadcast(this);
 
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
@@ -633,11 +647,12 @@ void ASfCharacter::RemoveInvincibility()
 	GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 10.f);
 }
 
-void ASfCharacter::AddHealth(float HealthDelta)
+void ASfCharacter::AddHealth(float HealthDelta, bool IsVisual)
 {
 	Health += HealthDelta;
 	Health = FMath::Clamp(Health, -1.f, MaxHealth);
 	OnHealthValueChange.Broadcast(this);
+	if(IsVisual && IsValid(NSHealth)) NiagaraSpawn(NSHealth); 
 }
 
 void ASfCharacter::UsedHealingSource()
