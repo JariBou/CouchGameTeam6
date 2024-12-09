@@ -307,6 +307,7 @@ public:
 	void SetupHealth(uint8 inMaxHealth);
 
 	void SetInvincibility(bool bCond);
+
 	
 #pragma endregion
 
