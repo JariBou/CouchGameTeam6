@@ -2,7 +2,9 @@
 
 #include "RoyalRiot/Public/Characters/SfCharacter.h"
 
+#include <Components/WidgetComponent.h>
 #include <Consumables/Consumable.h>
+#include <UI/IndicatorWidget.h>
 
 #include "Engine/LocalPlayer.h"
 #include "Components/CapsuleComponent.h"
@@ -117,6 +119,9 @@ ASfCharacter::ASfCharacter()
 	PlumComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PlumComponent"));
 	PlumComponent->SetupAttachment(GetMesh(), "Head");
 
+	IndixatorWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("DashIndicator"));
+	IndixatorWidgetComponent->SetupAttachment(RootComponent);
+
 	PhysicalAnimationComponent = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("PhysicalAnimationComponent"));
 
 	// Create a follow camera
@@ -160,6 +165,8 @@ void ASfCharacter::BeginPlay()
 	InputRJ = FVector2d(1, 0);
 
 	// ActivateRagdollArms();
+
+	DashIndicator = Cast<UIndicatorWidget>(IndixatorWidgetComponent->GetWidget());
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -203,6 +210,10 @@ void ASfCharacter::Tick(float DeltaSeconds)
 
 	if(DashCooldownTimer > 0.f && !CanDash)
 	{
+		if(DashIndicator)
+		{
+			DashIndicator->UpdateValue(FMath::Clamp(1- DashCooldownTimer/DashCooldown, 0.f, 1.f));
+		}
 		DashCooldownTimer -= DeltaSeconds;
 		
 		if(DashCooldownTimer <= 0.f)

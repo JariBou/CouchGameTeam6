@@ -29,9 +29,10 @@ public:
 #pragma endregion
 
 #pragma region Main Camera
-protected:
-	UPROPERTY()
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "Camera Subsystem")
 	TObjectPtr<UCameraComponent> CameraMain;
+protected:
 
 	UPROPERTY()
 	const UCameraPluginSettings* CameraPluginSettings;
