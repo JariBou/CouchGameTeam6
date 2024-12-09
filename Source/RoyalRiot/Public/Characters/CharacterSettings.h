@@ -64,15 +64,15 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category="Settings")
 	float RespawnInvincibilityTime;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Config, EditAnywhere, Category="Settings")
 	float InvincibilityTimeAfterGive = 1;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Config, EditAnywhere, Category="Settings")
 	float RespawnTime = 2;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(Config, VisibleAnywhere, Category="Settings")
 	TMap<uint8, TEnumAsByte<EDefaultSpawnInfo>> DefaultSpawnInfo;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(Config, VisibleAnywhere, Category="Settings")
 	bool UseDefaultSpawnInfo;
 };

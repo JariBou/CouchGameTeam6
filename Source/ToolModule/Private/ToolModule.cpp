@@ -37,9 +37,9 @@ void FToolModuleModule::RegisterMenuExtensions()
 		FName(TEXT("T2 Squire")),
 	};
 
+	UCharacterSettings* CharacterSettings = GetMutableDefault<UCharacterSettings>();
 	for (int i = 0; i < 4; ++i)
 	{
-		UCharacterSettings* CharacterSettings = GetMutableDefault<UCharacterSettings>();
 		if (!CharacterSettings->DefaultSpawnInfo.Contains(i)) CharacterSettings->DefaultSpawnInfo.Add(i, static_cast<TEnumAsByte<EDefaultSpawnInfo>>(i+1));
 		
 		const TSharedRef<SComboButton> CharacterSelectComboButton = SNew(SComboButton)
@@ -131,6 +131,7 @@ void FToolModuleModule::RegisterMenuExtensions()
 	ToolbarSection.AddEntry(FToolMenuEntry::InitWidget(CheckBoxLabelName, CheckBoxLabel, FText::FromString(CheckBoxLabelString)));
 	
 	const TSharedRef<SCheckBox> Checkbox = SNew(SCheckBox)
+		.IsChecked(CharacterSettings->UseDefaultSpawnInfo ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
 		.OnCheckStateChanged_Lambda([&](ECheckBoxState CheckState)
 		{
 			UCharacterSettings* CharactersSettings = GetMutableDefault<UCharacterSettings>();
