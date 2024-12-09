@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <UI/IndicatorWidget.h>
+
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
 #include "NiagaraComponent.h"
@@ -14,6 +16,7 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+	class UWidgetComponent;
 	class UNiagaraSystem;
 class UBoxComponent;
 class APickable;
@@ -70,7 +73,6 @@ public:
 	void OnDelegateStickCicleThrustEnd();
 
 
-
 #pragma region CameraFollowTarget
 public:
 	virtual FVector GetFollowTarget() override;
@@ -122,6 +124,14 @@ public:
 	/**Change Player Type */
 	UFUNCTION(BlueprintCallable, meta=(TypeOfPlayer))
 	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate = false);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* IndixatorWidgetComponent;
+
+	UPROPERTY()
+	UIndicatorWidget* DashIndicator;
+
+	
 protected:
 
 	/** Called for movement input */
