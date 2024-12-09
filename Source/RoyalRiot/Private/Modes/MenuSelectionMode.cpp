@@ -14,7 +14,7 @@ void AMenuSelectionMode::BeginPlay()
 	ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GetGameInstance()->GetSubsystem<ULocalMultiplayerSubsystem>();
 	if (LocalMultiplayerSubsystem == nullptr) return;
 
-	LocalMultiplayerSubsystem->CreateAndInitPlayers(ELocalMultiplayerInputMappingType::InGame);
+	LocalMultiplayerSubsystem->CreateAndInitPlayers(ELocalMultiplayerInputMappingType::Menu);
 
 	// TODO
 }

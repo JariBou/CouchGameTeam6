@@ -18,14 +18,17 @@ void ULocalMultiplayerSubsystem::CreateAndInitPlayers(ELocalMultiplayerInputMapp
 		{
 			// Reassign doode
 			AssignKeyboardMapping(PlayerIndexFromKeyboardProfileIndex[i], i, MappingType);
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Keyboard Profile)");
 		} else if (PlayerIndexFromKeyboardProfileIndex.FindKey(i))
 		{
 			// Reassign doode
 			AssignGamepadInputMapping(i, MappingType);
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, "Gamepad Profile");
+
 		}
 		else
 		{
-			
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "No profile");
 		}
 	}
 }
