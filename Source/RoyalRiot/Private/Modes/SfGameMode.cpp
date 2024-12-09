@@ -208,7 +208,7 @@ void ASfGameMode::CreateAndInitPlayers() const
 
 	ULocalMultiplayerSubsystem* LocalMultiplayerSubsystem = GameInstance->GetSubsystem<ULocalMultiplayerSubsystem>();
 	if (LocalMultiplayerSubsystem == nullptr) return;
-
+	
 	LocalMultiplayerSubsystem->CreateAndInitPlayers(ELocalMultiplayerInputMappingType::InGame);
 }
 
