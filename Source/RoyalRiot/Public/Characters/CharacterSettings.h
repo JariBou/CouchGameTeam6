@@ -6,6 +6,7 @@
 #include "Engine/DeveloperSettings.h"
 #include "CharacterSettings.generated.h"
 
+class UMenuInputData;
 class USfCharacterInputData;
 enum TypeOfPlayer : uint8;
 
@@ -58,9 +59,14 @@ class ROYALRIOT_API UCharacterSettings : public UDeveloperSettings
 public:
 	TObjectPtr<USfCharacterInputData> GetInputDataFromPlayerType(TEnumAsByte<TypeOfPlayer> Type) const;
 
+	TObjectPtr<UMenuInputData> GetMenuInputData() const;
+
 	UPROPERTY(Config, EditAnywhere, Category="Settings")
 	TMap<TEnumAsByte<TypeOfPlayer>, FCharacterSettingsData> CharacterInputDatas;
 
+	UPROPERTY(Config, EditAnywhere, Category="Settings")
+	TSoftObjectPtr<UMenuInputData> MenuInputData;
+	
 	UPROPERTY(Config, EditAnywhere, Category="Settings")
 	float RespawnInvincibilityTime;
 
