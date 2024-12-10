@@ -27,6 +27,9 @@ public:
 	UPROPERTY()
 	FOnPickedUp OnPickedUp;
 
+	UFUNCTION(BlueprintCallable)
+	void DestroyPickable();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

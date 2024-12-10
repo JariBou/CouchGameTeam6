@@ -16,6 +16,12 @@ APickable::APickable()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseStaticMesh"));
 }
 
+void APickable::DestroyPickable()
+{
+	if (Holder != nullptr) Holder->Drop();
+	Destroy();
+}
+
 // Called when the game starts or when spawned
 void APickable::BeginPlay()
 {
