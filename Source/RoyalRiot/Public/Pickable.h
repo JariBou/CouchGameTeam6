@@ -31,7 +31,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -48,12 +47,15 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Holder")
 	TObjectPtr<ASfCharacter> Holder;
 
 	UPROPERTY(EditAnywhere, Category="ParticlePart")
 	TObjectPtr<UNiagaraSystem> NiagaraParticleDrop;
 
 	UPROPERTY(VisibleAnywhere, Category="ParticlePart")
-	TObjectPtr<UNiagaraComponent> NiagaraComponentForDrop;	
+	TObjectPtr<UNiagaraComponent> NiagaraComponentForDrop;
+
+	UPROPERTY(EditAnywhere,Category="ParticlePart")
+	bool IsNiagaraOn = true;
 };
