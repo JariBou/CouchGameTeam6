@@ -335,18 +335,20 @@ void ASfCharacter::OnDelegateStickCircleThrustEnd()
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
 	// if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
 
-	// TODO: should only be called on joystick cancelation basically
-	
-	ActivateRagdollArms(false);
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
-	PlayAnimMontage(LungeAnimMontage);
+	// TODO: should only be called on joystick cancelation basically, Or should it?
+	if (!IsThrustAnimLaunched)
+	{
+		ActivateRagdollArms(false);
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+		PlayAnimMontage(LungeAnimMontage);
+	}
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForThrust);
 }
 
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
 {
 	CurrentDeltaMadeByStick = 0.f;
-	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
+	// IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
@@ -967,19 +969,15 @@ void ASfCharacter::StopFeedBackEffect()
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
 }
 
-void ASfCharacter::FinishRotAnim()
-{
-	IsRotationAnimLaunched = false;
-	ActivateRagdollArms(true);
-}
-
 void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	if (NotifyName == "EndTourbilol")
 	{
-		FinishRotAnim();
+		IsRotationAnimLaunched = false;
+		ActivateRagdollArms(true);
 	} else if (NotifyName == "EndThrust")
 	{
+		IsThrustAnimLaunched = false;
 		ActivateRagdollArms(true);
 	}
 

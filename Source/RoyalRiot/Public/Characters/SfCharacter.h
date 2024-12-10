@@ -405,8 +405,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Rotation")
 	int NumberOfRotationMadeByStick = 0;
 
-	bool IsRotationAnimLaunched = false;
-
 public:
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int RotationSpeed = 1.f;
@@ -418,13 +416,10 @@ public:
 	float TimeNeededForRotation = 1.f;
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
-	float TimeNeedForThrust = 0.5f;
+	float TimeNeedForThrust = 0.25f;
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int MaxAngleForThrust = 10;
-
-	UFUNCTION(BlueprintCallable)
-	void FinishRotAnim();
 	
 #pragma endregion
 	
@@ -480,6 +475,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRotating;
+
+	UPROPERTY()
+	bool IsRotationAnimLaunched = false;
+
+	UPROPERTY()
+	bool IsThrustAnimLaunched = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* PlumComponent;
