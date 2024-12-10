@@ -171,6 +171,7 @@ void ASfCharacter::BeginPlay()
 	// ActivateRagdollArms();
 
 	DashIndicator = Cast<UIndicatorWidget>(IndixatorWidgetComponent->GetWidget());
+	if (DashIndicator) DashIndicator->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -224,6 +225,7 @@ void ASfCharacter::Tick(float DeltaSeconds)
 		if(DashCooldownTimer <= 0.f)
 		{
 			CanDash = true;
+			if (DashIndicator) DashIndicator->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 	if(CanDash)
@@ -307,6 +309,7 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 	//TriggerDodgeSound.Broadcast();
 	if (!CanDash) return;
 	// Pas ouf de changer de state dans tout les cas
+	if (DashIndicator) DashIndicator->SetVisibility(ESlateVisibility::Visible);
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
 
