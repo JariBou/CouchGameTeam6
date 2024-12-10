@@ -2,6 +2,7 @@
 
 #include "RoyalRiot/Public/Characters/SfCharacter.h"
 
+#include <Chaos/PBDNullConstraints.h>
 #include <Components/WidgetComponent.h>
 #include <Consumables/Consumable.h>
 #include <UI/IndicatorWidget.h>
@@ -41,6 +42,7 @@ void ASfCharacter::OnDelegateStickCircleLate()
 		// TODO play anim montage
 		IsRotationAnimLaunched = true;
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		ActivateRagdollArms(false);
 		if (Sign == 0) Sign = 1;
 		if(Sign >= 0)
 		{
@@ -163,6 +165,8 @@ void ASfCharacter::BeginPlay()
 	// InputRJ = FVector2d(Forward.X, Forward.Y);
 	// InputRJ = FVector2d(GetActorForwardVector().X, GetActorForwardVector().Y);
 	InputRJ = FVector2d(1, 0);
+
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 
 	// ActivateRagdollArms();
 
@@ -355,6 +359,7 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		IsRotationAnimLaunched = true;
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		ActivateRagdollArms(false);
 		if (Sign == 0) Sign = 1;
 		if(Sign >= 0)
 		{
@@ -697,7 +702,7 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh)
 	{
 		GetWorldTimerManager().SetTimerForNextTick([&]
 		{
-			ActivateRagdollArms();
+			ActivateRagdollArms(true);
 			GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
 		});
 	}
@@ -959,6 +964,7 @@ void ASfCharacter::StopFeedBackEffect()
 void ASfCharacter::FinishRotAnim()
 {
 	IsRotationAnimLaunched = false;
+	ActivateRagdollArms(true);
 }
 
 void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)

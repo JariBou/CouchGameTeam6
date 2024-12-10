@@ -254,7 +254,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void ActivateRagdollArms();
+	void ActivateRagdollArms(bool State);
 
 	
 #pragma endregion
