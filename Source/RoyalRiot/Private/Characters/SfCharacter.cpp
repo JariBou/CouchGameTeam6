@@ -323,14 +323,14 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 		float DeltaAngle = FMath::Atan2(InputRJ.Y*TempInputRJValue.X - InputRJ.X*TempInputRJValue.Y, InputRJ.X*TempInputRJValue.X + InputRJ.Y*TempInputRJValue.Y);
 
 		CurrentDeltaMadeByStick += DeltaAngle;
-		NumberOfRotationMadeByStick = int(CurrentDeltaMadeByStick / (2 * PI));
+		NumberOfRotationMadeByStick = static_cast<int>(CurrentDeltaMadeByStick / (2 * PI));
 		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::FromInt(NumberOfRotationMadeByStick));
 		
 		DestinationAngle += DeltaAngle;
 	}
 }
 
-void ASfCharacter::OnDelegateStickCicleThrustEnd()
+void ASfCharacter::OnDelegateStickCircleThrustEnd()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
 	// if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
@@ -346,7 +346,7 @@ void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValu
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
 	TimerDelegateForStickCircleCount.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleLate);
-	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCicleThrustEnd);
+	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleThrustEnd);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleForCircle, TimerDelegateForStickCircleCount, TimeNeededForRotation, false);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleForThrust, TimerDelegateForStickCirlceThrust, TimeNeedForThrust, false);
 }

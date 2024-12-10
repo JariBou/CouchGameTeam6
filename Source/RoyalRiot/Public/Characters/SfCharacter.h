@@ -70,7 +70,7 @@ public:
 	void OnDelegateStickCircleLate();
 
 	UFUNCTION()
-	void OnDelegateStickCicleThrustEnd();
+	void OnDelegateStickCircleThrustEnd();
 
 
 #pragma region CameraFollowTarget
