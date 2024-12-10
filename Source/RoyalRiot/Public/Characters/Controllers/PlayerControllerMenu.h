@@ -23,10 +23,10 @@ public:
 
 
 #pragma region Input Data / Mapping Context
-
+	
 public:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMenuInputData> InputData;
+	TObjectPtr<UMenuInputData> InputData;	
 
 protected:
 	UPROPERTY()
