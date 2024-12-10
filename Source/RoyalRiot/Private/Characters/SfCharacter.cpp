@@ -334,7 +334,12 @@ void ASfCharacter::OnDelegateStickCircleThrustEnd()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
 	// if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
-	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+
+	// TODO: should only be called on joystick cancelation basically
+	
+	ActivateRagdollArms(false);
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+	PlayAnimMontage(LungeAnimMontage);
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForThrust);
 }
 
@@ -535,6 +540,7 @@ void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
 	FRotator NewActorRotator = GetActorRotation();
 	if (PlayerType == Knight)
 	{
+		if (IsRotationAnimLaunched) return;
 		CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
 		float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
 		NewActorRotator = GetActorRotation();
@@ -972,6 +978,9 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 	if (NotifyName == "EndTourbilol")
 	{
 		FinishRotAnim();
+	} else if (NotifyName == "EndThrust")
+	{
+		ActivateRagdollArms(true);
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));

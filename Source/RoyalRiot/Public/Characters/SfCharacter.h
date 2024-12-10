@@ -54,12 +54,6 @@ public:
 	UPROPERTY(EditAnywhere, Category="Materials For Characters")
 	UMaterialInterface* MaterialSTeam2;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> RotationAnimMontage;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
-
 	//Only Niagara Component, used only when niagara decide to exist (je te hais niagara)
 	UPROPERTY()
 	TObjectPtr<UNiagaraComponent> NiagaraComponentOfPlayer;
@@ -489,6 +483,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* PlumComponent;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontage;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> LungeAnimMontage;
 	
 	UFUNCTION()
 	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
