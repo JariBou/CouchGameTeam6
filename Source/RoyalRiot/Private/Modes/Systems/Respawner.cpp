@@ -34,14 +34,19 @@ ASfCharacter* URespawner::StartDeferredRespawn(FRespawnData RespawnData)
 
 ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 {
+	bool HadToFastRespawn = false;
 	if (TeamRespawnDelegateMap.Contains(RespawnData.Team))
 	{
 		// If someone else needs to respawn while someone on the same team is respawning make the other one respawn instantly
 		FQueuedRespawnData QueuedRespawnData = TeamRespawnDelegateMap[RespawnData.Team];
 		GameMode->GetWorldTimerManager().ClearTimer(QueuedRespawnData.TimerHandle);
 		// if (IsValid(QueuedRespawnData.Character)) throw std::invalid_argument("Queued respawn data is invalid");
+		QueuedRespawnData.RespawnData.HadToFastRespawn = true;
+		HadToFastRespawn = true;
 		EndDeferredRespawn(QueuedRespawnData.RespawnData, QueuedRespawnData.Character);
 	}
+
+	GameMode->OnPlayerRespawn.Broadcast(RespawnData.Team, Delay, HadToFastRespawn ? DoNothing : ShowIndicator);
 	
 	ASfCharacter* Character = GetWorld()->SpawnActorDeferred<ASfCharacter>(GameMode->GetSfCharacterBpClass(), /*RespawnPoint + */UTransformUtils::MakeTransformFromLocation(RespawnPoint.GetLocation() + FVector(0, 0, 10000)), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 
@@ -77,6 +82,7 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	//
 	// if (Character->PlayerType == Knight) Character->ActivateRagdollArms();
 
+	GameMode->OnPlayerRespawn.Broadcast(RespawnData.Team, -1.f, RespawnData.HadToFastRespawn ? DoNothing : HideIndicator);
 
 	FTimerHandle NullHandle;
 	Character->GetGameInstance()->GetTimerManager().SetTimer(NullHandle, Character, &ASfCharacter::RemoveInvincibility, CharacterSettings->RespawnInvincibilityTime);

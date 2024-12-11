@@ -63,10 +63,14 @@ class ROYALRIOT_API ASfGameMode : public AGameModeBase
 {
 public:
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTeamScoreChange, ETeam, TeamChanged, int, NewLives); 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTeamScoreChange, ETeam, TeamChanged, int, NewLives);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerRespawn, ETeam, TeamChanged, float, TimerValue, EIndicatorDisplayAction, DisplayAction);
 
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnTeamScoreChange OnTeamScoreChange;
+
+	UPROPERTY(BlueprintAssignable, Category="Event")
+	FOnPlayerRespawn OnPlayerRespawn;
 	
 	ASfGameMode();
 	
@@ -124,6 +128,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TMap<TEnumAsByte<ETeam>, FTeamInfo> TeamMap = {
 	};
+
+	UPROPERTY()
+	UIndicatorWidget* RespawnIndicator;
 
 public:
 	UFUNCTION(BlueprintCallable)
