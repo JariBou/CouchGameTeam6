@@ -2,8 +2,11 @@
 
 #pragma once
 
+#include <UI/IndicatorWidget.h>
+
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
+#include "NiagaraComponent.h"
 #include "SfCharacterStateID.h"
 #include "Teams.h"
 #include "GameFramework/Character.h"
@@ -13,6 +16,8 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+	class UWidgetComponent;
+	class UNiagaraSystem;
 class UBoxComponent;
 class APickable;
 struct FInputActionInstance;
@@ -49,18 +54,17 @@ public:
 	UPROPERTY(EditAnywhere, Category="Materials For Characters")
 	UMaterialInterface* MaterialSTeam2;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> RotationAnimMontage;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
+	//Only Niagara Component, used only when niagara decide to exist (je te hais niagara)
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> NiagaraComponentOfPlayer;
+	UPROPERTY(EditAnywhere, Category="VFX")
+	TObjectPtr<UNiagaraSystem> NSHealth;
 
 	UFUNCTION()
 	void OnDelegateStickCircleLate();
 
 	UFUNCTION()
-	void OnDelegateStickCicleThrustEnd();
-
+	void OnDelegateStickCircleThrustEnd();
 
 
 #pragma region CameraFollowTarget
@@ -97,6 +101,9 @@ private:
 	float CurrentAngle; //Current Yaw Rotation Of Actor
 	float DestinationAngle; //Destination Rotation Based On RightJoystick
 
+	UFUNCTION()
+	void NiagaraSpawn(UNiagaraSystem* NSToUse);
+
 public:
 	/** Constructeur */
 	ASfCharacter();
@@ -111,6 +118,14 @@ public:
 	/**Change Player Type */
 	UFUNCTION(BlueprintCallable, meta=(TypeOfPlayer))
 	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate = false);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* IndixatorWidgetComponent;
+
+	UPROPERTY()
+	UIndicatorWidget* DashIndicator;
+
+	
 protected:
 
 	/** Called for movement input */
@@ -129,7 +144,6 @@ protected:
 
 	virtual void Tick(float DeltaSeconds) override;
 #pragma endregion
-public:
 
 #pragma region Input Data / Mapping Context
 
@@ -234,7 +248,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void ActivateRagdollArms();
+	void ActivateRagdollArms(bool State);
 
 	
 #pragma endregion
@@ -286,7 +300,7 @@ public:
 	void RemoveInvincibility();
 
 	UFUNCTION()
-	void AddHealth(float HealthDelta);
+	void AddHealth(float HealthDelta, bool IsVisual);
 
 	UFUNCTION()
 	void UsedHealingSource();
@@ -298,6 +312,7 @@ public:
 	void SetupHealth(uint8 inMaxHealth);
 
 	void SetInvincibility(bool bCond);
+
 	
 #pragma endregion
 
@@ -390,8 +405,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Rotation")
 	int NumberOfRotationMadeByStick = 0;
 
-	bool IsRotationAnimLaunched = false;
-
 public:
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int RotationSpeed = 1.f;
@@ -403,13 +416,10 @@ public:
 	float TimeNeededForRotation = 1.f;
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
-	float TimeNeedForThrust = 0.5f;
+	float TimeNeedForThrust = 0.25f;
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int MaxAngleForThrust = 10;
-
-	UFUNCTION(BlueprintCallable)
-	void FinishRotAnim();
 	
 #pragma endregion
 	
@@ -466,8 +476,23 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRotating;
 
+	UPROPERTY()
+	bool IsRotationAnimLaunched = false;
+
+	UPROPERTY()
+	bool IsThrustAnimLaunched = false;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* PlumComponent;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontage;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> LungeAnimMontage;
 	
 	UFUNCTION()
 	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);

@@ -16,6 +16,12 @@ APickable::APickable()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseStaticMesh"));
 }
 
+void APickable::DestroyPickable()
+{
+	if (Holder != nullptr) Holder->Drop();
+	Destroy();
+}
+
 // Called when the game starts or when spawned
 void APickable::BeginPlay()
 {
@@ -26,6 +32,12 @@ void APickable::BeginPlay()
 void APickable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(Holder == nullptr && !IsNiagaraOn)
+	{
+		NiagaraDropSystem_Implementation();
+		IsNiagaraOn = true;
+	}
 }
 
 void APickable::Interact_Implementation(ASfCharacter* CouchGameCharacter)
@@ -33,8 +45,8 @@ void APickable::Interact_Implementation(ASfCharacter* CouchGameCharacter)
 	// GEngine->AddOnScreenDebugMessage(-1, 2 , FColor::Purple, TEXT("Interaction With Interface"));
 	if (CouchGameCharacter != nullptr) Holder = CouchGameCharacter;
 	OnPickedUp.Broadcast();
-	
-	NiagaraDropSystem_Implementation();
+	if(IsValid(NiagaraComponentForDrop)) NiagaraComponentForDrop->DeactivateImmediate();
+	IsNiagaraOn = false;	
 }
 
 bool APickable::CanPickUp_Implementation(ASfCharacter* CouchGameCharacter)
@@ -52,6 +64,10 @@ void APickable::NiagaraDropSystem_Implementation()
 		FRotator(0.f),
 		EAttachLocation::Type::SnapToTarget,
 		true);
-	if(IsValid(NiagaraComponentForDrop))	NiagaraComponentForDrop->SetUsingAbsoluteRotation(true);
+	if(IsValid(NiagaraComponentForDrop))
+	{
+		NiagaraComponentForDrop->Activate();
+		NiagaraComponentForDrop->SetUsingAbsoluteRotation(true);
+	}
 }
 

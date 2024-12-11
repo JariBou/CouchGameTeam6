@@ -28,7 +28,7 @@ void APlayerControllerMenu::SetupInputComponent()
 
 	SetInputData(GetDefault<UCharacterSettings>()->GetMenuInputData());
 	
-	BindInputActions();
+	//BindInputActions();
 }
 
 void APlayerControllerMenu::SetInputData(UMenuInputData* NewInputData)
@@ -47,7 +47,7 @@ void APlayerControllerMenu::BindInputActions()
 		
 		EnhancedInputComponent->BindAction(
 			InputData->Navigate,
-			ETriggerEvent::Triggered,
+			ETriggerEvent::Started,
 			this,
 			&APlayerControllerMenu::OnNavigate);
 	}
@@ -79,17 +79,14 @@ void APlayerControllerMenu::BindInputActions()
 
 void APlayerControllerMenu::OnNavigate(const FInputActionValue& InputActionValue)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, "Navigate");
 }
 
 void APlayerControllerMenu::OnConfirm(const FInputActionValue& InputActionValue)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, "Confirm");
 }
 
 void APlayerControllerMenu::OnBack(const FInputActionValue& InputActionValue)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, "Back");
 }
 
 
