@@ -9,6 +9,8 @@
 
 void ULocalMultiplayerSubsystem::CreateAndInitPlayers(ELocalMultiplayerInputMappingType MappingType)
 {
+	InputMappingType = MappingType;
+	
 	const ULocalMultiplayerSettings* LocalMultiplayerSettings = GetDefault<ULocalMultiplayerSettings>();
 
 	for (int i = 0; i < LocalMultiplayerSettings->GetNbKeyboardProfiles() + LocalMultiplayerSettings->nbMaxGamepads; ++i)
@@ -24,7 +26,6 @@ void ULocalMultiplayerSubsystem::CreateAndInitPlayers(ELocalMultiplayerInputMapp
 			// Reassign doode
 			AssignGamepadInputMapping(i, MappingType);
 			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, "Gamepad Profile");
-
 		}
 		else
 		{

@@ -26,20 +26,20 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
 		if (PlayerIndex = LMS->GetAssignedPlayerIndexFromGamepadDeviceID(EventArgs.ControllerId); PlayerIndex == -1)
 		{
 			PlayerIndex = LMS->AssignNewPlayerToGamepadDeviceID(EventArgs.ControllerId);
-			LMS->AssignGamepadInputMapping(PlayerIndex, ELocalMultiplayerInputMappingType::InGame);
+			LMS->AssignGamepadInputMapping(PlayerIndex, LMS->InputMappingType);
 		} else
 		{
-		
+			
 		}
 	} else
 	{
-		const int KeyboardProfileIndex = LocalMultiplayerSettings->FindKeyboardProfilesIndexFromKey(EventArgs.Key, ELocalMultiplayerInputMappingType::InGame);
+		const int KeyboardProfileIndex = LocalMultiplayerSettings->FindKeyboardProfilesIndexFromKey(EventArgs.Key, LMS->InputMappingType);
 		if (KeyboardProfileIndex != -1)
 		{
 			if (PlayerIndex = LMS->GetAssignedPlayerIndexFromKeyboardProfileIndex(KeyboardProfileIndex); PlayerIndex == -1)
 			{
 				PlayerIndex = LMS->AssignNewPlayerToKeyboardProfile(KeyboardProfileIndex);
-				LMS->AssignKeyboardMapping(PlayerIndex, KeyboardProfileIndex, ELocalMultiplayerInputMappingType::InGame);
+				LMS->AssignKeyboardMapping(PlayerIndex, KeyboardProfileIndex, LMS->InputMappingType);
 			} else
 			{
 		
@@ -75,7 +75,7 @@ bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInpu
 	if (PlayerIndex = LMS->GetAssignedPlayerIndexFromGamepadDeviceID(InputDevice.GetId()); PlayerIndex == -1)
 	{
 		PlayerIndex = LMS->AssignNewPlayerToGamepadDeviceID(InputDevice.GetId());
-		LMS->AssignGamepadInputMapping(PlayerIndex, ELocalMultiplayerInputMappingType::InGame);
+		LMS->AssignGamepadInputMapping(PlayerIndex, LMS->InputMappingType);
 	} else
 	{
 		

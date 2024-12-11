@@ -6,6 +6,14 @@
 #include <Blueprint/UserWidget.h>
 #include "IndicatorWidget.generated.h"
 
+UENUM(BlueprintType)
+enum EIndicatorDisplayAction
+{
+	ShowIndicator,
+	HideIndicator,
+	DoNothing
+};
+
 /**
  * 
  */
@@ -15,6 +23,15 @@ class ROYALRIOT_API UIndicatorWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void InitWithValue(float Value);
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateValue(float Value);
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowIndicator();
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void HideIndicator();
 };

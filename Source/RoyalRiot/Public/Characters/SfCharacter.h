@@ -54,12 +54,6 @@ public:
 	UPROPERTY(EditAnywhere, Category="Materials For Characters")
 	UMaterialInterface* MaterialSTeam2;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> RotationAnimMontage;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
-
 	//Only Niagara Component, used only when niagara decide to exist (je te hais niagara)
 	UPROPERTY()
 	TObjectPtr<UNiagaraComponent> NiagaraComponentOfPlayer;
@@ -70,7 +64,7 @@ public:
 	void OnDelegateStickCircleLate();
 
 	UFUNCTION()
-	void OnDelegateStickCicleThrustEnd();
+	void OnDelegateStickCircleThrustEnd();
 
 
 #pragma region CameraFollowTarget
@@ -254,7 +248,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void ActivateRagdollArms();
+	void ActivateRagdollArms(bool State);
 
 	
 #pragma endregion
@@ -411,8 +405,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Rotation")
 	int NumberOfRotationMadeByStick = 0;
 
-	bool IsRotationAnimLaunched = false;
-
 public:
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int RotationSpeed = 1.f;
@@ -424,13 +416,10 @@ public:
 	float TimeNeededForRotation = 1.f;
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
-	float TimeNeedForThrust = 0.5f;
+	float TimeNeedForThrust = 0.25f;
 
 	UPROPERTY(EditAnywhere, Category="Rotation")
 	int MaxAngleForThrust = 10;
-
-	UFUNCTION(BlueprintCallable)
-	void FinishRotAnim();
 	
 #pragma endregion
 	
@@ -487,8 +476,23 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRotating;
 
+	UPROPERTY()
+	bool IsRotationAnimLaunched = false;
+
+	UPROPERTY()
+	bool IsThrustAnimLaunched = false;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* PlumComponent;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontage;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RotationAnimMontageRevert;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> LungeAnimMontage;
 	
 	UFUNCTION()
 	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);

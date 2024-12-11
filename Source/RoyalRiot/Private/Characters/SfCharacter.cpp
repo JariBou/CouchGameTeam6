@@ -2,6 +2,7 @@
 
 #include "RoyalRiot/Public/Characters/SfCharacter.h"
 
+#include <Chaos/PBDNullConstraints.h>
 #include <Components/WidgetComponent.h>
 #include <Consumables/Consumable.h>
 #include <UI/IndicatorWidget.h>
@@ -41,6 +42,7 @@ void ASfCharacter::OnDelegateStickCircleLate()
 		// TODO play anim montage
 		IsRotationAnimLaunched = true;
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		ActivateRagdollArms(false);
 		if (Sign == 0) Sign = 1;
 		if(Sign >= 0)
 		{
@@ -164,9 +166,12 @@ void ASfCharacter::BeginPlay()
 	// InputRJ = FVector2d(GetActorForwardVector().X, GetActorForwardVector().Y);
 	InputRJ = FVector2d(1, 0);
 
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ASfCharacter::OnAnimMontageNotify);
+
 	// ActivateRagdollArms();
 
 	DashIndicator = Cast<UIndicatorWidget>(IndixatorWidgetComponent->GetWidget());
+	if (DashIndicator) DashIndicator->HideIndicator();
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -220,6 +225,7 @@ void ASfCharacter::Tick(float DeltaSeconds)
 		if(DashCooldownTimer <= 0.f)
 		{
 			CanDash = true;
+			if (DashIndicator) DashIndicator->HideIndicator();
 		}
 	}
 	if(CanDash)
@@ -303,6 +309,7 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 	//TriggerDodgeSound.Broadcast();
 	if (!CanDash) return;
 	// Pas ouf de changer de state dans tout les cas
+	if (DashIndicator) DashIndicator->ShowIndicator();
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
 
@@ -319,30 +326,37 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 		float DeltaAngle = FMath::Atan2(InputRJ.Y*TempInputRJValue.X - InputRJ.X*TempInputRJValue.Y, InputRJ.X*TempInputRJValue.X + InputRJ.Y*TempInputRJValue.Y);
 
 		CurrentDeltaMadeByStick += DeltaAngle;
-		NumberOfRotationMadeByStick = int(CurrentDeltaMadeByStick / (2 * PI));
+		NumberOfRotationMadeByStick = static_cast<int>(CurrentDeltaMadeByStick / (2 * PI));
 		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::FromInt(NumberOfRotationMadeByStick));
 		
 		DestinationAngle += DeltaAngle;
 	}
 }
 
-void ASfCharacter::OnDelegateStickCicleThrustEnd()
+void ASfCharacter::OnDelegateStickCircleThrustEnd()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
 	// if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
-	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+
+	// TODO: should only be called on joystick cancelation basically, Or should it?
+	if (!IsThrustAnimLaunched)
+	{
+		ActivateRagdollArms(false);
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+		PlayAnimMontage(LungeAnimMontage);
+	}
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForThrust);
 }
 
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
 {
 	CurrentDeltaMadeByStick = 0.f;
-	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
+	// IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
 	TimerDelegateForStickCircleCount.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleLate);
-	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCicleThrustEnd);
+	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleThrustEnd);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleForCircle, TimerDelegateForStickCircleCount, TimeNeededForRotation, false);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleForThrust, TimerDelegateForStickCirlceThrust, TimeNeedForThrust, false);
 }
@@ -355,6 +369,7 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		IsRotationAnimLaunched = true;
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		ActivateRagdollArms(false);
 		if (Sign == 0) Sign = 1;
 		if(Sign >= 0)
 		{
@@ -530,6 +545,7 @@ void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
 	FRotator NewActorRotator = GetActorRotation();
 	if (PlayerType == Knight)
 	{
+		if (IsRotationAnimLaunched) return;
 		CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
 		float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
 		NewActorRotator = GetActorRotation();
@@ -697,7 +713,7 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh)
 	{
 		GetWorldTimerManager().SetTimerForNextTick([&]
 		{
-			ActivateRagdollArms();
+			ActivateRagdollArms(true);
 			GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
 		});
 	}
@@ -956,16 +972,16 @@ void ASfCharacter::StopFeedBackEffect()
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
 }
 
-void ASfCharacter::FinishRotAnim()
-{
-	IsRotationAnimLaunched = false;
-}
-
 void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	if (NotifyName == "EndTourbilol")
 	{
-		FinishRotAnim();
+		IsRotationAnimLaunched = false;
+		ActivateRagdollArms(true);
+	} else if (NotifyName == "EndThrust")
+	{
+		IsThrustAnimLaunched = false;
+		ActivateRagdollArms(true);
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));

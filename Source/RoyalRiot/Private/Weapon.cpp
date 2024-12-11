@@ -21,7 +21,7 @@ void AWeapon::BeginPlay()
 	FWeaponInfo* row = Weapon.DataTable->FindRow<FWeaponInfo>(Weapon.RowName, "");
 	if (row == nullptr)
 	{
-		Destroy();
+		DestroyPickable();
 		return;
 	}
 	SetCurrentData(*row);
@@ -37,7 +37,7 @@ void AWeapon::Tick(float DeltaTime)
 		if (Life < 0)
 		{
 			Life = 0;
-			Destroy();
+			DestroyPickable();
 		}
 	}
 
@@ -68,8 +68,7 @@ void AWeapon::DealtDamage()
 	
 	if (Durability <= 0)
 	{
-		Holder->Drop();
-		Destroy();
+		DestroyPickable();
 	}
 }
 
@@ -92,8 +91,7 @@ bool AWeapon::DealDamage(ASfCharacter* Target)
 
 	if (Durability <= 0)
 	{
-		if(IsValid(Holder)) Holder->Drop();
-		Destroy();
+		DestroyPickable();
 	}
 	return true;
 }

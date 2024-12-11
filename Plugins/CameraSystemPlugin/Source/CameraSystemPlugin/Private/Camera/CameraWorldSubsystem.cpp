@@ -44,8 +44,8 @@ void UCameraWorldSubsystem::TickUpdateCameraZoom(float DeltaTime)
 	
 	FVector AveragePositionBetweenTargets = CalculateAveragePositionBetweenTargets();
 
-	float AverageXDisplacement = (AveragePositionBetweenTargets.X - CameraZoomYMaxLoc.X) * CameraPluginSettings->CameraXOffsetZoomStrength;
-	
+	float AverageXDisplacement = -1*(AveragePositionBetweenTargets.X - CameraZoomYMinLoc.X) * CameraPluginSettings->CameraXOffsetZoomStrength;
+	if (AverageXDisplacement <= 0) AverageXDisplacement = 0; 
 	float MaxDistance = FMath::Max(GreatestDistanceBetweenTargets, AverageXDisplacement);
 
 	float InvLerp = FMath::GetRangePct(CameraPluginSettings->CameraZoomDistanceBetweenTargetsMin, CameraPluginSettings->CameraZoomDistanceBetweenTargetsMax, MaxDistance);
