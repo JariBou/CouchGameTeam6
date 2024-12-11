@@ -199,7 +199,7 @@ void ASfCharacter::Tick(float DeltaSeconds)
 
 	if(IsUnderInvincibilityTime)
 	{
-		GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 0.f);
+		GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 0.f); // Necessarily for Fader To Work
 		InvisibilityAdvancement += DeltaSeconds;
 		float InvisibilityVfxValue = FMath::Clamp(1.f - FMath::Abs(FMath::Sin(InvisibilityAdvancement * PI * 2)),0.5f , 1.f);
 		GetMesh()->SetScalarParameterValueOnMaterials("Fader", InvisibilityVfxValue);
