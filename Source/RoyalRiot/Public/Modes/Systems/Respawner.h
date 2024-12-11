@@ -25,6 +25,9 @@ struct FRespawnData
 
 	UPROPERTY()
 	TEnumAsByte<TypeOfPlayer> TypeOfPlayer = Squire;
+	
+	UPROPERTY()
+	bool HadToFastRespawn = false;
 };
 
 USTRUCT(BlueprintType)

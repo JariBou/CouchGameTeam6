@@ -2,7 +2,10 @@
 
 #include "RoyalRiot/Public/Characters/SfCharacter.h"
 
+#include <Chaos/PBDNullConstraints.h>
+#include <Components/WidgetComponent.h>
 #include <Consumables/Consumable.h>
+#include <UI/IndicatorWidget.h>
 
 #include "Engine/LocalPlayer.h"
 #include "Components/CapsuleComponent.h"
@@ -12,6 +15,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Pickable.h"
 #include "Camera/CameraWorldSubsystem.h"
 #include "Characters/CharacterSettings.h"
@@ -38,6 +42,7 @@ void ASfCharacter::OnDelegateStickCircleLate()
 		// TODO play anim montage
 		IsRotationAnimLaunched = true;
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		ActivateRagdollArms(false);
 		if (Sign == 0) Sign = 1;
 		if(Sign >= 0)
 		{
@@ -62,6 +67,19 @@ FVector ASfCharacter::GetFollowTarget()
 bool ASfCharacter::IsFollowable()
 {
 	return Health > 0;
+}
+
+void ASfCharacter::NiagaraSpawn(UNiagaraSystem* NSToUse)
+{
+	NiagaraComponentOfPlayer = UNiagaraFunctionLibrary::SpawnSystemAttached(
+	NSToUse,
+	GetMesh(),
+	NAME_None,
+	FVector(0.f,0.f,0.f),
+	FRotator(0.f),
+	EAttachLocation::Type::SnapToTarget,
+	true);
+	if(IsValid(NiagaraComponentOfPlayer))	NiagaraComponentOfPlayer->SetUsingAbsoluteRotation(true);
 }
 
 ASfCharacter::ASfCharacter()
@@ -102,6 +120,9 @@ ASfCharacter::ASfCharacter()
 
 	PlumComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PlumComponent"));
 	PlumComponent->SetupAttachment(GetMesh(), "Head");
+
+	IndixatorWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("DashIndicator"));
+	IndixatorWidgetComponent->SetupAttachment(RootComponent);
 
 	PhysicalAnimationComponent = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("PhysicalAnimationComponent"));
 
@@ -145,7 +166,12 @@ void ASfCharacter::BeginPlay()
 	// InputRJ = FVector2d(GetActorForwardVector().X, GetActorForwardVector().Y);
 	InputRJ = FVector2d(1, 0);
 
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &ASfCharacter::OnAnimMontageNotify);
+
 	// ActivateRagdollArms();
+
+	DashIndicator = Cast<UIndicatorWidget>(IndixatorWidgetComponent->GetWidget());
+	if (DashIndicator) DashIndicator->HideIndicator();
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -180,7 +206,8 @@ void ASfCharacter::Tick(float DeltaSeconds)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 0.f);
 		InvisibilityAdvancement += DeltaSeconds;
-		GetMesh()->SetScalarParameterValueOnMaterials("Invisibility", FMath::Clamp(FMath::Sin(InvisibilityAdvancement * PI),0.f , 1.f));
+		float InvisibilityVfxValue = FMath::Clamp(1.f - FMath::Abs(FMath::Sin(InvisibilityAdvancement * PI * 2)),0.5f , 1.f);
+		GetMesh()->SetScalarParameterValueOnMaterials("Fader", InvisibilityVfxValue);
 	}
 
 	
@@ -189,11 +216,16 @@ void ASfCharacter::Tick(float DeltaSeconds)
 
 	if(DashCooldownTimer > 0.f && !CanDash)
 	{
+		if(DashIndicator)
+		{
+			DashIndicator->UpdateValue(FMath::Clamp(1- DashCooldownTimer/DashCooldown, 0.f, 1.f));
+		}
 		DashCooldownTimer -= DeltaSeconds;
 		
 		if(DashCooldownTimer <= 0.f)
 		{
 			CanDash = true;
+			if (DashIndicator) DashIndicator->HideIndicator();
 		}
 	}
 	if(CanDash)
@@ -277,6 +309,7 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 	//TriggerDodgeSound.Broadcast();
 	if (!CanDash) return;
 	// Pas ouf de changer de state dans tout les cas
+	if (DashIndicator) DashIndicator->ShowIndicator();
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
 }
 
@@ -293,30 +326,37 @@ void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
 		float DeltaAngle = FMath::Atan2(InputRJ.Y*TempInputRJValue.X - InputRJ.X*TempInputRJValue.Y, InputRJ.X*TempInputRJValue.X + InputRJ.Y*TempInputRJValue.Y);
 
 		CurrentDeltaMadeByStick += DeltaAngle;
-		NumberOfRotationMadeByStick = int(CurrentDeltaMadeByStick / (2 * PI));
+		NumberOfRotationMadeByStick = static_cast<int>(CurrentDeltaMadeByStick / (2 * PI));
 		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::FromInt(NumberOfRotationMadeByStick));
 		
 		DestinationAngle += DeltaAngle;
 	}
 }
 
-void ASfCharacter::OnDelegateStickCicleThrustEnd()
+void ASfCharacter::OnDelegateStickCircleThrustEnd()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::SanitizeFloat(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)));
 	// if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
-	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+
+	// TODO: should only be called on joystick cancelation basically, Or should it?
+	if (!IsThrustAnimLaunched)
+	{
+		ActivateRagdollArms(false);
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
+		PlayAnimMontage(LungeAnimMontage);
+	}
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleForThrust);
 }
 
 void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValue)
 {
 	CurrentDeltaMadeByStick = 0.f;
-	IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
+	// IsRotationAnimLaunched = false; //TO CHANGE IN ANIM 
 	FTimerDelegate TimerDelegateForStickCircleCount;
 	FTimerDelegate TimerDelegateForStickCirlceThrust;
 	// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Début Stick"));
 	TimerDelegateForStickCircleCount.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleLate);
-	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCicleThrustEnd);
+	TimerDelegateForStickCirlceThrust.BindUObject<ASfCharacter>(this, &ASfCharacter::OnDelegateStickCircleThrustEnd);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleForCircle, TimerDelegateForStickCircleCount, TimeNeededForRotation, false);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleForThrust, TimerDelegateForStickCirlceThrust, TimeNeedForThrust, false);
 }
@@ -329,6 +369,7 @@ void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
 		IsRotationAnimLaunched = true;
 		int Sign = FMath::Sign(NumberOfRotationMadeByStick);
+		ActivateRagdollArms(false);
 		if (Sign == 0) Sign = 1;
 		if(Sign >= 0)
 		{
@@ -504,6 +545,7 @@ void ASfCharacter::ManageCharacterRotation(float DeltaSeconds)
 	FRotator NewActorRotator = GetActorRotation();
 	if (PlayerType == Knight)
 	{
+		if (IsRotationAnimLaunched) return;
 		CurrentAngle = FMath::Lerp(CurrentAngle, DestinationAngle, DeltaSeconds * RotationSpeed);
 		float ActorConvertedAngle = FMath::RadiansToDegrees(CurrentAngle) + 90.f;
 		NewActorRotator = GetActorRotation();
@@ -583,6 +625,7 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 	if(CanBeDamagedCustom())
 	{
 		IsUnderInvincibilityTime = true;
+		InvisibilityAdvancement = 0.f;
 		TriggerTakeDamageSound.Broadcast();
 
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Player Takes Damage");
@@ -591,7 +634,7 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		DmgRedAdvancement = 0.f;
 		
 		//Health -= Amount;
-		AddHealth(-Amount);
+		AddHealth(-Amount, false);
 		OnHealthValueChange.Broadcast(this);
 
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
@@ -631,13 +674,15 @@ void ASfCharacter::RemoveInvincibility()
 	IsUnderInvincibilityTime = false;
 	//Reset Dissolve Mask
 	GetMesh()->SetScalarParameterValueOnMaterials("Dissolve", 10.f);
+	GetMesh()->SetScalarParameterValueOnMaterials("Fader", 1.f);
 }
 
-void ASfCharacter::AddHealth(float HealthDelta)
+void ASfCharacter::AddHealth(float HealthDelta, bool IsVisual)
 {
 	Health += HealthDelta;
 	Health = FMath::Clamp(Health, -1.f, MaxHealth);
 	OnHealthValueChange.Broadcast(this);
+	if(IsVisual && IsValid(NSHealth)) NiagaraSpawn(NSHealth); 
 }
 
 void ASfCharacter::UsedHealingSource()
@@ -668,7 +713,7 @@ void ASfCharacter::ChangeSkeletalMesh(USkeletalMesh* SkeletalMesh)
 	{
 		GetWorldTimerManager().SetTimerForNextTick([&]
 		{
-			ActivateRagdollArms();
+			ActivateRagdollArms(true);
 			GetMesh()->SetAnimClass(GetDefault<UCharacterSettings>()->CharacterInputDatas[PlayerType].AnimBlueprint);
 		});
 	}
@@ -844,6 +889,7 @@ APickable* ASfCharacter::Drop()
 	TimerDelegateForHandCollision.BindUObject<ASfCharacter>(this, &ASfCharacter::OnPickableCollisionTimeout, DroppedPickable);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegateForHandCollision, TimerForObjectCollisionWithPlayer, false);
 	// LastPickable = DroppedPickable;
+	CurrentPickable->Holder = nullptr;
 	CurrentPickable = nullptr;
 	return DroppedPickable;
 }
@@ -926,16 +972,16 @@ void ASfCharacter::StopFeedBackEffect()
 	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
 }
 
-void ASfCharacter::FinishRotAnim()
-{
-	IsRotationAnimLaunched = false;
-}
-
 void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	if (NotifyName == "EndTourbilol")
 	{
-		FinishRotAnim();
+		IsRotationAnimLaunched = false;
+		ActivateRagdollArms(true);
+	} else if (NotifyName == "EndThrust")
+	{
+		IsThrustAnimLaunched = false;
+		ActivateRagdollArms(true);
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));

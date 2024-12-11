@@ -37,7 +37,7 @@ void ASteak::EffectOnPlayer(UPrimitiveComponent* Comp, AActor* Char, UPrimitiveC
 
 	if (Player == nullptr) return;
 	
-	Player->AddHealth(HealthToAdd);
+	Player->AddHealth(HealthToAdd, true);
 	Player->UsedHealingSource();
 
 	this->Destroy();
@@ -48,7 +48,7 @@ void ASteak::GetConsumedBy(ASfCharacter* Consumer)
 	Super::GetConsumedBy(Consumer);
 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Consumed");
 	if (Consumer == nullptr) return;
-	Consumer->AddHealth(HealthToAdd);
+	Consumer->AddHealth(HealthToAdd, true);
 	this->Destroy();
 }
 
