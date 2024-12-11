@@ -28,7 +28,7 @@ void APlayerControllerMenu::SetupInputComponent()
 
 	SetInputData(GetDefault<UCharacterSettings>()->GetMenuInputData());
 	
-	BindInputActions();
+	//BindInputActions();
 }
 
 void APlayerControllerMenu::SetInputData(UMenuInputData* NewInputData)
@@ -47,7 +47,7 @@ void APlayerControllerMenu::BindInputActions()
 		
 		EnhancedInputComponent->BindAction(
 			InputData->Navigate,
-			ETriggerEvent::Triggered,
+			ETriggerEvent::Started,
 			this,
 			&APlayerControllerMenu::OnNavigate);
 	}
