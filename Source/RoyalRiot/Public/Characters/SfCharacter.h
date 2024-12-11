@@ -121,9 +121,18 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* IndixatorWidgetComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* PcWidgetComponent;
 
 	UPROPERTY()
 	UIndicatorWidget* DashIndicator;
+	
+	UPROPERTY()
+	UIndicatorWidget* PcIndicator;
+
+	UPROPERTY(EditAnywhere)
+	TMap<TEnumAsByte<TypeOfPlayer>, float> ControllerDisplayZOffset;
 
 	
 protected:

@@ -123,6 +123,9 @@ ASfCharacter::ASfCharacter()
 
 	IndixatorWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("DashIndicator"));
 	IndixatorWidgetComponent->SetupAttachment(RootComponent);
+	
+	PcWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("PlayerControllerIndicator"));
+	PcWidgetComponent->SetupAttachment(RootComponent);
 
 	PhysicalAnimationComponent = CreateDefaultSubobject<UPhysicalAnimationComponent>(TEXT("PhysicalAnimationComponent"));
 
@@ -172,6 +175,12 @@ void ASfCharacter::BeginPlay()
 
 	DashIndicator = Cast<UIndicatorWidget>(IndixatorWidgetComponent->GetWidget());
 	if (DashIndicator) DashIndicator->HideIndicator();
+
+	PcIndicator = Cast<UIndicatorWidget>(PcWidgetComponent->GetWidget());
+	if (PcIndicator) PcIndicator->InitWithValue(UGameplayStatics::GetPlayerControllerID(Cast<APlayerController>(GetController())));
+	
+	FVector PcWidgetComponentRelativeLocation = PcWidgetComponent->GetRelativeLocation();
+	PcWidgetComponent->SetRelativeLocation(FVector(PcWidgetComponentRelativeLocation.X, PcWidgetComponentRelativeLocation.Y, ControllerDisplayZOffset[PlayerType]));
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -1012,6 +1021,9 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool
 		// 	ActivateRagdollArms();
 		// });
 	}
+
+	FVector PcWidgetComponentRelativeLocation = PcWidgetComponent->GetRelativeLocation();
+	PcWidgetComponent->SetRelativeLocation(FVector(PcWidgetComponentRelativeLocation.X, PcWidgetComponentRelativeLocation.Y, ControllerDisplayZOffset[TypeOfPlayer]));
 	
 	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
 	BindInputMoveAndActions();
