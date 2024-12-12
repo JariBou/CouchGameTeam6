@@ -365,6 +365,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Hurtbox")
 	TObjectPtr<UBoxComponent> CollisionForPlayer;
 
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UUserWidget> FeedbackWidget;
+
+	UFUNCTION(BlueprintCallable)
+	void SetFeedbackWidget(UUserWidget* NewFeedbackWidget);
+
 	// UPROPERTY()
 	// TArray<AActor*> ListOfActorFromCollision;
 	

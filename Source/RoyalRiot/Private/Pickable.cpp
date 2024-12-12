@@ -16,6 +16,19 @@ APickable::APickable()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseStaticMesh"));
 }
 
+void APickable::SetFeedbackWidget(UUserWidget* NewFeedbackWidget)
+{
+	if(FeedbackWidget == nullptr)
+	{
+		FeedbackWidget = NewFeedbackWidget;
+	}
+	else
+	{
+		FeedbackWidget->RemoveFromParent();
+		FeedbackWidget = NewFeedbackWidget;
+	}
+}
+
 void APickable::DestroyPickable()
 {
 	if (Holder != nullptr) Holder->Drop();
