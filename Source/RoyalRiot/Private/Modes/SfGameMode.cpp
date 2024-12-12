@@ -92,6 +92,7 @@ void ASfGameMode::BeginPlay()
 			//Assign teams after selection
 			const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromId(i);
 			NewCharacter->PlayerTeam = SelectionInfo.PlayerTeam;
+			NewCharacter->PlayerType = Squire;
 
 			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), SelectionInfo.ControllerId);
 			// Possess after finishing spawn IMO
@@ -101,6 +102,7 @@ void ASfGameMode::BeginPlay()
 		//Assign teams after selection
 		const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromId(i);
 		NewCharacter->PlayerTeam = SelectionInfo.PlayerTeam;
+		NewCharacter->PlayerType = Squire;
 
 		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), SelectionInfo.ControllerId);
 		// Possess after finishing spawn IMO
@@ -123,6 +125,9 @@ void ASfGameMode::BeginPlay()
 		TeamMap[Team1].SelectRandomKnight();
 		TeamMap[Team2].SelectRandomKnight();
 	}
+	#else
+	TeamMap[Team1].SelectRandomKnight();
+	TeamMap[Team2].SelectRandomKnight();
 	#endif
 
 
