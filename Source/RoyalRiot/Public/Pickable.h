@@ -13,7 +13,7 @@ class ANiagaraActor;
 class UNiagaraSystem;
 class UNiagaraComponent;
 
-UCLASS()
+UCLASS(BlueprintType)
 class ROYALRIOT_API APickable : public AActor, public IInteractions
 {
 	GENERATED_BODY()
@@ -26,6 +26,12 @@ public:
 
 	UPROPERTY()
 	FOnPickedUp OnPickedUp;
+	
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UUserWidget> FeedbackWidget;
+
+	UFUNCTION(BlueprintCallable)
+	void SetFeedbackWidget(UUserWidget* NewFeedbackWidget);
 
 	UFUNCTION(BlueprintCallable)
 	void DestroyPickable();

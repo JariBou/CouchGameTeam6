@@ -924,6 +924,9 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 				IsCarrying = true;
 				CurrentPickable = Pickable;
 
+					Pickable->FeedbackWidget->RemoveFromParent();
+					Pickable->FeedbackWidget = nullptr;
+				
 				AWaterBucket* WaterBucket = Cast<AWaterBucket>(Pickable);
 				if(WaterBucket != nullptr)
 				{
@@ -938,8 +941,11 @@ void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 {
 	if(FriendlyKnight != nullptr)
 	{
+		FriendlyKnight->FeedbackWidget->RemoveFromParent();
+		CurrentPickable->FeedbackWidget = nullptr;
+		
 		APickable* DroppedPickable = Drop(); //Lache Son Arme
-
+		
 		if (AConsumable* Consumable = Cast<AConsumable>(DroppedPickable); Consumable != nullptr)
 		{
 			Consumable->GetConsumedBy(FriendlyKnight);
@@ -953,6 +959,7 @@ void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 		TriggerDropSound.Broadcast();
 		FriendlyKnight->PickupObject(DroppedPickable, true); //Met l'arme dans sa main
 		
+		
 		const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 		FTimerHandle NullHandle;
 		GetGameInstance()->GetTimerManager().SetTimer(NullHandle, this, &ASfCharacter::RemoveInvincibility, Settings->InvincibilityTimeAfterGive);
@@ -963,6 +970,19 @@ void ASfCharacter::Interact()
 {
 	Drop();
 	//Interaction Event sur Puit a coder
+}
+
+void ASfCharacter::SetFeedbackWidget(UUserWidget* NewFeedbackWidget)
+{
+	if(FeedbackWidget == nullptr)
+	{
+		FeedbackWidget = NewFeedbackWidget;
+	}
+	else
+	{
+		FeedbackWidget->RemoveFromParent();
+		FeedbackWidget = NewFeedbackWidget;
+	}
 }
 
 #pragma endregion
