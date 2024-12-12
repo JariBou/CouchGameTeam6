@@ -55,7 +55,8 @@ void ASfGameMode::BeginPlay()
 		
 
 		
-	
+		NewCharacter->AutoPossessPlayer = EAutoReceiveInput::Type::Disabled;
+
 
 		// Remove autoposses
 		// RemoveSetting player type in here, handled by DesignRandomKnight()

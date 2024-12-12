@@ -187,7 +187,7 @@ void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	if (IsCarrying) Drop();
+	if (IsCarrying) CurrentPickable->Destroy();
 	
 	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.RemoveDynamic(this, &ASfCharacter::OnAnimMontageNotify);
 
