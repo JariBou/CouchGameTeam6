@@ -35,7 +35,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 void ASfCharacter::OnDelegateStickCircleLate()
 {
-	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded)
+	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && !IsThrustAnimLaunched && !IsRotationAnimLaunched)
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
@@ -348,7 +348,7 @@ void ASfCharacter::OnDelegateStickCircleThrustEnd()
 	// if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
 
 	// TODO: should only be called on joystick cancelation basically, Or should it?
-	if (!IsThrustAnimLaunched)
+	if (!IsThrustAnimLaunched && !IsRotationAnimLaunched)
 	{
 		ActivateRagdollArms(false);
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
@@ -372,7 +372,7 @@ void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValu
 
 void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 {
-	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && IsRotationAnimLaunched == false)
+	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && !IsRotationAnimLaunched && !IsThrustAnimLaunched)
 	{
 		// Réussite du stick toupie lol
 		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
@@ -1001,7 +1001,8 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 // Input
 void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate)
 {
-	// if (!ForceUpdate && PlayerType == TypeOfPlayer) return;
+	// if (!ForceUpdate && PlayerType == TypeOfPlayer) return; // No Bloody clue as to why this doesn't work as expected
+	TEnumAsByte<::TypeOfPlayer> FormerPlayerType = PlayerType;
 	PlayerType = TypeOfPlayer;
 	const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();
 	FCharacterSettingsData CharacterSettingsData = Settings->CharacterInputDatas[TypeOfPlayer];
@@ -1013,7 +1014,7 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool
 	
 	if (TypeOfPlayer == Knight)
 	{
-		if (IsCarrying) Drop();
+		if (FormerPlayerType == Squire && IsCarrying) Drop();
 		
 		// ActivateRagdollArms();
 		// GetWorldTimerManager().SetTimerForNextTick([&]

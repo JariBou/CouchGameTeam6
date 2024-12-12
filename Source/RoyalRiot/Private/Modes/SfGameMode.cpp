@@ -14,6 +14,8 @@
 
 ASfGameMode::ASfGameMode()
 {
+	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ASfGameMode::BeginPlay()
@@ -51,22 +53,17 @@ void ASfGameMode::BeginPlay()
 		ASfCharacter* NewCharacter = GetWorld()->SpawnActorDeferred<ASfCharacter>(SfCharacterBpClass,SpawnPoint->GetTransform());
 		if (NewCharacter == nullptr) continue;
 		
-		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
 
-		/*
-		//Assign teams after selection
-		const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromArray(i);
-		SelectionInfo.PlayerTeam;
-
-		// Possess after finishing spawn IMO
-		SelectionInfo.PlayerController->Possess(NewCharacter);
+		
+	
 
 		// Remove autoposses
 		// RemoveSetting player type in here, handled by DesignRandomKnight()
-		*/
-
+		#if UE_EDITOR
+		
 		if (CharacterSettings->UseDefaultSpawnInfo)
 		{
+			NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
 			if (!CharacterSettings->DefaultSpawnInfo.Contains(i)) continue;
 			switch (CharacterSettings->DefaultSpawnInfo[i])
 			{
@@ -92,12 +89,25 @@ void ASfGameMode::BeginPlay()
 			}
 		} else
 		{
-			ETeam NewPlayerTeam = i%2 > 0 ? Team2 : Team1;
-			NewCharacter->PlayerTeam = NewPlayerTeam;
+			//Assign teams after selection
+			const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromId(i);
+			NewCharacter->PlayerTeam = SelectionInfo.PlayerTeam;
 
-			TypeOfPlayer TypeOfPlayer = /*i/2 > 0 ? Knight :*/ Squire;
-			NewCharacter->PlayerType = TypeOfPlayer;
-		}		
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), SelectionInfo.ControllerId);
+			// Possess after finishing spawn IMO
+			PlayerController->Possess(NewCharacter);
+		}	
+		#else
+		//Assign teams after selection
+		const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromId(i);
+		NewCharacter->PlayerTeam = SelectionInfo.PlayerTeam;
+
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), SelectionInfo.ControllerId);
+		// Possess after finishing spawn IMO
+		PlayerController->Possess(NewCharacter);
+		#endif
+		
+			
 
 		TeamMap[NewCharacter->PlayerTeam].AddPlayer(NewCharacter);
 		NewCharacter->ChangePlayerType(NewCharacter->PlayerType);
@@ -107,11 +117,13 @@ void ASfGameMode::BeginPlay()
 		i++;
 	}
 
+	#if UE_EDITOR
 	if (!CharacterSettings->UseDefaultSpawnInfo)
 	{
 		TeamMap[Team1].SelectRandomKnight();
 		TeamMap[Team2].SelectRandomKnight();
 	}
+	#endif
 
 
 	Respawner = NewObject<URespawner>(this, URespawner::StaticClass());
