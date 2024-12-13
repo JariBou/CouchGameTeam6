@@ -52,6 +52,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float Duration = 0.f;
 
+	UPROPERTY(EditAnywhere)
+	float SizeMin = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float SizeMax = 0.f;
+
 public:
 	void SetDuration(float inDuration);
 
