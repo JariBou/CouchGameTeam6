@@ -71,7 +71,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnPlayerRespawn OnPlayerRespawn;
-	
+
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UWorld> MainMenuLevel;
+
 	ASfGameMode();
 	
 	UFUNCTION(BlueprintCallable)

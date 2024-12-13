@@ -119,20 +119,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(TypeOfPlayer))
 	void ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate = false);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWidgetComponent* IndixatorWidgetComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWidgetComponent* PcWidgetComponent;
-
-	UPROPERTY()
-	UIndicatorWidget* DashIndicator;
-	
-	UPROPERTY()
-	UIndicatorWidget* PcIndicator;
-
-	UPROPERTY(EditAnywhere)
-	TMap<TEnumAsByte<TypeOfPlayer>, float> ControllerDisplayZOffset;
 
 	
 protected:
@@ -482,7 +469,7 @@ public:
 	
 #pragma endregion 
 
-#pragma region Animations
+#pragma region Animations & display
 
 	public:
 	UPROPERTY(BlueprintReadOnly)
@@ -511,6 +498,24 @@ public:
 	
 	UFUNCTION()
 	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* IndixatorWidgetComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* PcWidgetComponent;
+
+	UPROPERTY()
+	UIndicatorWidget* DashIndicator;
+	
+	UPROPERTY()
+	UIndicatorWidget* PcIndicator;
+
+	UPROPERTY(EditAnywhere)
+	TMap<TEnumAsByte<TypeOfPlayer>, float> ControllerDisplayZOffset;
+
+	UFUNCTION()
+	void UpdateControllerIdDisplay(int ControllerId);
 
 	#pragma endregion
 };

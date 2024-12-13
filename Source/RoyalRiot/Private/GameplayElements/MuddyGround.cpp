@@ -23,6 +23,10 @@ void AMuddyGround::BeginPlay()
 
 	TObjectPtr<UStaticMeshComponent> MuddyGroundMesh = Cast<UStaticMeshComponent>(ComponentToGet);
 
+	int RandomArrayIndex = FMath::RandRange(0, StaticMeshArray.Max() - 1);
+	
+	MuddyGroundMesh->SetStaticMesh(StaticMeshArray[RandomArrayIndex]);
+	
 	if(MuddyGroundMesh != nullptr)
 	{
 		MuddyGroundMesh->OnComponentBeginOverlap.AddDynamic(this, &AMuddyGround::BeginOverlap);

@@ -40,6 +40,8 @@ public:
 	void BeginDestroy() override;
 	
 protected:
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<UStaticMesh>> StaticMeshArray;
 	
 	UPROPERTY(EditAnywhere)
 	float SlowPercent = 0.f;

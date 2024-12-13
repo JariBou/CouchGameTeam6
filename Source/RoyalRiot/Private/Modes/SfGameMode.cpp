@@ -217,6 +217,7 @@ bool ASfGameMode::CheckEndOfGame()
 void ASfGameMode::OnEndOfGame()
 {
 	// TODO: Clément
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), MainMenuLevel);
 }
 
 void ASfGameMode::CreateAndInitPlayers() const

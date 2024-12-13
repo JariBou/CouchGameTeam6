@@ -177,7 +177,8 @@ void ASfCharacter::BeginPlay()
 	if (DashIndicator) DashIndicator->HideIndicator();
 
 	PcIndicator = Cast<UIndicatorWidget>(PcWidgetComponent->GetWidget());
-	if (PcIndicator) PcIndicator->InitWithValue(UGameplayStatics::GetPlayerControllerID(Cast<APlayerController>(GetController())));
+	// if (PcIndicator) PcIndicator->InitWithValue(UGameplayStatics::GetPlayerControllerID(Cast<APlayerController>(GetController())));
+	UpdateControllerIdDisplay(UGameplayStatics::GetPlayerControllerID(Cast<APlayerController>(GetController())));
 	
 	FVector PcWidgetComponentRelativeLocation = PcWidgetComponent->GetRelativeLocation();
 	PcWidgetComponent->SetRelativeLocation(FVector(PcWidgetComponentRelativeLocation.X, PcWidgetComponentRelativeLocation.Y, ControllerDisplayZOffset[PlayerType]));
@@ -1014,6 +1015,11 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, NotifyName.ToString());
+}
+
+void ASfCharacter::UpdateControllerIdDisplay(int ControllerId)
+{
+	if (PcIndicator) PcIndicator->InitWithValue(ControllerId);
 }
 
 //////////////////////////////////////////////////////////////////////////

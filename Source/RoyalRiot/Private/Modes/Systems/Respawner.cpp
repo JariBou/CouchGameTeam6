@@ -94,6 +94,7 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	// Here we "apply" the change
 	Character->ChangePlayerType(Character->PlayerType, true);
 	RespawnData.PlayerController->Possess(Character);
+	Character->UpdateControllerIdDisplay(UGameplayStatics::GetPlayerControllerID(Cast<APlayerController>(RespawnData.PlayerController)));
 
 	Character->TriggerRespawnSound.Broadcast();
 
