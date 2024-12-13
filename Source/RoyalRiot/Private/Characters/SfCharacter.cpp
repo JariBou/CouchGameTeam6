@@ -69,11 +69,11 @@ bool ASfCharacter::IsFollowable()
 	return Health > 0;
 }
 
-void ASfCharacter::NiagaraSpawn(UNiagaraSystem* NSToUse)
+void ASfCharacter::NiagaraSpawn(UNiagaraSystem* NSToUse, USceneComponent* ComponentToAttach)
 {
 	NiagaraComponentOfPlayer = UNiagaraFunctionLibrary::SpawnSystemAttached(
 	NSToUse,
-	GetMesh(),
+	ComponentToAttach,
 	NAME_None,
 	FVector(0.f,0.f,0.f),
 	FRotator(0.f),
@@ -692,7 +692,7 @@ void ASfCharacter::AddHealth(float HealthDelta, bool IsVisual)
 	Health += HealthDelta;
 	Health = FMath::Clamp(Health, -1.f, MaxHealth);
 	OnHealthValueChange.Broadcast(this);
-	if(IsVisual && IsValid(NSHealth)) NiagaraSpawn(NSHealth); 
+	if(IsVisual && IsValid(NSHealth)) NiagaraSpawn(NSHealth, PlumComponent); 
 }
 
 void ASfCharacter::UsedHealingSource()
@@ -924,9 +924,8 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 				Pickable->AttachToComponent(this->GetMesh(),TransformRules,FName(RightHandBoneName));
 				IsCarrying = true;
 				CurrentPickable = Pickable;
-
-					Pickable->FeedbackWidget->RemoveFromParent();
-					Pickable->FeedbackWidget = nullptr;
+				Pickable->FeedbackWidget->RemoveFromParent();
+				Pickable->FeedbackWidget = nullptr;
 				
 				AWaterBucket* WaterBucket = Cast<AWaterBucket>(Pickable);
 				if(WaterBucket != nullptr)

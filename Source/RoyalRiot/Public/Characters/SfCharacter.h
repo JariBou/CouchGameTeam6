@@ -102,7 +102,7 @@ private:
 	float DestinationAngle; //Destination Rotation Based On RightJoystick
 
 	UFUNCTION()
-	void NiagaraSpawn(UNiagaraSystem* NSToUse);
+	void NiagaraSpawn(UNiagaraSystem* NSToUse, USceneComponent* ComponentToAttach);
 
 public:
 	/** Constructeur */
