@@ -26,6 +26,10 @@ void AMuddyGround::BeginPlay()
 	int RandomArrayIndex = FMath::RandRange(0, StaticMeshArray.Max() - 1);
 	
 	MuddyGroundMesh->SetStaticMesh(StaticMeshArray[RandomArrayIndex]);
+
+	float RandomScale = FMath::RandRange(SizeMin, SizeMax);
+
+	MuddyGroundMesh->SetWorldScale3D(FVector(RandomScale, RandomScale, RandomScale));
 	
 	if(MuddyGroundMesh != nullptr)
 	{
