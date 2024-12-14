@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "MuddyGround.generated.h"
 
-UCLASS()
+UCLASS(config=Game)
 class ROYALRIOT_API AMuddyGround : public AActor
 {
 	GENERATED_BODY()
@@ -63,7 +63,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStaticMeshComponent> Plane;
+	TObjectPtr<UStaticMeshComponent> Mesh;
 	
 private:
 

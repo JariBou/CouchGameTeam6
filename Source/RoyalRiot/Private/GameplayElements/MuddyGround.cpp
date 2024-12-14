@@ -4,6 +4,7 @@
 #include "GameplayElements/MuddyGround.h"
 
 #include "Characters/SfCharacter.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -12,7 +13,7 @@ AMuddyGround::AMuddyGround()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	Plane = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Plane"));
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Plane"));
 }
 
 // Called when the game starts or when spawned
@@ -66,26 +67,28 @@ void AMuddyGround::Tick(float DeltaTime)
 void AMuddyGround::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ASfCharacter* Character = Cast<ASfCharacter>(OtherActor);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Hurtbox Collision");
 
-	if(Character == nullptr) return;
-	if (OverlappingActorsAndSpeedOnEnter.Contains(Character)) return;
-		
-	Character->StartFeedBackEffect(true);
+		ASfCharacter* Character = Cast<ASfCharacter>(OtherActor);
 
-	//Add character in list of overlapping characters, character as key and speed as value
-	OverlappingActorsAndSpeedOnEnter.Add(Character, Character->GetCharacterMovement()->MaxWalkSpeed);
-
-	//Add character in list of overlapping characters, character as key and dash distance as value
-	OverlappingActorsAndDashDistancedOnEnter.Add(Character, Character->DashDistance);
+		if(Character == nullptr) return;
+		if (OverlappingActorsAndSpeedOnEnter.Contains(Character)) return;
 	
-	// //Change speed to speed * slow value
-	// if(SlowPercent > 0.0f) Character->GetCharacterMovement()->MaxWalkSpeed = Character->GetCharacterMovement()->MaxWalkSpeed * (SlowPercent / 100.0f);
-	//
-	// //Change dash distance value to dash distance * dash percentage
-	// if(DashDistancePercent > 0.0f) Character->DashDistance = OverlappingActorsAndDashDistancedOnEnter.FindRef(Character) * (DashDistancePercent / 100.0f);
-}
+		Character->StartFeedBackEffect(true);
 
+		//Add character in list of overlapping characters, character as key and speed as value
+		OverlappingActorsAndSpeedOnEnter.Add(Character, Character->GetCharacterMovement()->MaxWalkSpeed);
+
+		//Add character in list of overlapping characters, character as key and dash distance as value
+		OverlappingActorsAndDashDistancedOnEnter.Add(Character, Character->DashDistance);
+		
+		// //Change speed to speed * slow value
+		// if(SlowPercent > 0.0f) Character->GetCharacterMovement()->MaxWalkSpeed = Character->GetCharacterMovement()->MaxWalkSpeed * (SlowPercent / 100.0f);
+		//
+		// //Change dash distance value to dash distance * dash percentage
+		// if(DashDistancePercent > 0.0f) Character->DashDistance = OverlappingActorsAndDashDistancedOnEnter.FindRef(Character) * (DashDistancePercent / 100.0f);
+}
+	
 bool AMuddyGround::RemoveActorDebuff(AActor* OtherActor)
 {
 	ASfCharacter* Character = Cast<ASfCharacter>(OtherActor);
