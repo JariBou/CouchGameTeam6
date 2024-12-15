@@ -4,6 +4,7 @@
 #include "GameplayElements/MuddyGround.h"
 
 #include "Characters/SfCharacter.h"
+#include "Characters/VibrationsFeedBack/Vibrations.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -72,7 +73,7 @@ void AMuddyGround::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		if(Character == nullptr) return;
 		if (OverlappingActorsAndSpeedOnEnter.Contains(Character)) return;
 	
-		Character->StartFeedBackEffect(Vibrations, VibrationTag, true);
+		Character->StartFeedBackEffect(Vibrations->Mud.ForceFeedbackEffect, Vibrations->Mud.Tag, true);
 
 		//Add character in list of overlapping characters, character as key and speed as value
 		OverlappingActorsAndSpeedOnEnter.Add(Character, Character->GetCharacterMovement()->MaxWalkSpeed);
@@ -93,7 +94,7 @@ bool AMuddyGround::RemoveActorDebuff(AActor* OtherActor)
 
 	if(Character == nullptr) return true;
 
-	Character->StopFeedBackEffect(Vibrations, VibrationTag);
+	Character->StopFeedBackEffect(Vibrations->Mud.ForceFeedbackEffect, Vibrations->Mud.Tag);
 	if (!OverlappingActorsAndSpeedOnEnter.Contains(Character)) return true;
 
 	//Set character speed to its value before entering and remove it from overlapping characters list
