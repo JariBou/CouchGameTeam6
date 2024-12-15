@@ -21,7 +21,9 @@
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacterInputData.h"
 #include "Characters/SfCharacterStateMachine.h"
+#include "Characters/VibrationsFeedBack/Vibrations.h"
 #include "Components/BoxComponent.h"
+#include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "GameplayElements/WaterBucket.h"
 #include "GameplayElements/Events/VisualEventHandler.h"
 #include "Kismet/GameplayStatics.h"
@@ -634,11 +636,19 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 {
 	if(CanBeDamagedCustom())
 	{
+		//Start vibrations when taking damages
+		StartFeedBackEffect(
+			VibrationsData->TakeDamage.ForceFeedbackEffect,
+			VibrationsData->TakeDamage.Tag,
+			false,
+			this
+		);	
+		
 		IsUnderInvincibilityTime = true;
 		InvisibilityAdvancement = 0.f;
 		TriggerTakeDamageSound.Broadcast();
 
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Player Takes Damage");
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "Player Takes Damage");
 
 		IsMatDmgRed = true;
 		DmgRedAdvancement = 0.f;
@@ -673,6 +683,23 @@ void ASfCharacter::Kill(ASfCharacter* DmgDealer)
 	IsDead = true;
 	
 	TriggerDeathSound.Broadcast();
+
+	//Start vibrations when getting killed
+	StartFeedBackEffect(
+		VibrationsData->Death.ForceFeedbackEffect,
+		VibrationsData->Death.Tag,
+		false,
+		this
+	);
+
+	//Start vibrations when killing opponent
+	StartFeedBackEffect(
+		VibrationsData->KillOpponent.ForceFeedbackEffect,
+		VibrationsData->KillOpponent.Tag,
+		false,
+		DmgDealer
+	);
+	
 	
 	ASfGameMode* SfGameMode = Cast<ASfGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (SfGameMode != nullptr) SfGameMode->NotifyPlayerKilled(DmgDealer, this);
@@ -943,6 +970,22 @@ void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 	{
 		FriendlyKnight->FeedbackWidget->RemoveFromParent();
 		CurrentPickable->FeedbackWidget = nullptr;
+
+		//Start vibrations on Squire when giving item
+		StartFeedBackEffect(
+						VibrationsData->SquireGive.ForceFeedbackEffect,
+						VibrationsData->SquireGive.Tag,
+						false,
+						this
+		);
+
+		//Start vibrations on FriendlyKnight when receiving item
+		FriendlyKnight->StartFeedBackEffect(
+						VibrationsData->KnightReceive.ForceFeedbackEffect,
+						VibrationsData->KnightReceive.Tag,
+						false,
+						FriendlyKnight
+		);
 		
 		APickable* DroppedPickable = Drop(); //Lache Son Arme
 		
@@ -987,18 +1030,23 @@ void ASfCharacter::SetFeedbackWidget(UUserWidget* NewFeedbackWidget)
 
 #pragma endregion
 
-void ASfCharacter::StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping)
+void ASfCharacter::StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping, ASfCharacter* Character)
 {
 	FForceFeedbackParameters FeedbackParams;
 	FeedbackParams.bLooping = IsLooping;
 	FeedbackParams.Tag = ForceFeedBackEffectTag;
 	
-	Cast<APlayerController>(GetController())->ClientPlayForceFeedback(ForceFeedbackEffect, FeedbackParams);
+	Cast<APlayerController>(Character->GetController())->ClientPlayForceFeedback(ForceFeedbackEffect, FeedbackParams);
 }
 
-void ASfCharacter::StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag)
+void ASfCharacter::StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag, ASfCharacter* Character)
 {
-	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedbackEffectTag);
+	Cast<APlayerController>(Character->GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedbackEffectTag);
+}
+
+TObjectPtr<UVibrations> ASfCharacter::GetVibrationsData()
+{
+	return VibrationsData;
 }
 
 void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)

@@ -7,6 +7,7 @@
 
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacter.h"
+#include "Characters/VibrationsFeedBack/Vibrations.h"
 #include "Kismet/GameplayStatics.h"
 #include "Modes/SfGameMode.h"
 
@@ -83,7 +84,7 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	// if (Character->PlayerType == Knight) Character->ActivateRagdollArms();
 
 	GameMode->OnPlayerRespawn.Broadcast(RespawnData.Team, -1.f, RespawnData.HadToFastRespawn ? DoNothing : HideIndicator);
-
+	
 	FTimerHandle NullHandle;
 	Character->GetGameInstance()->GetTimerManager().SetTimer(NullHandle, Character, &ASfCharacter::RemoveInvincibility, CharacterSettings->RespawnInvincibilityTime);
 
@@ -98,6 +99,13 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 
 	Character->TriggerRespawnSound.Broadcast();
 
+	//Start vibrations on player respawn
+	Character->StartFeedBackEffect(
+		Character->GetVibrationsData()->Respawn.ForceFeedbackEffect,
+		Character->GetVibrationsData()->Respawn.Tag,
+		false,
+		Character
+	);
 
 	// RespawnMap.Remove(RespawnData);
 }

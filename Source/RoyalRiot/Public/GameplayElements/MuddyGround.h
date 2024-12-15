@@ -77,10 +77,7 @@ private:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UForceFeedbackEffect> Vibrations;
-
-	UPROPERTY(EditAnywhere)
-	FName VibrationTag;
+	TObjectPtr<UVibrations> Vibrations;
 	
 #pragma endregion
 };
