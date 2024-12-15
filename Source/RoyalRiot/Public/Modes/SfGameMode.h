@@ -11,6 +11,8 @@
 #include "Systems/Respawner.h"
 #include "SfGameMode.generated.h"
 
+class UUserWidgetBlueprint;
+
 USTRUCT(BlueprintType)
 struct FTeamInfo
 {
@@ -73,7 +75,7 @@ public:
 	FOnPlayerRespawn OnPlayerRespawn;
 
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<UWorld> MainMenuLevel;
+	TSubclassOf<UUserWidget> EndGameMenu;
 
 	ASfGameMode();
 	

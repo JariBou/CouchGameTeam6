@@ -7,6 +7,7 @@
 
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.h"
+#include "Blueprint/UserWidgetBlueprint.h"
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacter.h"
 #include "GameFramework/PlayerStart.h"
@@ -217,7 +218,17 @@ bool ASfGameMode::CheckEndOfGame()
 void ASfGameMode::OnEndOfGame()
 {
 	// TODO: Clément
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), MainMenuLevel);
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	//AHUD* GameHUD = PlayerController->GetHUD();
+	UUserWidget* CreatedWidget = CreateWidget<UUserWidget>(PlayerController, EndGameMenu);
+	
+	FInputModeGameAndUI UIMode;
+	UIMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+	UIMode.SetHideCursorDuringCapture(false);
+	
+	PlayerController->SetInputMode(UIMode);
+
+	CreatedWidget->AddToViewport(1);
 }
 
 void ASfGameMode::CreateAndInitPlayers() const
