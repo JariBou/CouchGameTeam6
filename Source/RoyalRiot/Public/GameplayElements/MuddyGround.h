@@ -72,4 +72,15 @@ private:
 	TMap<TObjectPtr<ASfCharacter>, float> OverlappingActorsAndDashDistancedOnEnter;
 	
 #pragma endregion
+
+#pragma region Vibrations Feedback
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UForceFeedbackEffect> Vibrations;
+
+	UPROPERTY(EditAnywhere)
+	FName VibrationTag;
+	
+#pragma endregion
 };
