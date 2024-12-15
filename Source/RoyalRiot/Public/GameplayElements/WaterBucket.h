@@ -40,7 +40,7 @@ public:
 
 	void UpdateMesh();
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsFilled = false;
 
 protected:
