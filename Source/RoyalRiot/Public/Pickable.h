@@ -50,7 +50,7 @@ public:
 
 	virtual void NiagaraDropSystem_Implementation() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Bitmask, BitmaskEnum = ETypeOfPickable))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Bitmask, BitmaskEnum = "/Script/RoyalRiot.ETypeOfPickable"))
 	int32 PickableType = 0;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)

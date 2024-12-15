@@ -16,11 +16,11 @@ struct ROYALRIOT_API FEventInfo : public FTableRowBase
 	GENERATED_BODY()
 		 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 EventDuration;
+	int32 EventDuration = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AEventActor> EventBp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 EventSpawnCount;
+	uint8 EventSpawnCount = 1;
 };

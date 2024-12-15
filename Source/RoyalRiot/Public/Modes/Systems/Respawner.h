@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <Teams.h>
+
 #include "CoreMinimal.h"
 #include "TypeOfPickable.h"
 #include "UObject/Object.h"
@@ -18,7 +20,7 @@ struct FRespawnData
 
 	public:
 	UPROPERTY()
-	TEnumAsByte<ETeam> Team;
+	TEnumAsByte<ETeam> Team = Team1;
 
 	UPROPERTY()
 	AController* PlayerController;

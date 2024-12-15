@@ -17,13 +17,13 @@ struct FTeamInfo
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	TEnumAsByte<ETeam> Team;
+	TEnumAsByte<ETeam> Team = Team1;
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ASfCharacter*> Players;
 
 	UPROPERTY(BlueprintReadOnly)
-	uint8 Lives; // <==== UINT8
+	uint8 Lives = 1; // <==== UINT8
 
 	void AddPlayer(ASfCharacter* Player)
 	{

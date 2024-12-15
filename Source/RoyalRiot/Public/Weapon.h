@@ -56,7 +56,7 @@ private:
 #pragma region Data Table
 public:
 	#pragma region Property
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(RowType = "WeaponInfo"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(RowType = "/Script/RoyalRiot.WeaponInfo"))
 	FDataTableRowHandle Weapon;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -76,8 +76,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentData(FWeaponInfo NewData);
 #pragma endregion
-
-
 
 #pragma region Sounds
 

@@ -14,7 +14,7 @@ struct FPlayerSelectionInfo
 	GENERATED_BODY()
 
 	UPROPERTY()
-	uint8 ControllerId;
+	uint8 ControllerId = 0xFF;
 
 	UPROPERTY() // Should be obsolete lmao
 	APlayerController* PlayerController = nullptr;

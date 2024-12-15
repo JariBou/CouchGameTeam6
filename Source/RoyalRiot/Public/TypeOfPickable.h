@@ -8,9 +8,9 @@
 UENUM(BlueprintType, meta=(Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum ETypeOfPickable : uint8
 {
-	NONE = 0 UMETA(Hidden),
-	KNIGHT = 1 << 0,
-	SQUIRE = 1 << 1,
+	PickableByNone = 0 UMETA(Hidden),
+	PickableByKnight = 1 << 0,
+	PickableBySquire = 1 << 1,
 };
 ENUM_CLASS_FLAGS(ETypeOfPickable);
 

@@ -25,16 +25,16 @@ struct FCharacterSettingsData
 	TSubclassOf<UAnimInstance> AnimBlueprint;
 
 	UPROPERTY(EditAnywhere)
-	uint8 MaxHealth;
+	uint8 MaxHealth = 0xFF;
 	
 	UPROPERTY(EditAnywhere)
-	float InvincibilityTimeAfterHit;
+	float InvincibilityTimeAfterHit = .1f;
 
 	UPROPERTY(EditAnywhere)
-	float KnockbackForce;
+	float KnockbackForce = .1f;
 
 	UPROPERTY(EditAnywhere)
-	FVector Scale;
+	FVector Scale = FVector(1, 1, 1);
 	
 };
 

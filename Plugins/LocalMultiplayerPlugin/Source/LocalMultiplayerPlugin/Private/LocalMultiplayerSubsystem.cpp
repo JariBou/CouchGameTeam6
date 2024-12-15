@@ -15,7 +15,7 @@ void ULocalMultiplayerSubsystem::CreateAndInitPlayers(ELocalMultiplayerInputMapp
 
 	for (int i = 0; i < LocalMultiplayerSettings->GetNbKeyboardProfiles() + LocalMultiplayerSettings->nbMaxGamepads; ++i)
 	{
-		APlayerController* PlayerController = UGameplayStatics::CreatePlayer(GetWorld(), i);
+		APlayerController* PlayerController = i==0 ? UGameplayStatics::GetPlayerController(GetWorld(),  0) : UGameplayStatics::CreatePlayer(GetWorld(), i);
 		if (PlayerIndexFromKeyboardProfileIndex.Contains(i))
 		{
 			// Reassign doode
