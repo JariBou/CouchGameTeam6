@@ -16,6 +16,7 @@
 #include "PhysicsEngine/PhysicalAnimationComponent.h"
 #include "SfCharacter.generated.h"
 
+	class UVibrations;
 	class UWidgetComponent;
 	class UNiagaraSystem;
 class UBoxComponent;
@@ -514,9 +515,15 @@ public:
 #pragma region Vibrations feedbacks
 
 public:
-	void StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping);
+	void StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping, ASfCharacter* Character);
 
-	void StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag);
+	void StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag, ASfCharacter* Character);
+	
+	TObjectPtr<UVibrations> GetVibrationsData();
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UVibrations> VibrationsData;
 	
 #pragma endregion
 	

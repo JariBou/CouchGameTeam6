@@ -3,6 +3,8 @@
 
 #include "Weapon.h"
 
+#include "Characters/VibrationsFeedBack/Vibrations.h"
+
 
 // Sets default values
 AWeapon::AWeapon()
@@ -85,6 +87,15 @@ bool AWeapon::DealDamage(ASfCharacter* Target)
 	});
 
 	Target->TakeDamageCustom(Holder, GetDamage());
+
+	//Start vibration on holder when dealing damage
+	Holder->StartFeedBackEffect(
+		Holder->GetVibrationsData()->HitOpponent.ForceFeedbackEffect,
+		Holder->GetVibrationsData()->HitOpponent.Tag,
+		false,
+		Holder
+	);
+	
 	Durability--;
 	
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Weapon Takes DAMAAAAAAAAGE");
