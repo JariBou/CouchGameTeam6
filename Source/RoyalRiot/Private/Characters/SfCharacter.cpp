@@ -987,7 +987,7 @@ void ASfCharacter::SetFeedbackWidget(UUserWidget* NewFeedbackWidget)
 
 #pragma endregion
 
-void ASfCharacter::StartFeedBackEffect(bool IsLooping)
+void ASfCharacter::StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping)
 {
 	FForceFeedbackParameters FeedbackParams;
 	FeedbackParams.bLooping = IsLooping;
@@ -996,9 +996,9 @@ void ASfCharacter::StartFeedBackEffect(bool IsLooping)
 	Cast<APlayerController>(GetController())->ClientPlayForceFeedback(ForceFeedbackEffect, FeedbackParams);
 }
 
-void ASfCharacter::StopFeedBackEffect()
+void ASfCharacter::StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag)
 {
-	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedBackEffectTag);
+	Cast<APlayerController>(GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedbackEffectTag);
 }
 
 void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)

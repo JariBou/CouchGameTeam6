@@ -387,17 +387,6 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	float DashDistance = 0.f;
-
-	void StartFeedBackEffect(bool IsLooping);
-
-	void StopFeedBackEffect();
-
-protected:
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UForceFeedbackEffect> ForceFeedbackEffect;
-
-	UPROPERTY(EditAnywhere)
-	FName ForceFeedBackEffectTag;
 	
 #pragma endregion
 
@@ -521,5 +510,15 @@ public:
 	void UpdateControllerIdDisplay(int ControllerId);
 
 	#pragma endregion
+
+#pragma region Vibrations feedbacks
+
+public:
+	void StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping);
+
+	void StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag);
+	
+#pragma endregion
+	
 };
 

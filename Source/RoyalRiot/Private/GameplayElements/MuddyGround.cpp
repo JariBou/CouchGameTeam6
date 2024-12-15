@@ -72,7 +72,7 @@ void AMuddyGround::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		if(Character == nullptr) return;
 		if (OverlappingActorsAndSpeedOnEnter.Contains(Character)) return;
 	
-		Character->StartFeedBackEffect(true);
+		Character->StartFeedBackEffect(Vibrations, VibrationTag, true);
 
 		//Add character in list of overlapping characters, character as key and speed as value
 		OverlappingActorsAndSpeedOnEnter.Add(Character, Character->GetCharacterMovement()->MaxWalkSpeed);
@@ -93,7 +93,7 @@ bool AMuddyGround::RemoveActorDebuff(AActor* OtherActor)
 
 	if(Character == nullptr) return true;
 
-	Character->StopFeedBackEffect();
+	Character->StopFeedBackEffect(Vibrations, VibrationTag);
 	if (!OverlappingActorsAndSpeedOnEnter.Contains(Character)) return true;
 
 	//Set character speed to its value before entering and remove it from overlapping characters list
