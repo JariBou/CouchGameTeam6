@@ -787,6 +787,7 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	
 	//Btw si j'avais dit de créer un BP du puits c'est pas pour rien....
 	//C reel ca, mais va y c la faute de clément chef
+	// if (IsDashing || IsDead) return;
 
 	TArray<AActor*> ListOfActorFromCollision;
 	UEventHandler* FoundWell = nullptr;
@@ -1074,7 +1075,7 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 	} else if (NotifyName == "EndDash")
 	{
 		IsDashing = false;
-		ActivateRagdollArms(true);
+		if (PlayerType == Knight) ActivateRagdollArms(true);
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));
