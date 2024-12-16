@@ -177,11 +177,12 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	const FRespawnData respawnData {
 		Dead->PlayerTeam,
 		Dead->GetController(),
+		Dead,
 	};
 	
 	respawnData.PlayerController->UnPossess();
 	TeamMap[Dead->PlayerTeam].RemovePlayer(Dead);
-	Dead->Destroy();
+	// Dead->Destroy();
 	
 	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight, true);
 	// TeamMap[Dead->PlayerTeam].Players[0]->PlayerType = Knight;

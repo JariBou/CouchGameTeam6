@@ -632,7 +632,7 @@ void ASfCharacter::SetUpArmsRagdoll()
 bool ASfCharacter::CanBeDamagedCustom()
 {
 	// Actually I'm not sure we really use this CanBeDamaged() but well, it works
-	return CanBeDamaged() && !IsUnderInvincibilityTime;
+	return CanBeDamaged() && !IsUnderInvincibilityTime && !IsDead;
 }
 
 bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
