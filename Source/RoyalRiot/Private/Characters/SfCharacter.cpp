@@ -183,7 +183,10 @@ void ASfCharacter::BeginPlay()
 	UpdateControllerIdDisplay(UGameplayStatics::GetPlayerControllerID(Cast<APlayerController>(GetController())));
 	
 	FVector PcWidgetComponentRelativeLocation = PcWidgetComponent->GetRelativeLocation();
-	PcWidgetComponent->SetRelativeLocation(FVector(PcWidgetComponentRelativeLocation.X, PcWidgetComponentRelativeLocation.Y, ControllerDisplayZOffset[PlayerType]));
+	PcWidgetComponent->SetRelativeLocation(FVector(PcWidgetComponentRelativeLocation.X, PcWidgetComponentRelativeLocation.Y, ControllerDisplayZPosition[PlayerType]));
+	
+	FVector IndixatorWidgetComponentRelativeLocation = IndixatorWidgetComponent->GetRelativeLocation();
+	IndixatorWidgetComponent->SetRelativeLocation(FVector(IndixatorWidgetComponentRelativeLocation.X, IndixatorWidgetComponentRelativeLocation.Y, IndixatorWidgetComponentRelativeLocation.Z + DashIndicatorZOffset[PlayerType]));
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -1097,7 +1100,7 @@ void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool
 	}
 
 	FVector PcWidgetComponentRelativeLocation = PcWidgetComponent->GetRelativeLocation();
-	PcWidgetComponent->SetRelativeLocation(FVector(PcWidgetComponentRelativeLocation.X, PcWidgetComponentRelativeLocation.Y, ControllerDisplayZOffset[TypeOfPlayer]));
+	PcWidgetComponent->SetRelativeLocation(FVector(PcWidgetComponentRelativeLocation.X, PcWidgetComponentRelativeLocation.Y, ControllerDisplayZPosition[TypeOfPlayer]));
 	
 	InputData = Settings->GetInputDataFromPlayerType(PlayerType);
 	BindInputMoveAndActions();

@@ -505,7 +505,10 @@ public:
 	UIndicatorWidget* PcIndicator;
 
 	UPROPERTY(EditAnywhere)
-	TMap<TEnumAsByte<TypeOfPlayer>, float> ControllerDisplayZOffset;
+	TMap<TEnumAsByte<TypeOfPlayer>, float> ControllerDisplayZPosition;
+
+	UPROPERTY(EditAnywhere)
+	TMap<TEnumAsByte<TypeOfPlayer>, float> DashIndicatorZOffset;
 
 	UFUNCTION()
 	void UpdateControllerIdDisplay(int ControllerId);
