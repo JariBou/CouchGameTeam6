@@ -203,6 +203,11 @@ float ASfGameMode::GetTimer()
 	return Timer;
 }
 
+void ASfGameMode::SetTimeDilation(float NewTimeDilation)
+{
+	GetWorld()->GetWorldSettings()->SetTimeDilation(NewTimeDilation);
+}
+
 bool ASfGameMode::CheckEndOfGame()
 {
 	isGameOver = false;
