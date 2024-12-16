@@ -26,6 +26,9 @@ struct FRespawnData
 	AController* PlayerController;
 
 	UPROPERTY()
+	ASfCharacter* DeadCharacter;
+
+	UPROPERTY()
 	TEnumAsByte<TypeOfPlayer> TypeOfPlayer = Squire;
 	
 	UPROPERTY()

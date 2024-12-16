@@ -77,6 +77,8 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 {
 	if (TeamRespawnDelegateMap.Contains(RespawnData.Team)) TeamRespawnDelegateMap.Remove(RespawnData.Team);
 
+	if (RespawnData.DeadCharacter) RespawnData.DeadCharacter->Destroy();
+
 	const UCharacterSettings* CharacterSettings = GetDefault<UCharacterSettings>();
 	// USkeletalMesh* SkeletalMesh = CharacterSettings->CharacterInputDatas[Character->PlayerType].Mesh.LoadSynchronous();
 	// Character->ChangeSkeletalMesh(SkeletalMesh);
