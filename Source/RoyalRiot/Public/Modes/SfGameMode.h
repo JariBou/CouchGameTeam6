@@ -84,6 +84,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetTimer();
+
+	UFUNCTION(BlueprintCallable)
+	void SetTimeDilation(float NewTimeDilation);
 	
 private:
 	GENERATED_BODY()

@@ -47,5 +47,8 @@ public:
 	TObjectPtr<UInputAction> InputActionLeftTrigger;
 
 	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionSpecialRight;
+
+	UPROPERTY(EditAnywhere)
 	TMap<ESfCharacterStateID, TSubclassOf<USfCharacterState>> CharacterStates;
 };
