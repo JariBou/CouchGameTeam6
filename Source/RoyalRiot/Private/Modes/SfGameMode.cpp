@@ -187,7 +187,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight, true);
 	// TeamMap[Dead->PlayerTeam].Players[0]->PlayerType = Knight;
 
-	Dead->GetMesh()->SetSimulatePhysics(true);
+	Dead->DoRagdoll();
 
 	
 	ASfCharacter* NewCharacter = Respawner->QueueRespawn(respawnData, RespawnTime);

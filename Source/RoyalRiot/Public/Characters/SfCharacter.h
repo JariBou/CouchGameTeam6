@@ -522,6 +522,9 @@ public:
 	UFUNCTION()
 	void UpdateControllerIdDisplay(int ControllerId);
 
+	UFUNCTION()
+	void DoRagdoll();
+
 	#pragma endregion
 
 #pragma region Vibrations feedbacks

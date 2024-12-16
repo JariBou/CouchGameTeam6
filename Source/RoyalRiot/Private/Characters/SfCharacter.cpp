@@ -231,7 +231,7 @@ void ASfCharacter::Tick(float DeltaSeconds)
 
 	if(DashCooldownTimer > 0.f && !CanDash)
 	{
-		if(DashIndicator)
+		if(IndixatorWidgetComponent && DashIndicator)
 		{
 			DashIndicator->UpdateValue(FMath::Clamp(1- DashCooldownTimer/DashCooldown, 0.f, 1.f));
 		}
@@ -240,7 +240,7 @@ void ASfCharacter::Tick(float DeltaSeconds)
 		if(DashCooldownTimer <= 0.f)
 		{
 			CanDash = true;
-			if (DashIndicator) DashIndicator->HideIndicator();
+			if (IndixatorWidgetComponent && DashIndicator) DashIndicator->HideIndicator();
 		}
 	}
 	if(CanDash)
@@ -1085,6 +1085,13 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 void ASfCharacter::UpdateControllerIdDisplay(int ControllerId)
 {
 	if (PcIndicator) PcIndicator->InitWithValue(ControllerId);
+}
+
+void ASfCharacter::DoRagdoll()
+{
+	GetMesh()->SetSimulatePhysics(true);
+	PcWidgetComponent->DestroyComponent();
+	IndixatorWidgetComponent->DestroyComponent();
 }
 
 //////////////////////////////////////////////////////////////////////////
