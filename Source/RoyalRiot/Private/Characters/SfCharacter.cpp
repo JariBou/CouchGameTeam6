@@ -821,6 +821,7 @@ void ASfCharacter::PickUpAndThrowAction(const FInputActionInstance& Instance)
 	{
 		if(PlayerType == Squire && FriendlyKnight != nullptr)
 		{
+			// PlayAnimMontage(GiveObjectMontage);
 			GiveToKnight(FriendlyKnight);
 		}
 		else if(APickable* obj = Cast<APickable>(ClosestActor); obj != nullptr) //Switch
@@ -964,6 +965,7 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 					Pickable->FeedbackWidget->RemoveFromParent();
 					Pickable->FeedbackWidget = nullptr;
 				}
+				//PlayAnimMontage(PickupObjectMontage);
 				AWaterBucket* WaterBucket = Cast<AWaterBucket>(Pickable);
 				if(WaterBucket != nullptr)
 				{

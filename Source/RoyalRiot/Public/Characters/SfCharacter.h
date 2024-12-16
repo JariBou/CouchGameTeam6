@@ -491,6 +491,12 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> LungeAnimMontage;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> PickupObjectMontage;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> GiveObjectMontage;
 	
 	UFUNCTION()
 	void OnAnimMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
