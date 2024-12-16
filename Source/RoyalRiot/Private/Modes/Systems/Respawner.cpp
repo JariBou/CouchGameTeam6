@@ -54,7 +54,7 @@ ASfCharacter* URespawner::QueueRespawn(FRespawnData RespawnData, float Delay)
 	Character->PlayerTeam = RespawnData.Team;
 	Character->PlayerType = RespawnData.TypeOfPlayer;
 	Character->SetInvincibility(true);
-
+	
 	FTimerHandle TimerHandle;
 	FTimerDelegate TimerDelegate;
 
@@ -108,6 +108,6 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 		false,
 		Character
 	);
-
+	
 	// RespawnMap.Remove(RespawnData);
 }
