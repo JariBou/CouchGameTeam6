@@ -17,6 +17,15 @@ class ROYALRIOT_API AConsumableSpawner : public AActor
 		// Sets default values for this actor's properties
 		AConsumableSpawner();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HasValidConsumable();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnConsumableSpawned();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnConsumablePickedUp();
+
 	protected:
 		// Called when the game starts or when spawned
 		virtual void BeginPlay() override;
@@ -26,6 +35,7 @@ class ROYALRIOT_API AConsumableSpawner : public AActor
 
 	UFUNCTION()
 	void OnSpawnedItemPickedUp();
+	
 
 	public:
 		// Called every frame

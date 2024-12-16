@@ -19,6 +19,7 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+	IsNiagaraOn = false;
 	StaticMeshComponent->SetSimulatePhysics(true);
 	FWeaponInfo* row = Weapon.DataTable->FindRow<FWeaponInfo>(Weapon.RowName, "");
 	if (row == nullptr)
