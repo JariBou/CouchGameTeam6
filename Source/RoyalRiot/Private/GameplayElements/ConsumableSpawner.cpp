@@ -12,6 +12,11 @@ AConsumableSpawner::AConsumableSpawner()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
+bool AConsumableSpawner::HasValidConsumable()
+{
+	return Consumable != nullptr;
+}
+
 // Called when the game starts or when spawned
 void AConsumableSpawner::BeginPlay()
 {
@@ -31,6 +36,7 @@ void AConsumableSpawner::SpawnRandomConsumable()
 	TSubclassOf<AConsumable> ConsumableClass = *UArrayUtils::GetRandomElement(PossibleConsumables);
 	Consumable = GetWorld()->SpawnActor<AConsumable>(ConsumableClass, GetActorLocation(), GetActorRotation());
 	Consumable->OnPickedUp.AddDynamic(this, &AConsumableSpawner::OnSpawnedItemPickedUp);
+	OnConsumableSpawned();
 }
 
 void AConsumableSpawner::OnSpawnedItemPickedUp()
@@ -39,6 +45,7 @@ void AConsumableSpawner::OnSpawnedItemPickedUp()
 	Consumable = nullptr;
 	FTimerHandle NullHandle;
 	GetWorldTimerManager().SetTimer(NullHandle, this, &AConsumableSpawner::SpawnRandomConsumable, SpawnDelay);
+	OnConsumablePickedUp();
 }
 
 // Called every frame
