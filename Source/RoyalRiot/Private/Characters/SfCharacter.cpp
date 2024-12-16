@@ -37,7 +37,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 void ASfCharacter::OnDelegateStickCircleLate()
 {
-	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && !IsThrustAnimLaunched && !IsRotationAnimLaunched)
+	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && !IsThrustAnimLaunched && !IsRotationAnimLaunched &&!IsDashing)
 	{
 		// Réussite du stick toupie lol
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
@@ -322,7 +322,7 @@ void ASfCharacter::OnInputRun(const FInputActionValue& InputActionValue)
 void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 {
 	//TriggerDodgeSound.Broadcast();
-	if (!CanDash) return;
+	if (!CanDash || IsThrustAnimLaunched || IsRotationAnimLaunched) return;
 	// Pas ouf de changer de state dans tout les cas
 	if (DashIndicator) DashIndicator->ShowIndicator();
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
@@ -354,7 +354,7 @@ void ASfCharacter::OnDelegateStickCircleThrustEnd()
 	// if(FMath::Abs(FMath::RadiansToDegrees(CurrentDeltaMadeByStick)) >= MaxAngleForThrust) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Stick Superior"));
 
 	// TODO: should only be called on joystick cancelation basically, Or should it?
-	if (!IsThrustAnimLaunched && !IsRotationAnimLaunched)
+	if (!IsThrustAnimLaunched && !IsRotationAnimLaunched && !IsDashing)
 	{
 		ActivateRagdollArms(false);
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("StickThrustEnd"));
@@ -378,7 +378,7 @@ void ASfCharacter::RightJoystickStarted(const FInputActionValue& InputActionValu
 
 void ASfCharacter::RightJoystickEnded(const FInputActionValue& InputActionValue)
 {
-	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && !IsRotationAnimLaunched && !IsThrustAnimLaunched)
+	if(FMath::Abs(NumberOfRotationMadeByStick) >= NumberOfRotationNeeded && !IsRotationAnimLaunched && !IsThrustAnimLaunched && !IsDashing)
 	{
 		// Réussite du stick toupie lol
 		// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, TEXT("Réussi"));
@@ -880,6 +880,11 @@ void ASfCharacter::PickUpAndThrow(TArray<AActor*>& ArrayOfPickable)
 		Drop();
 	} else //Si il n'en a pas dans les mains
 	{
+		ArrayOfPickable.RemoveAll([&](const AActor* Actor)
+		{
+			const APickable* Pickable = Cast<APickable>(Actor);
+			return Pickable != nullptr && Pickable->Holder != nullptr;
+		});
 		APickable* PickableObject = Cast<APickable>(GetClosestActorToCharacterInArray(ArrayOfPickable));
 		if(PickableObject != nullptr) PickupObject(PickableObject);
 	}
@@ -954,9 +959,11 @@ void ASfCharacter::PickupObject(APickable* Pickable, bool Force)
 				Pickable->AttachToComponent(this->GetMesh(),TransformRules,FName(RightHandBoneName));
 				IsCarrying = true;
 				CurrentPickable = Pickable;
-				Pickable->FeedbackWidget->RemoveFromParent();
-				Pickable->FeedbackWidget = nullptr;
-				
+				if (Pickable->FeedbackWidget)
+				{
+					Pickable->FeedbackWidget->RemoveFromParent();
+					Pickable->FeedbackWidget = nullptr;
+				}
 				AWaterBucket* WaterBucket = Cast<AWaterBucket>(Pickable);
 				if(WaterBucket != nullptr)
 				{
@@ -1061,6 +1068,10 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 	} else if (NotifyName == "EndThrust")
 	{
 		IsThrustAnimLaunched = false;
+		ActivateRagdollArms(true);
+	} else if (NotifyName == "EndDash")
+	{
+		IsDashing = false;
 		ActivateRagdollArms(true);
 	}
 

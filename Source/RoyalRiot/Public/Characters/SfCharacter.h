@@ -169,6 +169,9 @@ public:
 	UPROPERTY()
 	bool CanDash = true;
 
+	UPROPERTY()
+	bool IsDashing;
+
 protected:
 	UPROPERTY()
 	FVector2D InputMove = {0.f, 0.f};

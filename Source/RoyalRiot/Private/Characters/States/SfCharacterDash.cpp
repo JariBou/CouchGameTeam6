@@ -22,19 +22,22 @@ void USfCharacterDash::StateInit(USfCharacterStateMachine* InStateMachine)
 void USfCharacterDash::StateEnter(ESfCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
-	
+
 	Character->TriggerDodgeSound.Broadcast();
 	FVector MovementDirection;
+	Character->IsDashing = true;
 
 	if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Knight)
 	{
 		Character->SetCanBeDamaged(false);
+		Character->ActivateRagdollArms(false);
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), KnightDashSound, Character->GetActorLocation());
 	}
 	else if(Character->PlayerType == TEnumAsByte<TypeOfPlayer>::EnumType::Squire)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SquireDashSound, Character->GetActorLocation());
 	}
+	Character->PlayAnimMontage(Montage);
 
 	if(Character->GetCharacterMovement()->Velocity == FVector::ZeroVector)
 	{
