@@ -187,6 +187,9 @@ void ASfCharacter::BeginPlay()
 	
 	FVector IndixatorWidgetComponentRelativeLocation = IndixatorWidgetComponent->GetRelativeLocation();
 	IndixatorWidgetComponent->SetRelativeLocation(FVector(IndixatorWidgetComponentRelativeLocation.X, IndixatorWidgetComponentRelativeLocation.Y, IndixatorWidgetComponentRelativeLocation.Z + DashIndicatorZOffset[PlayerType]));
+
+	CanDash = true;
+	DashCooldownTimer = 0;
 }
 
 void ASfCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -643,8 +646,7 @@ bool ASfCharacter::TakeDamageCustom(ASfCharacter* DmgDealer, float Amount)
 		StartFeedBackEffect(
 			VibrationsData->TakeDamage.ForceFeedbackEffect,
 			VibrationsData->TakeDamage.Tag,
-			false,
-			this
+			false
 		);	
 		
 		IsUnderInvincibilityTime = true;
@@ -691,16 +693,14 @@ void ASfCharacter::Kill(ASfCharacter* DmgDealer)
 	StartFeedBackEffect(
 		VibrationsData->Death.ForceFeedbackEffect,
 		VibrationsData->Death.Tag,
-		false,
-		this
-	);
+		false
+		);
 
 	//Start vibrations when killing opponent
 	StartFeedBackEffect(
 		VibrationsData->KillOpponent.ForceFeedbackEffect,
 		VibrationsData->KillOpponent.Tag,
-		false,
-		DmgDealer
+		false
 	);
 	
 	
@@ -988,16 +988,14 @@ void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 		StartFeedBackEffect(
 						VibrationsData->SquireGive.ForceFeedbackEffect,
 						VibrationsData->SquireGive.Tag,
-						false,
-						this
+						false
 		);
 
 		//Start vibrations on FriendlyKnight when receiving item
 		FriendlyKnight->StartFeedBackEffect(
 						VibrationsData->KnightReceive.ForceFeedbackEffect,
 						VibrationsData->KnightReceive.Tag,
-						false,
-						FriendlyKnight
+						false
 		);
 		
 		APickable* DroppedPickable = Drop(); //Lache Son Arme
@@ -1043,18 +1041,18 @@ void ASfCharacter::SetFeedbackWidget(UUserWidget* NewFeedbackWidget)
 
 #pragma endregion
 
-void ASfCharacter::StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping, ASfCharacter* Character)
+void ASfCharacter::StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping)
 {
 	FForceFeedbackParameters FeedbackParams;
 	FeedbackParams.bLooping = IsLooping;
 	FeedbackParams.Tag = ForceFeedBackEffectTag;
 	
-	Cast<APlayerController>(Character->GetController())->ClientPlayForceFeedback(ForceFeedbackEffect, FeedbackParams);
+	Cast<APlayerController>(this->GetController())->ClientPlayForceFeedback(ForceFeedbackEffect, FeedbackParams);
 }
 
-void ASfCharacter::StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag, ASfCharacter* Character)
+void ASfCharacter::StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag)
 {
-	Cast<APlayerController>(Character->GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedbackEffectTag);
+	Cast<APlayerController>(this->GetController())->ClientStopForceFeedback(ForceFeedbackEffect, ForceFeedbackEffectTag);
 }
 
 TObjectPtr<UVibrations> ASfCharacter::GetVibrationsData()
@@ -1098,7 +1096,7 @@ void ASfCharacter::DoRagdoll()
 // Input
 void ASfCharacter::ChangePlayerType(TEnumAsByte<TypeOfPlayer> TypeOfPlayer, bool ForceUpdate)
 {
-	// if (!ForceUpdate && PlayerType == TypeOfPlayer) return; // No Bloody clue as to why this doesn't work as expected
+	if (!ForceUpdate && PlayerType == TypeOfPlayer) return; // No Bloody clue as to why this doesn't work as expected
 	TEnumAsByte<::TypeOfPlayer> FormerPlayerType = PlayerType;
 	PlayerType = TypeOfPlayer;
 	const UCharacterSettings* Settings = GetDefault<UCharacterSettings>();

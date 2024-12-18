@@ -105,8 +105,7 @@ void URespawner::EndDeferredRespawn(FRespawnData RespawnData, ASfCharacter* Char
 	Character->StartFeedBackEffect(
 		Character->GetVibrationsData()->Respawn.ForceFeedbackEffect,
 		Character->GetVibrationsData()->Respawn.Tag,
-		false,
-		Character
+		false
 	);
 	
 	// RespawnMap.Remove(RespawnData);
