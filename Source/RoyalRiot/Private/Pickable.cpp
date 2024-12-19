@@ -19,20 +19,18 @@ APickable::APickable()
 
 void APickable::SetFeedbackWidget(UUserWidget* NewFeedbackWidget)
 {
-	if(FeedbackWidget == nullptr)
-	{
-		FeedbackWidget = NewFeedbackWidget;
-	}
-	else
-	{
-		FeedbackWidget->RemoveFromParent();
-		FeedbackWidget = NewFeedbackWidget;
-	}
+	if (FeedbackWidget != nullptr) FeedbackWidget->RemoveFromParent();
+	FeedbackWidget = NewFeedbackWidget;
 }
 
 void APickable::DestroyPickable()
 {
-	if (Holder != nullptr) Holder->Drop();
+	if (FeedbackWidget != nullptr) FeedbackWidget->RemoveFromParent();
+	if (Holder != nullptr)
+	{
+		Holder->IsCarrying = false;
+		Holder->CurrentPickable = nullptr;
+	}
 	Destroy();
 }
 

@@ -894,7 +894,7 @@ void ASfCharacter::PickUpAndThrow(TArray<AActor*>& ArrayOfPickable)
 
 void ASfCharacter::OnPickableCollisionTimeout(APickable* Pickable)
 {
-	if(Pickable != nullptr)	Pickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
+	if(IsValid(Pickable))	Pickable->StaticMeshComponent->IgnoreActorWhenMoving(this, false);
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
 

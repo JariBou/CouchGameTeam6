@@ -78,7 +78,7 @@ void AWeapon::DealtDamage()
 bool AWeapon::DealDamage(ASfCharacter* Target)
 {
 	if (Holder == nullptr || JustDealtDamage) return false;
-	if (Holder->PlayerType == Squire) return false;
+	if (Holder->PlayerType == Squire || Holder->IsDead) return false;
 	if (!Target->CanBeDamagedCustom()) return false;
 	
 	JustDealtDamage = true;
