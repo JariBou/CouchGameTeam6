@@ -114,7 +114,7 @@ void ASfGameMode::BeginPlay()
 			
 
 		TeamMap[NewCharacter->PlayerTeam].AddPlayer(NewCharacter);
-		NewCharacter->ChangePlayerType(NewCharacter->PlayerType);
+		NewCharacter->ChangePlayerType(NewCharacter->PlayerType, true);
 		// NewCharacter->ChangeSkeletalMesh(CharacterSettings->CharacterInputDatas[NewCharacter->PlayerType].Mesh.LoadSynchronous());
 
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());
@@ -184,7 +184,7 @@ void ASfGameMode::NotifyPlayerKilled(ASfCharacter* Killer, ASfCharacter* Dead)
 	TeamMap[Dead->PlayerTeam].RemovePlayer(Dead);
 	// Dead->Destroy();
 	
-	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight, true);
+	TeamMap[Dead->PlayerTeam].Players[0]->ChangePlayerType(Knight);
 	// TeamMap[Dead->PlayerTeam].Players[0]->PlayerType = Knight;
 
 	Dead->DoRagdoll();

@@ -93,13 +93,13 @@ bool AWeapon::DealDamage(ASfCharacter* Target)
 	Holder->StartFeedBackEffect(
 		Holder->GetVibrationsData()->HitOpponent.ForceFeedbackEffect,
 		Holder->GetVibrationsData()->HitOpponent.Tag,
-		false,
-		Holder
+		false
 	);
 	
 	Durability--;
 	
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "Weapon Takes DAMAAAAAAAAGE");
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, FString::SanitizeFloat(GetDamage()));
 
 	if (Durability <= 0)
 	{
@@ -118,6 +118,7 @@ void AWeapon::SetCurrentData(FWeaponInfo NewData)
 	CurrentDataRow = NewData;
 	Durability = CurrentDataRow.WeaponStats.Durability;
 	Life = CurrentDataRow.WeaponStats.Lifetime;
+	
 	//StaticMeshComponent->SetStaticMesh(CurrentDataRow.WeaponMesh.LoadSynchronous());
 }
 

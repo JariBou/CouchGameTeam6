@@ -530,9 +530,9 @@ public:
 #pragma region Vibrations feedbacks
 
 public:
-	void StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping, ASfCharacter* Character);
+	void StartFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedBackEffectTag, bool IsLooping);
 
-	void StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag, ASfCharacter* Character);
+	void StopFeedBackEffect(UForceFeedbackEffect* ForceFeedbackEffect, FName ForceFeedbackEffectTag);
 	
 	TObjectPtr<UVibrations> GetVibrationsData();
 

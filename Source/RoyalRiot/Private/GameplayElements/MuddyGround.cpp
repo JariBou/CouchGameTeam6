@@ -77,8 +77,7 @@ void AMuddyGround::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		Character->StartFeedBackEffect(
 			Vibrations->Mud.ForceFeedbackEffect,
 			Vibrations->Mud.Tag,
-			true,
-			Character
+			true
 		);
 
 		//Add character in list of overlapping characters, character as key and speed as value
@@ -102,8 +101,7 @@ bool AMuddyGround::RemoveActorDebuff(AActor* OtherActor)
 
 	Character->StopFeedBackEffect(
 		Vibrations->Mud.ForceFeedbackEffect,
-		Vibrations->Mud.Tag,
-		Character
+		Vibrations->Mud.Tag
 	);
 	if (!OverlappingActorsAndSpeedOnEnter.Contains(Character)) return true;
 
