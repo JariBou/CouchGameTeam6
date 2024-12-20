@@ -60,6 +60,8 @@ public:
 	TObjectPtr<UNiagaraComponent> NiagaraComponentOfPlayer;
 	UPROPERTY(EditAnywhere, Category="VFX")
 	TObjectPtr<UNiagaraSystem> NSHealth;
+	UPROPERTY(EditAnywhere, Category="VFX")
+	TObjectPtr<UNiagaraSystem> NSTrace;
 
 	UFUNCTION()
 	void OnDelegateStickCircleLate();

@@ -329,6 +329,11 @@ void ASfCharacter::OnInputDash(const FInputActionValue& InputActionValue)
 	// Pas ouf de changer de state dans tout les cas
 	if (DashIndicator) DashIndicator->ShowIndicator();
 	StateMachine->ChangeState(ESfCharacterStateID::Dash);
+	if(IsValid(NSTrace))
+	{
+		NiagaraSpawn(NSTrace, GetMesh());
+		NiagaraComponentOfPlayer->SetWorldLocation(GetMesh()->GetBoneLocation("Spine03"));
+	}
 }
 
 void ASfCharacter::RightJoystickInput(const FInputActionValue& InputActionValue)
@@ -1074,6 +1079,8 @@ void ASfCharacter::OnAnimMontageNotify(FName NotifyName, const FBranchingPointNo
 	{
 		IsDashing = false;
 		if (PlayerType == Knight) ActivateRagdollArms(true);
+		//Je sais pas ce que je fais je comprends pas votre dash les gars
+		if(IsValid(NiagaraComponentOfPlayer)) NiagaraComponentOfPlayer->Deactivate();
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString("AnimMontage Notify"));
