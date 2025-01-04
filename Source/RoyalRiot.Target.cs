@@ -16,6 +16,7 @@ public class RoyalRiotTarget : TargetRules
 
 	private void RegisterModulesCreatedByRider()
 	{
+		ExtraModuleNames.AddRange(new string[] { "LevelSelectionTool" });
 		// ExtraModuleNames.AddRange(new string[] { "ToolModule" });
 	}
 }

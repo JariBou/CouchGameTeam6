@@ -12,7 +12,7 @@ public class RoyalRiot : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "LocalMultiplayerPlugin",
-			"DeveloperSettings", "CameraSystemPlugin", "Niagara", "UMG"
+			"DeveloperSettings", "CameraSystemPlugin", "Niagara", "UMG", "UnrealEd"
 		});
 	}
 }

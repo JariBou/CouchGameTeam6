@@ -97,8 +97,10 @@ private:
 	UPROPERTY()
 	float RespawnTime;
 
-	virtual void BeginPlay() override;
+	virtual void StartPlay() override;
 
+	virtual void BeginPlay() override;
+	
 	virtual void Tick(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintCallable)

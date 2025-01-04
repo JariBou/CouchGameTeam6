@@ -5,12 +5,15 @@
 
 #include <Systems/CharacterSelectionSubsystem.h>
 
+#include "Editor.h"
+#include "LevelSelectionSettings.h"
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.h"
 #include "Blueprint/UserWidgetBlueprint.h"
 #include "Characters/CharacterSettings.h"
 #include "Characters/SfCharacter.h"
 #include "GameFramework/PlayerStart.h"
+#include "GameInstance/SfGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 ASfGameMode::ASfGameMode()
@@ -19,9 +22,52 @@ ASfGameMode::ASfGameMode()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void ASfGameMode::StartPlay()
+{
+	Super::StartPlay();
+
+#if UE_EDITOR
+
+	const ULevelSelectionSettings* LevelSelectionSettings = GetDefault<ULevelSelectionSettings>();
+
+	//USfGameInstance* GameInstance = Cast<USfGameInstance>(GetGameInstance());
+	//if(GameInstance == nullptr) return;
+
+	//&& FName(GetWorld()->GetName()) != LevelSelectionSettings->SelectedLevelName
+	if(LevelSelectionSettings->SelectedLevelName != FName(TEXT("None")) )
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("MAYBE WORLD"));
+
+		for(const TSoftObjectPtr<UWorld> World : LevelSelectionSettings->Levels)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("NO WORLD"));
+
+			if(FName(World.GetAssetName()) == LevelSelectionSettings->SelectedLevelName)
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("YES WORLD"));
+				//UWorld* WorldToLoad = LevelSelectionSettings->LoadWorldAsset(World);
+
+				FLatentActionInfo LatentInfo;
+				
+				UGameplayStatics::OpenLevel(
+					GetWorld(),
+					FName(World.GetAssetName())					
+				);
+
+				//GameInstance->HasEditorLevelLoaded = true;
+				
+				break;
+			}
+		}
+	}
+	
+#endif
+}
+
 void ASfGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	TeamScoreMap.Add(Team1);
 	TeamScoreMap.Add(Team2);
 
@@ -99,7 +145,8 @@ void ASfGameMode::BeginPlay()
 			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), SelectionInfo.ControllerId);
 			// Possess after finishing spawn IMO
 			PlayerController->Possess(NewCharacter);
-		}	
+		}
+		
 		#else
 		//Assign teams after selection
 		const FPlayerSelectionInfo& SelectionInfo = CharacterSelectionSubsystem->GetPlayerSelectionInfoFromId(i);
