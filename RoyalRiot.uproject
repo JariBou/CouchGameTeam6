@@ -12,7 +12,10 @@
 		{
 			"Name": "ToolModule",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Blutility"
+			]
 		}
 	],
 	"Plugins": [

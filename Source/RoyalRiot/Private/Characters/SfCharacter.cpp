@@ -1028,7 +1028,6 @@ void ASfCharacter::GiveToKnight(ASfCharacter* FriendlyKnight)
 void ASfCharacter::Interact()
 {
 	Drop();
-	//Interaction Event sur Puit a coder
 }
 
 void ASfCharacter::SetFeedbackWidget(UUserWidget* NewFeedbackWidget)

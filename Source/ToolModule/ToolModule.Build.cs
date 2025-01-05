@@ -11,6 +11,14 @@ public class ToolModule : ModuleRules
             {
                 "Core",
                 "RoyalRiot",
+                "UMGEditor",
+                "Blutility",
+                "UMG",
+                "Niagara",
+                "Json",
+                "JsonUtilities",
+                "AssetTools",
+                "UnrealEd"
             }
         );
 
@@ -23,6 +31,7 @@ public class ToolModule : ModuleRules
                 "SlateCore",
                 "ToolMenus",
                 "PropertyEditor",
+                "Niagara"
             }
         );
     }
