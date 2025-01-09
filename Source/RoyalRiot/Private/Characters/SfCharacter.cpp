@@ -230,7 +230,7 @@ void ASfCharacter::Tick(float DeltaSeconds)
 
 	
 
-	ManageCharacterRotation(DeltaSeconds);
+	//ManageCharacterRotation(DeltaSeconds);
 
 	if(DashCooldownTimer > 0.f && !CanDash)
 	{
